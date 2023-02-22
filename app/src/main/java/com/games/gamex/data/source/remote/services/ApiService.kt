@@ -1,4 +1,4 @@
-package com.games.gamex.data.source.remote
+package com.games.gamex.data.source.remote.services
 
 import com.games.gamex.data.source.remote.response.GamesResponse
 import retrofit2.Response

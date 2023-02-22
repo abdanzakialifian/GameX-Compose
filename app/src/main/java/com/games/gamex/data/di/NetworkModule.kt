@@ -1,6 +1,6 @@
 package com.games.gamex.data.di
 
-import com.games.gamex.data.source.remote.ApiService
+import com.games.gamex.data.source.remote.services.ApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,7 +13,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object NetworkModule {
+class NetworkModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
