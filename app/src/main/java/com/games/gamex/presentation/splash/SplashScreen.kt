@@ -3,6 +3,8 @@ package com.games.gamex.presentation.splash
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,7 +27,11 @@ fun SplashScreen(onNavigate: () -> Unit, modifier: Modifier = Modifier) {
         delay(3000L)
         onNavigate()
     }
+    SplashContent(modifier = modifier)
+}
 
+@Composable
+fun SplashContent(modifier: Modifier = Modifier) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splash_animation))
     val progress by animateLottieCompositionAsState(
         composition = composition,
@@ -48,6 +54,11 @@ fun SplashScreen(onNavigate: () -> Unit, modifier: Modifier = Modifier) {
 @Composable
 fun SplashScreenPreview() {
     GameXTheme {
-        SplashScreen(onNavigate = {})
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colors.background
+        ) {
+            SplashScreen(onNavigate = {})
+        }
     }
 }

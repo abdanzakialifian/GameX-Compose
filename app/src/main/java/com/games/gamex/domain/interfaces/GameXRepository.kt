@@ -1,9 +1,9 @@
 package com.games.gamex.domain.interfaces
 
-import com.games.gamex.data.source.remote.response.GamesResponse
-import com.games.gamex.utils.UiState
+import androidx.paging.PagingData
+import com.games.gamex.data.source.remote.response.GamesResultItem
 import kotlinx.coroutines.flow.Flow
 
 interface GameXRepository {
-    fun getGames(): Flow<UiState<GamesResponse>>
+    fun getAllGames(): Flow<PagingData<GamesResultItem>>
 }

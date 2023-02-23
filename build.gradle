@@ -10,7 +10,10 @@ buildscript {
         timber_version = '5.0.1'
         nav_version = '2.5.3'
         hilt_navigation_version = '1.0.0'
-        lottie_version = '4.0.0'
+        lottie_version = '5.0.3'
+        paging_version = '3.1.1'
+        paging_compose = '1.0.0-alpha17'
+        coil_compose = '2.2.2'
     }
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {

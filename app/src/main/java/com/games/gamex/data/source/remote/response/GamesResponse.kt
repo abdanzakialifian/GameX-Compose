@@ -14,7 +14,7 @@ data class GamesResponse(
 	val noIndex: Boolean? = null,
 
 	@field:SerializedName("nofollow_collections")
-	val noFollowCollections: List<String?>? = null,
+	val noFollowCollections: List<String>? = null,
 
 	@field:SerializedName("previous")
 	val previous: Any? = null,
@@ -38,7 +38,7 @@ data class GamesResponse(
 	val seoDescription: String? = null,
 
 	@field:SerializedName("results")
-	val results: List<ResultsItem?>? = null,
+	val results: List<GamesResultItem>? = null,
 
 	@field:SerializedName("seo_keywords")
 	val seoKeywords: String? = null
@@ -95,15 +95,6 @@ data class EsrbRating(
 	val slug: String? = null
 )
 
-data class RequirementsEn(
-
-	@field:SerializedName("minimum")
-	val minimum: String? = null,
-
-	@field:SerializedName("recommended")
-	val recommended: String? = null
-)
-
 data class RatingsItem(
 
 	@field:SerializedName("count")
@@ -122,7 +113,7 @@ data class RatingsItem(
 data class Filters(
 
 	@field:SerializedName("years")
-	val years: List<YearsItem?>? = null
+	val years: List<YearsItem>? = null
 )
 
 data class ParentPlatformsItem(
@@ -185,7 +176,7 @@ data class PlatformsItem(
 	val platform: Platform? = null
 )
 
-data class ResultsItem(
+data class GamesResultItem(
 
 	@field:SerializedName("added")
 	val added: Int? = null,
@@ -200,10 +191,10 @@ data class ResultsItem(
 	val playtime: Int? = null,
 
 	@field:SerializedName("short_screenshots")
-	val shortScreenshots: List<ShortScreenshotsItem?>? = null,
+	val shortScreenshots: List<ShortScreenshotsItem>? = null,
 
 	@field:SerializedName("platforms")
-	val platforms: List<PlatformsItem?>? = null,
+	val platforms: List<PlatformsItem>? = null,
 
 	@field:SerializedName("user_game")
 	val userGame: Any? = null,
@@ -215,10 +206,10 @@ data class ResultsItem(
 	val reviewsTextCount: Int? = null,
 
 	@field:SerializedName("ratings")
-	val ratings: List<RatingsItem?>? = null,
+	val ratings: List<RatingsItem>? = null,
 
 	@field:SerializedName("genres")
-	val genres: List<GenresItem?>? = null,
+	val genres: List<GenresItem>? = null,
 
 	@field:SerializedName("saturated_color")
 	val saturatedColor: String? = null,
@@ -230,7 +221,7 @@ data class ResultsItem(
 	val addedByStatus: AddedByStatus? = null,
 
 	@field:SerializedName("parent_platforms")
-	val parentPlatforms: List<ParentPlatformsItem?>? = null,
+	val parentPlatforms: List<ParentPlatformsItem>? = null,
 
 	@field:SerializedName("ratings_count")
 	val ratingsCount: Int? = null,
@@ -245,10 +236,10 @@ data class ResultsItem(
 	val suggestionsCount: Int? = null,
 
 	@field:SerializedName("stores")
-	val stores: List<StoresItem?>? = null,
+	val stores: List<StoresItem>? = null,
 
 	@field:SerializedName("tags")
-	val tags: List<TagsItem?>? = null,
+	val tags: List<TagsItem>? = null,
 
 	@field:SerializedName("background_image")
 	val backgroundImage: String? = null,
@@ -296,15 +287,6 @@ data class Store(
 	val slug: String? = null
 )
 
-data class RequirementsRu(
-
-	@field:SerializedName("minimum")
-	val minimum: String? = null,
-
-	@field:SerializedName("recommended")
-	val recommended: String? = null
-)
-
 data class YearsItem(
 
 	@field:SerializedName("filter")
@@ -326,7 +308,7 @@ data class YearsItem(
 	val to: Int? = null,
 
 	@field:SerializedName("years")
-	val years: List<YearsItem?>? = null,
+	val years: List<YearsItem>? = null,
 
 	@field:SerializedName("year")
 	val year: Int? = null

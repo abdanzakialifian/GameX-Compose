@@ -10,10 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.games.gamex.presentation.home.view.HomeScreen
+import com.games.gamex.presentation.home.viewmodel.HomeViewModel
 import com.games.gamex.presentation.navigation.Screen
 import com.games.gamex.presentation.splash.SplashScreen
 import com.games.gamex.presentation.ui.theme.GameXTheme
@@ -54,7 +56,8 @@ fun GameXApp() {
             })
         }
         composable(Screen.HomeScreen.route) {
-            HomeScreen()
+            val viewModel = hiltViewModel<HomeViewModel>()
+            HomeScreen(viewModel = viewModel)
         }
     }
 }

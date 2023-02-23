@@ -1,5 +1,6 @@
 package com.games.gamex.data.di
 
+import com.games.gamex.BuildConfig
 import com.games.gamex.data.source.remote.services.ApiService
 import dagger.Module
 import dagger.Provides
@@ -25,7 +26,7 @@ class NetworkModule {
                 // add query parameter key every request
                 val original = chain.request()
                 val originalHttpUrl = original.url
-                val apiKey = "API_KEY_RAWG"
+                val apiKey = BuildConfig.GAME_API_KEY
                 val url = originalHttpUrl.newBuilder()
                     .addQueryParameter("key", apiKey)
                     .build()
