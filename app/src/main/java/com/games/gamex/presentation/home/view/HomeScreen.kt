@@ -59,27 +59,27 @@ fun HomeContent(modifier: Modifier = Modifier, allGames: LazyPagingItems<GamesRe
             ),
             fontSize = 16.sp
         )
-    }
-    Spacer(modifier = Modifier.height(100.dp))
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                color = Color.White,
-                shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
-            )
-    ) {
-        LazyRow(
-            modifier = Modifier.padding(top = 10.dp),
-            contentPadding = PaddingValues(horizontal = 20.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            items(items = allGames, key = { it.id ?: 0 }) {
-                GameItem(
-                    image = it?.backgroundImage ?: "",
-                    title = it?.name ?: "",
-                    onNavigate = { }
+        Spacer(modifier = Modifier.height(100.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    color = Color.White,
+                    shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
                 )
+        ) {
+            LazyRow(
+                modifier = Modifier.padding(top = 10.dp),
+                contentPadding = PaddingValues(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(items = allGames, key = { it.id ?: 0 }) {
+                    GameItem(
+                        image = it?.backgroundImage ?: "",
+                        title = it?.name ?: "",
+                        onNavigate = { }
+                    )
+                }
             }
         }
     }
