@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.airbnb.lottie.LottieComposition
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
@@ -27,18 +28,17 @@ fun SplashScreen(onNavigate: () -> Unit, modifier: Modifier = Modifier) {
         delay(3000L)
         onNavigate()
     }
-    SplashContent(modifier = modifier)
-}
-
-@Composable
-fun SplashContent(modifier: Modifier = Modifier) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splash_animation))
     val progress by animateLottieCompositionAsState(
         composition = composition,
         speed = 2F,
         restartOnPlay = false
     )
+    SplashContent(composition = composition, progress = progress, modifier = modifier)
+}
 
+@Composable
+fun SplashContent(composition: LottieComposition?, progress: Float, modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize()) {
         LottieAnimation(
             modifier = Modifier
