@@ -2,4 +2,5 @@
     <string name="app_name">Game-X</string>
     <string name="welcome">Welcome,</string>
     <string name="welcome_sub_title">What would you like to play?</string>
+    <string name="search_game">Search game</string>
 </resources>

@@ -4,12 +4,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -18,11 +21,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.games.gamex.R
 import com.games.gamex.data.source.remote.response.GamesResultItem
+import com.games.gamex.presentation.component.CustomSearch
 import com.games.gamex.presentation.component.GameItem
 import com.games.gamex.presentation.home.viewmodel.HomeViewModel
 import com.games.gamex.presentation.ui.theme.GameXTheme
@@ -30,11 +35,16 @@ import com.games.gamex.presentation.ui.theme.GameXTheme
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewModel()) {
     val getAllGamesState = viewModel.getAllGames().collectAsLazyPagingItems()
-    HomeContent(modifier = modifier, allGames = getAllGamesState)
+
+    HomeContent(allGames = getAllGamesState, modifier = modifier)
 }
 
 @Composable
-fun HomeContent(modifier: Modifier = Modifier, allGames: LazyPagingItems<GamesResultItem>) {
+fun HomeContent(allGames: LazyPagingItems<GamesResultItem>, modifier: Modifier = Modifier) {
+    var searchValue by remember {
+        mutableStateOf("")
+    }
+
     Column(modifier = modifier.fillMaxSize()) {
         Text(
             modifier = Modifier.padding(
@@ -59,7 +69,14 @@ fun HomeContent(modifier: Modifier = Modifier, allGames: LazyPagingItems<GamesRe
             ),
             fontSize = 16.sp
         )
-        Spacer(modifier = Modifier.height(100.dp))
+        Spacer(modifier = Modifier.height(30.dp))
+        CustomSearch(
+            modifier = Modifier.padding(horizontal = 20.dp),
+            value = searchValue,
+            hint = stringResource(id = R.string.search_game),
+            onValueChange = { searchValue = it }
+        )
+        Spacer(modifier = Modifier.height(50.dp))
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -68,17 +85,45 @@ fun HomeContent(modifier: Modifier = Modifier, allGames: LazyPagingItems<GamesRe
                     shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
                 )
         ) {
-            LazyRow(
-                modifier = Modifier.padding(top = 10.dp),
-                contentPadding = PaddingValues(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                items(items = allGames, key = { it.id ?: 0 }) {
-                    GameItem(
-                        image = it?.backgroundImage ?: "",
-                        title = it?.name ?: "",
-                        onNavigate = { }
-                    )
+            Column {
+                Text(
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+                    text = "All game",
+                    color = Color.Black,
+                    fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
+                    fontSize = 18.sp
+                )
+                LazyRow(
+                    modifier = Modifier.padding(top = 10.dp),
+                    contentPadding = PaddingValues(horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(items = allGames, key = { it.id ?: 0 }) {
+                        GameItem(
+                            image = it?.backgroundImage ?: "",
+                            title = it?.name ?: "",
+                            onNavigate = { }
+                        )
+                    }
+                    when (allGames.loadState.append) {
+                        is LoadState.Loading -> {
+                            item {
+                                Column(
+                                    modifier = Modifier.height(190.dp).padding(horizontal = 8.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(30.dp), color = colorResource(
+                                            id = R.color.dark_grey
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                        is LoadState.NotLoading -> {}
+                        is LoadState.Error -> {}
+                    }
                 }
             }
         }

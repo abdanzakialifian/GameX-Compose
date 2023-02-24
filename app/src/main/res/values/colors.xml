@@ -10,4 +10,5 @@
     <color name="purple">#5F67EA</color>
     <color name="black_opacity_50">#80000000</color>
     <color name="black_opacity_15">#26000000</color>
+    <color name="dark_grey">#413F42</color>
 </resources>

@@ -34,7 +34,10 @@ fun GameItem(image: String, title: String, onNavigate: () -> Unit, modifier: Mod
             .clickable { onNavigate() }
     ) {
         AsyncImage(
+            modifier = Modifier.align(Alignment.Center),
             model = image,
+            placeholder = painterResource(id = R.drawable.ic_load),
+            error = painterResource(id = R.drawable.ic_broken_image),
             contentDescription = "Image Game",
             contentScale = ContentScale.Crop
         )
@@ -44,8 +47,8 @@ fun GameItem(image: String, title: String, onNavigate: () -> Unit, modifier: Mod
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
+                            colorResource(id = R.color.black_opacity_15),
                             colorResource(id = R.color.black_opacity_50),
-                            colorResource(id = R.color.black_opacity_15)
                         )
                     )
                 )

@@ -4,6 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.games.gamex.data.source.remote.response.GamesResultItem
 import com.games.gamex.data.source.remote.services.ApiService
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,6 +17,7 @@ class GamesPagingSource @Inject constructor(private val apiService: ApiService) 
 
         return try {
             val response = apiService.getGames(position, params.loadSize)
+            delay(3000L)
             val responseBody = response.body()?.results
             LoadResult.Page(
                 data = responseBody ?: listOf(),
