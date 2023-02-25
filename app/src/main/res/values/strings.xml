@@ -3,4 +3,6 @@
     <string name="welcome">Welcome,</string>
     <string name="welcome_sub_title">What would you like to play?</string>
     <string name="search_game">Search game</string>
+    <string name="all_games">All games</string>
+    <string name="categories">Categories</string>
 </resources>
