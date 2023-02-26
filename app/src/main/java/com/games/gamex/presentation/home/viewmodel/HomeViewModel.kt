@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.games.gamex.domain.model.GamesResultItem
 import com.games.gamex.domain.model.GenresResultItem
+import com.games.gamex.domain.model.PlatformsResultItem
 import com.games.gamex.domain.usecase.GameXInteractor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -26,4 +27,11 @@ class HomeViewModel @Inject constructor(private val gameXInteractor: GameXIntera
         started = SharingStarted.WhileSubscribed(3000L),
         initialValue = PagingData.empty()
     )
+
+    fun getAllPlatforms(): Flow<PagingData<PlatformsResultItem>> =
+        gameXInteractor.getAllPlatforms().stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(3000L),
+            initialValue = PagingData.empty()
+        )
 }

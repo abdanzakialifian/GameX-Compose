@@ -2,23 +2,23 @@ package com.games.gamex.data.source.remote.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.games.gamex.data.source.remote.response.GamesResultItemResponse
+import com.games.gamex.data.source.remote.response.PlatformsResultItemResponse
 import com.games.gamex.data.source.remote.services.ApiService
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GamesPagingSource @Inject constructor(private val apiService: ApiService) :
-    PagingSource<Int, GamesResultItemResponse>() {
+class PlatformsPagingSource @Inject constructor(private val apiService: ApiService) :
+    PagingSource<Int, PlatformsResultItemResponse>() {
 
     private var totalItem = 0
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GamesResultItemResponse> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PlatformsResultItemResponse> {
         val position = params.key ?: INITIAL_POSITION
 
         return try {
-            val response = apiService.getGames(position, params.loadSize)
+            val response = apiService.getPlatforms(position, params.loadSize)
             delay(500L)
             val responseBody = response.body()?.results
             totalItem += responseBody?.size ?: 0
@@ -39,7 +39,7 @@ class GamesPagingSource @Inject constructor(private val apiService: ApiService) 
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, GamesResultItemResponse>): Int? =
+    override fun getRefreshKey(state: PagingState<Int, PlatformsResultItemResponse>): Int? =
         state.anchorPosition?.let { anchorPosition ->
             state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
                 ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)

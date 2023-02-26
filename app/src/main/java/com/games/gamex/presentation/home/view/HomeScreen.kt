@@ -3,7 +3,9 @@ package com.games.gamex.presentation.home.view
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -28,10 +30,8 @@ import androidx.paging.compose.items
 import com.games.gamex.R
 import com.games.gamex.domain.model.GamesResultItem
 import com.games.gamex.domain.model.GenresResultItem
-import com.games.gamex.presentation.component.CategoriesItem
-import com.games.gamex.presentation.component.CustomSearch
-import com.games.gamex.presentation.component.GameItem
-import com.games.gamex.presentation.component.ShimmerAnimation
+import com.games.gamex.domain.model.PlatformsResultItem
+import com.games.gamex.presentation.component.*
 import com.games.gamex.presentation.home.viewmodel.HomeViewModel
 import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.utils.Shimmer
@@ -41,14 +41,21 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewMod
 
     val getAllGenresState = viewModel.getAllGenres().collectAsLazyPagingItems()
     val getAllGamesState = viewModel.getAllGames().collectAsLazyPagingItems()
+    val getAllPlatformsState = viewModel.getAllPlatforms().collectAsLazyPagingItems()
 
-    HomeContent(allGames = getAllGamesState, allGenres = getAllGenresState, modifier = modifier)
+    HomeContent(
+        allGames = getAllGamesState,
+        allGenres = getAllGenresState,
+        allPlatforms = getAllPlatformsState,
+        modifier = modifier
+    )
 }
 
 @Composable
 fun HomeContent(
     allGames: LazyPagingItems<GamesResultItem>,
     allGenres: LazyPagingItems<GenresResultItem>,
+    allPlatforms: LazyPagingItems<PlatformsResultItem>,
     modifier: Modifier = Modifier
 ) {
     var searchValue by remember {
@@ -90,10 +97,10 @@ fun HomeContent(
                     shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
                 )
         ) {
-            Column {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 Text(
                     modifier = Modifier.padding(
-                        start = 20.dp, top = 20.dp, end = 20.dp, bottom = 10.dp
+                        start = 20.dp, top = 20.dp, end = 20.dp, bottom = 15.dp
                     ),
                     text = stringResource(id = R.string.categories),
                     color = Color.Black,
@@ -107,6 +114,23 @@ fun HomeContent(
                     items(allGenres, key = { it.id ?: 0 }) {
                         CategoriesItem(category = it?.name ?: "", onNavigate = {})
                     }
+                    // initial load
+                    when (allGenres.loadState.refresh) {
+                        is LoadState.Loading -> items(count = 10) {
+                            ShimmerAnimation(shimmer = Shimmer.CATEGORIES_ITEM_SHIMMER)
+                        }
+                        is LoadState.Error -> {}
+                        else -> {}
+                    }
+
+                    // load more (pagination)
+                    when (allGenres.loadState.append) {
+                        is LoadState.Loading -> item {
+                            ShimmerAnimation(shimmer = Shimmer.CATEGORIES_ITEM_SHIMMER)
+                        }
+                        is LoadState.Error -> {}
+                        else -> {}
+                    }
                 }
                 Text(
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
@@ -119,48 +143,61 @@ fun HomeContent(
                     contentPadding = PaddingValues(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
+                    items(items = allGames, key = { it.id ?: 0 }) {
+                        GameItem(
+                            image = it?.image ?: "",
+                            title = it?.name ?: "",
+                            onNavigate = { })
+                    }
+
                     // initial load
                     when (allGames.loadState.refresh) {
                         is LoadState.Loading -> items(count = 10) {
                             ShimmerAnimation(Shimmer.GAME_ITEM_SHIMMER)
                         }
-                        is LoadState.NotLoading -> {
-                            items(items = allGames, key = { it.id ?: 0 }) {
-                                GameItem(image = it?.image ?: "",
-                                    title = it?.name ?: "",
-                                    onNavigate = { })
-                            }
-                        }
                         is LoadState.Error -> {}
+                        else -> {}
                     }
 
                     // load more (pagination)
                     when (allGames.loadState.append) {
-                        is LoadState.Loading -> {
-                            item {
-                                Column(
-                                    modifier = Modifier
-                                        .height(190.dp)
-                                        .padding(horizontal = 8.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(30.dp), color = colorResource(
-                                            id = R.color.dark_grey
-                                        )
+                        is LoadState.Loading -> item {
+                            Column(
+                                modifier = Modifier
+                                    .height(190.dp)
+                                    .padding(horizontal = 8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(30.dp), color = colorResource(
+                                        id = R.color.dark_grey
                                     )
-                                }
-                            }
-                        }
-                        is LoadState.NotLoading -> {
-                            items(items = allGames, key = { it.id ?: 0 }) {
-                                GameItem(image = it?.image ?: "",
-                                    title = it?.name ?: "",
-                                    onNavigate = { })
+                                )
                             }
                         }
                         is LoadState.Error -> {}
+                        else -> {}
+                    }
+                }
+                Text(
+                    modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp),
+                    text = "Platform",
+                    color = Color.Black,
+                    fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
+                    fontSize = 18.sp
+                )
+                LazyRow(
+                    modifier = Modifier.padding(bottom = 40.dp),
+                    contentPadding = PaddingValues(horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(allPlatforms, key = { it.id ?: 0 }) {
+                        PlatformItem(
+                            image = it?.image ?: "",
+                            name = it?.name ?: "",
+                            totalGames = it?.gamesCount ?: 0
+                        )
                     }
                 }
             }
