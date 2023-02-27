@@ -5,4 +5,6 @@
     <string name="search_game">Search game</string>
     <string name="all_games">All games</string>
     <string name="categories">Categories</string>
+    <string name="platforms">Platforms</string>
+    <string name="total_games">Total games : %d</string>
 </resources>

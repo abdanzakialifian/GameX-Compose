@@ -38,8 +38,8 @@ fun GameItem(image: String, title: String, onNavigate: () -> Unit, modifier: Mod
             AsyncImage(
                 modifier = Modifier.align(Alignment.Center),
                 model = image,
-                placeholder = painterResource(id = R.drawable.ic_load),
-                error = painterResource(id = R.drawable.ic_broken_image),
+                placeholder = painterResource(id = R.drawable.ic_load_64),
+                error = painterResource(id = R.drawable.ic_broken_image_64),
                 contentDescription = "Image Game",
                 contentScale = ContentScale.Crop
             )

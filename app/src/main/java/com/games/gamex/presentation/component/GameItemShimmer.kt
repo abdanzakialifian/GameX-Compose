@@ -5,14 +5,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.games.gamex.R
 import com.games.gamex.presentation.ui.theme.GameXTheme
 
 @Composable
@@ -45,13 +52,17 @@ fun GameItemShimmer(brush: Brush, modifier: Modifier = Modifier) {
                             .background(brush = brush)
                             .align(Alignment.CenterVertically)
                     )
-                    Box(
+                    Text(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(15.dp)
                             .padding(start = 2.dp)
-                            .background(brush = brush)
+                            .fillMaxWidth()
                             .align(Alignment.CenterVertically)
+                            .background(brush = brush, shape = RoundedCornerShape(6.dp)),
+                        text = "",
+                        color = colorResource(id = R.color.white),
+                        fontSize = 12.sp,
+                        overflow = TextOverflow.Ellipsis,
+                        fontFamily = FontFamily(Font(resId = R.font.open_sans_medium))
                     )
                 }
             }

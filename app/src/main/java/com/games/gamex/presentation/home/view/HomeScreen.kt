@@ -182,7 +182,7 @@ fun HomeContent(
                 }
                 Text(
                     modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp),
-                    text = "Platform",
+                    text = stringResource(id = R.string.platforms),
                     color = Color.Black,
                     fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
                     fontSize = 18.sp
@@ -196,8 +196,39 @@ fun HomeContent(
                         PlatformItem(
                             image = it?.image ?: "",
                             name = it?.name ?: "",
-                            totalGames = it?.gamesCount ?: 0
+                            totalGames = it?.gamesCount ?: 0,
+                            onNavigate = {}
                         )
+                    }
+
+                    // initial load
+                    when (allPlatforms.loadState.refresh) {
+                        is LoadState.Loading -> items(count = 10) {
+                            ShimmerAnimation(shimmer = Shimmer.PLATFORM_ITEM_SHIMMER)
+                        }
+                        is LoadState.Error -> {}
+                        else -> {}
+                    }
+
+                    // load more (pagination)
+                    when (allPlatforms.loadState.append) {
+                        is LoadState.Loading -> item {
+                            Column(
+                                modifier = Modifier
+                                    .height(210.dp)
+                                    .padding(horizontal = 8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(30.dp), color = colorResource(
+                                        id = R.color.dark_grey
+                                    )
+                                )
+                            }
+                        }
+                        is LoadState.Error -> {}
+                        else -> {}
                     }
                 }
             }

@@ -34,5 +34,6 @@ fun ShimmerAnimation(shimmer: Shimmer) {
     when (shimmer) {
         Shimmer.GAME_ITEM_SHIMMER -> GameItemShimmer(brush = brush)
         Shimmer.CATEGORIES_ITEM_SHIMMER -> CategoriesItemShimmer(brush = brush)
+        Shimmer.PLATFORM_ITEM_SHIMMER -> PlatformItemShimmer(brush = brush)
     }
 }
