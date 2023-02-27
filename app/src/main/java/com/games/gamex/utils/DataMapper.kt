@@ -12,7 +12,7 @@ object DataMapper {
         GamesResultItem(id = input.id, image = input.backgroundImage, name = input.name)
 
     fun mapGenresResultItemResponseToGenresResultItem(input: GenresResultItemResponse): GenresResultItem =
-        GenresResultItem(id = input.id, name = input.name)
+        GenresResultItem(id = input.id, name = input.name, image = input.imageBackground)
 
     fun mapPlatformsResultItemResponseToPlatformsResultItem(input: PlatformsResultItemResponse): PlatformsResultItem = PlatformsResultItem(
         id = input.id,

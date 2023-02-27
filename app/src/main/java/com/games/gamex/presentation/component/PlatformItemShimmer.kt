@@ -22,16 +22,16 @@ import com.games.gamex.presentation.ui.theme.GameXTheme
 @Composable
 fun PlatformItemShimmer(brush: Brush, modifier: Modifier = Modifier) {
     Card(
-        modifier = modifier.size(width = 250.dp, height = 210.dp),
+        modifier = modifier.size(width = 250.dp, height = 230.dp),
         backgroundColor = Color.White,
         shape = RoundedCornerShape(20.dp),
-        elevation = 2.dp
+        elevation = 0.dp
     ) {
         Column {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(140.dp)
+                    .height(160.dp)
                     .clip(RoundedCornerShape(20.dp))
                     .background(brush = brush),
             )

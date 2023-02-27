@@ -99,9 +99,7 @@ fun HomeContent(
         ) {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 Text(
-                    modifier = Modifier.padding(
-                        start = 20.dp, top = 20.dp, end = 20.dp, bottom = 15.dp
-                    ),
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
                     text = stringResource(id = R.string.categories),
                     color = Color.Black,
                     fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
@@ -112,7 +110,10 @@ fun HomeContent(
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(allGenres, key = { it.id ?: 0 }) {
-                        CategoriesItem(category = it?.name ?: "", onNavigate = {})
+                        CategoriesItem(
+                            category = it?.name ?: "",
+                            image = it?.image ?: "",
+                            onNavigate = {})
                     }
                     // initial load
                     when (allGenres.loadState.refresh) {

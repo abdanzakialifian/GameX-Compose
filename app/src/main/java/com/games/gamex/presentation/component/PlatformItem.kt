@@ -30,27 +30,27 @@ fun PlatformItem(
     onNavigate: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var isLoading by remember {
+        mutableStateOf(false)
+    }
+
+    var isError by remember {
+        mutableStateOf(false)
+    }
+
     Card(
-        modifier = modifier.size(width = 250.dp, height = 210.dp),
+        modifier = modifier.size(width = 250.dp, height = 230.dp),
         backgroundColor = Color.White,
         shape = RoundedCornerShape(20.dp),
-        elevation = 2.dp
+        elevation = 0.dp
     ) {
-        var isLoading by remember {
-            mutableStateOf(false)
-        }
-
-        var isError by remember {
-            mutableStateOf(false)
-        }
-
         Column(modifier = Modifier
             .fillMaxWidth()
             .clickable { onNavigate() }) {
             AsyncImage(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(140.dp)
+                    .height(160.dp)
                     .clip(RoundedCornerShape(20.dp)),
                 model = image,
                 placeholder = painterResource(id = R.drawable.ic_load_64),
