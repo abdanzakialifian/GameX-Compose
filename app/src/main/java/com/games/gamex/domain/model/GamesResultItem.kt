@@ -4,4 +4,5 @@ data class GamesResultItem(
     val id: Int? = null,
     val image: String? = null,
     val name: String? = null,
+    val released: String? = null
 )

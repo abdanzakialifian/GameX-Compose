@@ -245,6 +245,7 @@ fun HomeContent(
                             GameItemSecond(
                                 image = it?.image ?: "",
                                 name = it?.name ?: "",
+                                date = it?.released ?: "",
                                 onItemClicked = { })
                         }
                     }
