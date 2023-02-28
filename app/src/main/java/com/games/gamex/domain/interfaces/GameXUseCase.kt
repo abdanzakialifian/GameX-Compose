@@ -7,7 +7,7 @@ import com.games.gamex.domain.model.PlatformsResultItem
 import kotlinx.coroutines.flow.Flow
 
 interface GameXUseCase {
-    fun getAllGames(): Flow<PagingData<GamesResultItem>>
+    fun getAllGames(querySearch: String): Flow<PagingData<GamesResultItem>>
     fun getAllGenres(): Flow<PagingData<GenresResultItem>>
     fun getAllPlatforms(): Flow<PagingData<PlatformsResultItem>>
 }

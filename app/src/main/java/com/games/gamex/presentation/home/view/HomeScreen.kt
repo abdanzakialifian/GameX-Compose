@@ -39,11 +39,17 @@ import com.games.gamex.utils.Shimmer
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewModel()) {
 
+    var searchValue by remember {
+        mutableStateOf("")
+    }
+
     val getAllGenresState = viewModel.getAllGenres().collectAsLazyPagingItems()
-    val getAllGamesState = viewModel.getAllGames().collectAsLazyPagingItems()
+    val getAllGamesState = viewModel.getAllGames(searchValue).collectAsLazyPagingItems()
     val getAllPlatformsState = viewModel.getAllPlatforms().collectAsLazyPagingItems()
 
     HomeContent(
+        searchValue = searchValue,
+        onValueChange = { searchValue = it },
         allGames = getAllGamesState,
         allGenres = getAllGenresState,
         allPlatforms = getAllPlatformsState,
@@ -53,14 +59,13 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewMod
 
 @Composable
 fun HomeContent(
+    searchValue: String,
+    onValueChange: (String) -> Unit,
     allGames: LazyPagingItems<GamesResultItem>,
     allGenres: LazyPagingItems<GenresResultItem>,
     allPlatforms: LazyPagingItems<PlatformsResultItem>,
     modifier: Modifier = Modifier
 ) {
-    var searchValue by remember {
-        mutableStateOf("")
-    }
 
     Column(modifier = modifier.fillMaxSize()) {
         Text(
@@ -84,10 +89,12 @@ fun HomeContent(
             fontSize = 16.sp
         )
         Spacer(modifier = Modifier.height(30.dp))
-        CustomSearch(modifier = Modifier.padding(horizontal = 20.dp),
+        CustomSearch(
+            modifier = Modifier.padding(horizontal = 20.dp),
             value = searchValue,
             hint = stringResource(id = R.string.search_game),
-            onValueChange = { searchValue = it })
+            onValueChange = onValueChange
+        )
         Spacer(modifier = Modifier.height(50.dp))
         Box(
             modifier = Modifier

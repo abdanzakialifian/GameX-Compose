@@ -19,13 +19,15 @@ class RemoteDataSource @Inject constructor(
     private val genresPagingSource: GenresPagingSource,
     private val platformsPagingSource: PlatformsPagingSource
 ) {
-    fun getAllGames(): Flow<PagingData<GamesResultItemResponse>> = Pager(
+    fun getAllGames(querySearch: String): Flow<PagingData<GamesResultItemResponse>> = Pager(
         config = PagingConfig(
             pageSize = 10,
             initialLoadSize = 10,
         ),
         pagingSourceFactory = {
-            gamesPagingSource
+            gamesPagingSource.apply {
+                setQuerySearch(querySearch)
+            }
         }
     ).flow
 

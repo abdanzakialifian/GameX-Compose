@@ -13,7 +13,7 @@ import javax.inject.Singleton
 @Singleton
 class GameXInteractor @Inject constructor(private val gameXRepository: GameXRepository) :
     GameXUseCase {
-    override fun getAllGames(): Flow<PagingData<GamesResultItem>> = gameXRepository.getAllGames()
+    override fun getAllGames(querySearch: String): Flow<PagingData<GamesResultItem>> = gameXRepository.getAllGames(querySearch)
     override fun getAllGenres(): Flow<PagingData<GenresResultItem>> = gameXRepository.getAllGenres()
     override fun getAllPlatforms(): Flow<PagingData<PlatformsResultItem>> =
         gameXRepository.getAllPlatforms()

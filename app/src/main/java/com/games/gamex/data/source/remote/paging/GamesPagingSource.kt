@@ -13,12 +13,13 @@ class GamesPagingSource @Inject constructor(private val apiService: ApiService) 
     PagingSource<Int, GamesResultItemResponse>() {
 
     private var totalItem = 0
+    private var querySearch = ""
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GamesResultItemResponse> {
         val position = params.key ?: INITIAL_POSITION
 
         return try {
-            val response = apiService.getGames(position, params.loadSize)
+            val response = apiService.getGames(position, params.loadSize, querySearch)
             delay(3000L)
             val responseBody = response.body()?.results
             totalItem += responseBody?.size ?: 0
@@ -44,6 +45,10 @@ class GamesPagingSource @Inject constructor(private val apiService: ApiService) 
             state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
                 ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
         }
+
+    fun setQuerySearch(querySearch: String) {
+        this.querySearch = querySearch
+    }
 
     companion object {
         private const val INITIAL_POSITION = 1

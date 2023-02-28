@@ -16,11 +16,12 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val gameXInteractor: GameXInteractor) :
     ViewModel() {
-    fun getAllGames(): Flow<PagingData<GamesResultItem>> = gameXInteractor.getAllGames().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(3000L),
-        initialValue = PagingData.empty()
-    )
+    fun getAllGames(querySearch: String): Flow<PagingData<GamesResultItem>> =
+        gameXInteractor.getAllGames(querySearch).stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(3000L),
+            initialValue = PagingData.empty()
+        )
 
     fun getAllGenres(): Flow<PagingData<GenresResultItem>> = gameXInteractor.getAllGenres().stateIn(
         scope = viewModelScope,
