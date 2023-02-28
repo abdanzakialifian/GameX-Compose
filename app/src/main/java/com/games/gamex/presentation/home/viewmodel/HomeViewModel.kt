@@ -8,31 +8,40 @@ import com.games.gamex.domain.model.GenresResultItem
 import com.games.gamex.domain.model.PlatformsResultItem
 import com.games.gamex.domain.usecase.GameXInteractor
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val gameXInteractor: GameXInteractor) :
     ViewModel() {
-    fun getAllGames(querySearch: String): Flow<PagingData<GamesResultItem>> =
-        gameXInteractor.getAllGames(querySearch).stateIn(
+
+    private val searchQuery = MutableStateFlow("")
+
+    fun setSearchQuery(searchQuery: String) {
+        this.searchQuery.value = searchQuery
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getAllGames: Flow<PagingData<GamesResultItem>> = searchQuery.flatMapLatest { searchQuery ->
+        gameXInteractor.getAllGames(searchQuery).stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(3000L),
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = PagingData.empty()
+        )
+    }
+
+    val getAllGenres: StateFlow<PagingData<GenresResultItem>> =
+        gameXInteractor.getAllGenres().stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
             initialValue = PagingData.empty()
         )
 
-    fun getAllGenres(): Flow<PagingData<GenresResultItem>> = gameXInteractor.getAllGenres().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(3000L),
-        initialValue = PagingData.empty()
-    )
-
-    fun getAllPlatforms(): Flow<PagingData<PlatformsResultItem>> =
+    val getAllPlatforms: StateFlow<PagingData<PlatformsResultItem>> =
         gameXInteractor.getAllPlatforms().stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(3000L),
+            started = SharingStarted.WhileSubscribed(),
             initialValue = PagingData.empty()
         )
 }

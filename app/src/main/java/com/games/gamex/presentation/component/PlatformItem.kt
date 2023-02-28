@@ -27,7 +27,7 @@ fun PlatformItem(
     image: String,
     name: String,
     totalGames: Int,
-    onNavigate: () -> Unit,
+    onItemClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isLoading by remember {
@@ -46,10 +46,9 @@ fun PlatformItem(
     ) {
         Column(modifier = Modifier
             .fillMaxWidth()
-            .clickable { onNavigate() }) {
+            .clickable { onItemClicked() }) {
             AsyncImage(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .height(160.dp)
                     .clip(RoundedCornerShape(20.dp)),
                 model = image,
@@ -88,6 +87,6 @@ fun PlatformItem(
 @Composable
 fun PlatformItemPreview() {
     GameXTheme {
-        PlatformItem(image = "", name = "PC", totalGames = 531329, onNavigate = {})
+        PlatformItem(image = "", name = "PC", totalGames = 531329, onItemClicked = {})
     }
 }

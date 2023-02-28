@@ -26,12 +26,12 @@ import com.games.gamex.presentation.ui.theme.GameXTheme
 fun CategoriesItem(
     category: String,
     image: String,
-    onNavigate: () -> Unit,
+    onItemClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier
         .size(width = 90.dp, height = 110.dp)
-        .clickable { onNavigate() }) {
+        .clickable { onItemClicked() }) {
         AsyncImage(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
@@ -64,6 +64,6 @@ fun CategoriesItem(
 @Composable
 fun CategoriesItemPreview() {
     GameXTheme {
-        CategoriesItem("Adventure", image = "", onNavigate = {})
+        CategoriesItem("Adventure", image = "", onItemClicked = {})
     }
 }

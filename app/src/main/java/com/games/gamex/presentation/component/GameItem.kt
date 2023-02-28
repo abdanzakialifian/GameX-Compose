@@ -26,7 +26,7 @@ import com.games.gamex.R
 import com.games.gamex.presentation.ui.theme.GameXTheme
 
 @Composable
-fun GameItem(image: String, title: String, onNavigate: () -> Unit, modifier: Modifier = Modifier) {
+fun GameItem(image: String, title: String, onItemClicked: () -> Unit, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier
             .size(width = 130.dp, height = 190.dp),
@@ -34,7 +34,7 @@ fun GameItem(image: String, title: String, onNavigate: () -> Unit, modifier: Mod
         shape = RoundedCornerShape(16.dp),
         elevation = 4.dp,
     ) {
-        Box(modifier = Modifier.fillMaxSize().clickable { onNavigate() }) {
+        Box(modifier = Modifier.fillMaxSize().clickable { onItemClicked() }) {
             AsyncImage(
                 modifier = Modifier.align(Alignment.Center),
                 model = image,
@@ -89,6 +89,6 @@ fun GameItem(image: String, title: String, onNavigate: () -> Unit, modifier: Mod
 @Composable
 fun GameItemPreview() {
     GameXTheme {
-        GameItem(image = "", title = "", onNavigate = {})
+        GameItem(image = "", title = "", onItemClicked = {})
     }
 }

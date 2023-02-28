@@ -19,7 +19,7 @@ class PlatformsPagingSource @Inject constructor(private val apiService: ApiServi
 
         return try {
             val response = apiService.getPlatforms(position, params.loadSize)
-            delay(3000L)
+            delay(500L)
             val responseBody = response.body()?.results
             totalItem += responseBody?.size ?: 0
 

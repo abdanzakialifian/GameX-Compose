@@ -20,7 +20,7 @@ class GamesPagingSource @Inject constructor(private val apiService: ApiService) 
 
         return try {
             val response = apiService.getGames(position, params.loadSize, querySearch)
-            delay(3000L)
+            delay(500L)
             val responseBody = response.body()?.results
             totalItem += responseBody?.size ?: 0
 
