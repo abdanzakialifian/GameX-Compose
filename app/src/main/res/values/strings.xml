@@ -7,4 +7,5 @@
     <string name="categories">Categories</string>
     <string name="platforms">Platforms</string>
     <string name="total_games">Total games : %d</string>
+    <string name="release_date">Released : %s</string>
 </resources>

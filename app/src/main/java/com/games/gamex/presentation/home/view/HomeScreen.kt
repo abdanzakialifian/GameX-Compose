@@ -43,12 +43,14 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewMod
     val getAllGamesState = viewModel.getAllGames.collectAsLazyPagingItems()
     val getAllGenresState = viewModel.getAllGenres.collectAsLazyPagingItems()
     val getAllPlatformsState = viewModel.getAllPlatforms.collectAsLazyPagingItems()
+    val searchAllGamesState = viewModel.searchAllGames.collectAsLazyPagingItems()
 
     HomeContent(
         onValueChange = { viewModel.setSearchQuery(searchQuery = it) },
         allGames = getAllGamesState,
         allGenres = getAllGenresState,
         allPlatforms = getAllPlatformsState,
+        searchAllGames = searchAllGamesState,
         modifier = modifier
     )
 }
@@ -56,14 +58,16 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewMod
 @Composable
 fun HomeContent(
     onValueChange: (String) -> Unit,
-    allGames: LazyPagingItems<GamesResultItem>,
     allGenres: LazyPagingItems<GenresResultItem>,
+    allGames: LazyPagingItems<GamesResultItem>,
     allPlatforms: LazyPagingItems<PlatformsResultItem>,
+    searchAllGames: LazyPagingItems<GamesResultItem>,
     modifier: Modifier = Modifier
 ) {
     var searchValue by remember {
         mutableStateOf("")
     }
+
     Column(modifier = modifier.fillMaxSize()) {
         Text(
             modifier = Modifier.padding(
@@ -106,151 +110,200 @@ fun HomeContent(
         ) {
             Column(modifier = if (searchValue.isEmpty()) Modifier.verticalScroll(rememberScrollState()) else Modifier.fillMaxHeight()) {
                 if (searchValue.isEmpty()) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
-                        text = stringResource(id = R.string.categories),
-                        color = Color.Black,
-                        fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
-                        fontSize = 18.sp
-                    )
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 20.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        // initial load
-                        when (allGenres.loadState.refresh) {
-                            is LoadState.Loading -> items(count = 10) {
-                                ShimmerAnimation(shimmer = Shimmer.CATEGORIES_ITEM_SHIMMER)
-                            }
-                            is LoadState.Error -> {}
-                            else -> items(allGenres, key = { it.id ?: 0 }) {
-                                CategoriesItem(
-                                    category = it?.name ?: "",
-                                    image = it?.image ?: "",
-                                    onItemClicked = {})
-                            }
-                        }
-
-                        // load more (pagination)
-                        when (allGenres.loadState.append) {
-                            is LoadState.Loading -> item {
-                                ShimmerAnimation(shimmer = Shimmer.CATEGORIES_ITEM_SHIMMER)
-                            }
-                            is LoadState.Error -> {}
-                            else -> {}
-                        }
-                    }
-                    Text(
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
-                        text = stringResource(id = R.string.all_games),
-                        color = Color.Black,
-                        fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
-                        fontSize = 18.sp
-                    )
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 20.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        // initial load
-                        when (allGames.loadState.refresh) {
-                            is LoadState.Loading -> items(count = 10) {
-                                ShimmerAnimation(Shimmer.GAME_ITEM_SHIMMER)
-                            }
-                            is LoadState.Error -> {}
-                            else -> items(items = allGames, key = { it.id ?: 0 }) {
-                                GameItem(
-                                    image = it?.image ?: "",
-                                    title = it?.name ?: "",
-                                    onItemClicked = { })
-                            }
-                        }
-
-                        // load more (pagination)
-                        when (allGames.loadState.append) {
-                            is LoadState.Loading -> item {
-                                Column(
-                                    modifier = Modifier
-                                        .height(190.dp)
-                                        .padding(horizontal = 8.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(30.dp), color = colorResource(
-                                            id = R.color.dark_grey
-                                        )
-                                    )
-                                }
-                            }
-                            is LoadState.Error -> {}
-                            else -> {}
-                        }
-                    }
-                    Text(
-                        modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp),
-                        text = stringResource(id = R.string.platforms),
-                        color = Color.Black,
-                        fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
-                        fontSize = 18.sp
-                    )
-                    LazyRow(
-                        modifier = Modifier.padding(bottom = 40.dp),
-                        contentPadding = PaddingValues(horizontal = 20.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        // initial load
-                        when (allPlatforms.loadState.refresh) {
-                            is LoadState.Loading -> items(count = 10) {
-                                ShimmerAnimation(shimmer = Shimmer.PLATFORM_ITEM_SHIMMER)
-                            }
-                            is LoadState.Error -> {}
-                            else -> items(allPlatforms, key = { it.id ?: 0 }) {
-                                PlatformItem(
-                                    image = it?.image ?: "",
-                                    name = it?.name ?: "",
-                                    totalGames = it?.gamesCount ?: 0,
-                                    onItemClicked = {}
-                                )
-                            }
-                        }
-
-                        // load more (pagination)
-                        when (allPlatforms.loadState.append) {
-                            is LoadState.Loading -> item {
-                                Column(
-                                    modifier = Modifier
-                                        .height(210.dp)
-                                        .padding(horizontal = 8.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(30.dp), color = colorResource(
-                                            id = R.color.dark_grey
-                                        )
-                                    )
-                                }
-                            }
-                            is LoadState.Error -> {}
-                            else -> {}
-                        }
-                    }
+                    Categories(allGenres = allGenres)
+                    AllGamesHorizontal(allGames = allGames)
+                    Platforms(allPlatforms = allPlatforms)
                 } else {
-                    LazyColumn(
-                        modifier = Modifier.padding(horizontal = 20.dp),
-                        contentPadding = PaddingValues(vertical = 20.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        items(allGames, key = { it.id ?: 0 }) {
-                            GameItemSecond(
-                                image = it?.image ?: "",
-                                name = it?.name ?: "",
-                                date = it?.released ?: "",
-                                onItemClicked = { })
-                        }
-                    }
+                    AllGamesVertical(searchAllGames = searchAllGames)
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun Categories(allGenres: LazyPagingItems<GenresResultItem>) {
+    Text(
+        modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
+        text = stringResource(id = R.string.categories),
+        color = Color.Black,
+        fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
+        fontSize = 18.sp
+    )
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 20.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        // initial load
+        when (allGenres.loadState.refresh) {
+            is LoadState.Loading -> items(count = 10) {
+                ShimmerAnimation(shimmer = Shimmer.CATEGORIES_ITEM_PLACEHOLDER)
+            }
+            is LoadState.Error -> {}
+            else -> items(allGenres, key = { it.id ?: 0 }) {
+                CategoriesItem(
+                    category = it?.name ?: "",
+                    image = it?.image ?: "",
+                    onItemClicked = {})
+            }
+        }
+
+        // load more (pagination)
+        when (allGenres.loadState.append) {
+            is LoadState.Loading -> item {
+                ShimmerAnimation(shimmer = Shimmer.CATEGORIES_ITEM_PLACEHOLDER)
+            }
+            is LoadState.Error -> {}
+            else -> {}
+        }
+    }
+}
+
+@Composable
+fun AllGamesHorizontal(allGames: LazyPagingItems<GamesResultItem>) {
+    Text(
+        modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
+        text = stringResource(id = R.string.all_games),
+        color = Color.Black,
+        fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
+        fontSize = 18.sp
+    )
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 20.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        // initial load
+        when (allGames.loadState.refresh) {
+            is LoadState.Loading -> items(count = 10) {
+                ShimmerAnimation(Shimmer.GAME_ITEM_PLACEHOLDER)
+            }
+            is LoadState.Error -> {}
+            else -> items(items = allGames, key = { it.id ?: 0 }) {
+                GameItem(
+                    image = it?.image ?: "",
+                    title = it?.name ?: "",
+                    onItemClicked = { })
+            }
+        }
+
+        // load more (pagination)
+        when (allGames.loadState.append) {
+            is LoadState.Loading -> item {
+                Column(
+                    modifier = Modifier
+                        .height(190.dp)
+                        .padding(horizontal = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(30.dp), color = colorResource(
+                            id = R.color.dark_grey
+                        )
+                    )
+                }
+            }
+            is LoadState.Error -> {}
+            else -> {}
+        }
+    }
+}
+
+@Composable
+fun Platforms(allPlatforms: LazyPagingItems<PlatformsResultItem>) {
+    Text(
+        modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp),
+        text = stringResource(id = R.string.platforms),
+        color = Color.Black,
+        fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
+        fontSize = 18.sp
+    )
+    LazyRow(
+        modifier = Modifier.padding(bottom = 40.dp),
+        contentPadding = PaddingValues(horizontal = 20.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        // initial load
+        when (allPlatforms.loadState.refresh) {
+            is LoadState.Loading -> items(count = 10) {
+                ShimmerAnimation(shimmer = Shimmer.PLATFORM_ITEM_PLACEHOLDER)
+            }
+            is LoadState.Error -> {}
+            else -> items(allPlatforms, key = { it.id ?: 0 }) {
+                PlatformItem(
+                    image = it?.image ?: "",
+                    name = it?.name ?: "",
+                    totalGames = it?.gamesCount ?: 0,
+                    onItemClicked = {}
+                )
+            }
+        }
+
+        // load more (pagination)
+        when (allPlatforms.loadState.append) {
+            is LoadState.Loading -> item {
+                Column(
+                    modifier = Modifier
+                        .height(210.dp)
+                        .padding(horizontal = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(30.dp), color = colorResource(
+                            id = R.color.dark_grey
+                        )
+                    )
+                }
+            }
+            is LoadState.Error -> {}
+            else -> {}
+        }
+    }
+}
+
+@Composable
+fun AllGamesVertical(searchAllGames: LazyPagingItems<GamesResultItem>) {
+    LazyColumn(
+        modifier = Modifier.padding(horizontal = 20.dp),
+        contentPadding = PaddingValues(vertical = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        // initial load
+        when (searchAllGames.loadState.refresh) {
+            is LoadState.Loading -> items(15) {
+                ShimmerAnimation(shimmer = Shimmer.GAME_ITEM_SECOND_PLACEHOLDER)
+            }
+            is LoadState.Error -> {}
+            else -> items(searchAllGames, key = { it.id ?: 0 }) {
+                GameItemSecond(
+                    image = it?.image ?: "",
+                    name = it?.name ?: "",
+                    date = it?.released ?: "",
+                    rating = it?.rating ?: 0.0F,
+                    onItemClicked = { })
+            }
+        }
+
+        // load more (pagination)
+        when (searchAllGames.loadState.append) {
+            is LoadState.Loading -> item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(30.dp), color = colorResource(
+                            id = R.color.dark_grey
+                        )
+                    )
+                }
+            }
+            is LoadState.Error -> {}
+            else -> {}
         }
     }
 }

@@ -20,7 +20,7 @@ import com.games.gamex.R
 import com.games.gamex.presentation.ui.theme.GameXTheme
 
 @Composable
-fun PlatformItemShimmer(brush: Brush, modifier: Modifier = Modifier) {
+fun PlatformItemPlaceholder(brush: Brush, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier.size(width = 250.dp, height = 230.dp),
         backgroundColor = Color.White,
@@ -63,9 +63,9 @@ fun PlatformItemShimmer(brush: Brush, modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-fun PlatformItemShimmerPreview() {
+fun PlatformItemPlaceholderPreview() {
     GameXTheme {
-        PlatformItemShimmer(
+        PlatformItemPlaceholder(
             brush = Brush.linearGradient(
                 colors = listOf(
                     Color.LightGray.copy(alpha = 0.6F),

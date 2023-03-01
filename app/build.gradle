@@ -97,4 +97,7 @@ dependencies {
 
     // paging 3
     implementation "androidx.paging:paging-runtime:$paging_version"
+
+    // rating bar
+    implementation "com.github.a914-gowtham:compose-ratingbar:$rating_bar_version"
 }

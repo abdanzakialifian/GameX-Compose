@@ -13,7 +13,8 @@ object DataMapper {
             id = input.id,
             image = input.backgroundImage,
             name = input.name,
-            released = input.released
+            released = input.released,
+            rating = input.rating.toString().toFloat()
         )
 
     fun mapGenresResultItemResponseToGenresResultItem(input: GenresResultItemResponse): GenresResultItem =

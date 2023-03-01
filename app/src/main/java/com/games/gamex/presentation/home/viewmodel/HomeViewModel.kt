@@ -23,13 +23,20 @@ class HomeViewModel @Inject constructor(private val gameXInteractor: GameXIntera
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val getAllGames: Flow<PagingData<GamesResultItem>> = searchQuery.flatMapLatest { searchQuery ->
-        gameXInteractor.getAllGames(searchQuery).stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = PagingData.empty()
-        )
-    }
+    val searchAllGames: Flow<PagingData<GamesResultItem>> =
+        searchQuery.flatMapLatest { searchQuery ->
+            gameXInteractor.getAllGames(searchQuery).stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = PagingData.empty()
+            )
+        }
+
+    val getAllGames: Flow<PagingData<GamesResultItem>> = gameXInteractor.getAllGames("").stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = PagingData.empty()
+    )
 
     val getAllGenres: StateFlow<PagingData<GenresResultItem>> =
         gameXInteractor.getAllGenres().stateIn(
