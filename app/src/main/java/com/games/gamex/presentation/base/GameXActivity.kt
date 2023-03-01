@@ -14,6 +14,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.games.gamex.presentation.detail.view.DetailScreen
 import com.games.gamex.presentation.home.view.HomeScreen
 import com.games.gamex.presentation.home.viewmodel.HomeViewModel
 import com.games.gamex.presentation.navigation.Screen
@@ -42,7 +43,6 @@ class GameXActivity : ComponentActivity() {
 @Composable
 fun GameXApp() {
     val navController = rememberNavController()
-
     NavHost(navController = navController, startDestination = Screen.SplashScreen.route) {
         composable(Screen.SplashScreen.route) {
             SplashScreen(onNavigate = {
@@ -57,7 +57,16 @@ fun GameXApp() {
         }
         composable(Screen.HomeScreen.route) {
             val viewModel = hiltViewModel<HomeViewModel>()
-            HomeScreen(viewModel = viewModel)
+            HomeScreen(
+                onAllGenresClicked = { navController.navigate(Screen.DetailScreen.route) },
+                onAllGamesClicked = { navController.navigate(Screen.DetailScreen.route) },
+                onAllPlatformsClicked = { navController.navigate(Screen.DetailScreen.route) },
+                onSearchAllGamesClicked = { navController.navigate(Screen.DetailScreen.route) },
+                viewModel = viewModel,
+            )
+        }
+        composable(Screen.DetailScreen.route) {
+            DetailScreen()
         }
     }
 }

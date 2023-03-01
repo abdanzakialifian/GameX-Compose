@@ -38,7 +38,14 @@ import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.utils.Shimmer
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewModel()) {
+fun HomeScreen(
+    onAllGenresClicked: () -> Unit,
+    onAllGamesClicked: () -> Unit,
+    onAllPlatformsClicked: () -> Unit,
+    onSearchAllGamesClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = viewModel()
+) {
 
     val getAllGamesState = viewModel.getAllGames.collectAsLazyPagingItems()
     val getAllGenresState = viewModel.getAllGenres.collectAsLazyPagingItems()
@@ -51,13 +58,21 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewMod
         allGenres = getAllGenresState,
         allPlatforms = getAllPlatformsState,
         searchAllGames = searchAllGamesState,
-        modifier = modifier
+        modifier = modifier,
+        onAllGenresClicked = onAllGenresClicked,
+        onAllGamesClicked = onAllGamesClicked,
+        onAllPlatformsClicked = onAllPlatformsClicked,
+        onSearchAllGamesClicked = onSearchAllGamesClicked
     )
 }
 
 @Composable
 fun HomeContent(
     onValueChange: (String) -> Unit,
+    onAllGenresClicked: () -> Unit,
+    onAllGamesClicked: () -> Unit,
+    onAllPlatformsClicked: () -> Unit,
+    onSearchAllGamesClicked: () -> Unit,
     allGenres: LazyPagingItems<GenresResultItem>,
     allGames: LazyPagingItems<GamesResultItem>,
     allPlatforms: LazyPagingItems<PlatformsResultItem>,
@@ -110,11 +125,17 @@ fun HomeContent(
         ) {
             Column(modifier = if (searchValue.isEmpty()) Modifier.verticalScroll(rememberScrollState()) else Modifier.fillMaxHeight()) {
                 if (searchValue.isEmpty()) {
-                    Categories(allGenres = allGenres)
-                    AllGamesHorizontal(allGames = allGames)
-                    Platforms(allPlatforms = allPlatforms)
+                    Categories(onAllGenresClicked = onAllGenresClicked, allGenres = allGenres)
+                    AllGamesHorizontal(onAllGamesClicked = onAllGamesClicked, allGames = allGames)
+                    Platforms(
+                        onAllPlatformsClicked = onAllPlatformsClicked,
+                        allPlatforms = allPlatforms
+                    )
                 } else {
-                    AllGamesVertical(searchAllGames = searchAllGames)
+                    AllGamesVertical(
+                        onSearchAllGamesClicked = onSearchAllGamesClicked,
+                        searchAllGames = searchAllGames
+                    )
                 }
             }
         }
@@ -122,7 +143,7 @@ fun HomeContent(
 }
 
 @Composable
-fun Categories(allGenres: LazyPagingItems<GenresResultItem>) {
+fun Categories(onAllGenresClicked: () -> Unit, allGenres: LazyPagingItems<GenresResultItem>) {
     Text(
         modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
         text = stringResource(id = R.string.categories),
@@ -144,7 +165,8 @@ fun Categories(allGenres: LazyPagingItems<GenresResultItem>) {
                 CategoriesItem(
                     category = it?.name ?: "",
                     image = it?.image ?: "",
-                    onItemClicked = {})
+                    onItemClicked = onAllGenresClicked
+                )
             }
         }
 
@@ -160,7 +182,7 @@ fun Categories(allGenres: LazyPagingItems<GenresResultItem>) {
 }
 
 @Composable
-fun AllGamesHorizontal(allGames: LazyPagingItems<GamesResultItem>) {
+fun AllGamesHorizontal(onAllGamesClicked: () -> Unit, allGames: LazyPagingItems<GamesResultItem>) {
     Text(
         modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
         text = stringResource(id = R.string.all_games),
@@ -182,7 +204,8 @@ fun AllGamesHorizontal(allGames: LazyPagingItems<GamesResultItem>) {
                 GameItem(
                     image = it?.image ?: "",
                     title = it?.name ?: "",
-                    onItemClicked = { })
+                    onItemClicked = onAllGamesClicked,
+                )
             }
         }
 
@@ -210,7 +233,10 @@ fun AllGamesHorizontal(allGames: LazyPagingItems<GamesResultItem>) {
 }
 
 @Composable
-fun Platforms(allPlatforms: LazyPagingItems<PlatformsResultItem>) {
+fun Platforms(
+    onAllPlatformsClicked: () -> Unit,
+    allPlatforms: LazyPagingItems<PlatformsResultItem>
+) {
     Text(
         modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp),
         text = stringResource(id = R.string.platforms),
@@ -234,7 +260,7 @@ fun Platforms(allPlatforms: LazyPagingItems<PlatformsResultItem>) {
                     image = it?.image ?: "",
                     name = it?.name ?: "",
                     totalGames = it?.gamesCount ?: 0,
-                    onItemClicked = {}
+                    onItemClicked = onAllPlatformsClicked
                 )
             }
         }
@@ -263,7 +289,10 @@ fun Platforms(allPlatforms: LazyPagingItems<PlatformsResultItem>) {
 }
 
 @Composable
-fun AllGamesVertical(searchAllGames: LazyPagingItems<GamesResultItem>) {
+fun AllGamesVertical(
+    onSearchAllGamesClicked: () -> Unit,
+    searchAllGames: LazyPagingItems<GamesResultItem>
+) {
     LazyColumn(
         modifier = Modifier.padding(horizontal = 20.dp),
         contentPadding = PaddingValues(vertical = 20.dp),
@@ -281,7 +310,8 @@ fun AllGamesVertical(searchAllGames: LazyPagingItems<GamesResultItem>) {
                     name = it?.name ?: "",
                     date = it?.released ?: "",
                     rating = it?.rating ?: 0.0F,
-                    onItemClicked = { })
+                    onItemClicked = onSearchAllGamesClicked
+                )
             }
         }
 
@@ -316,7 +346,12 @@ fun HomeScreenPreview() {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colors.background,
         ) {
-            HomeScreen()
+            HomeScreen(
+                onAllGenresClicked = {},
+                onAllGamesClicked = {},
+                onAllPlatformsClicked = {},
+                onSearchAllGamesClicked = {},
+            )
         }
     }
 }
