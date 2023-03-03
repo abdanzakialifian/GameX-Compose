@@ -1,16 +1,12 @@
 package com.games.gamex.presentation.home.view
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -115,13 +111,10 @@ fun HomeContent(
             }
         )
         Spacer(modifier = Modifier.height(50.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    color = Color.White,
-                    shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
-                )
+        Card(
+            modifier = Modifier.fillMaxSize(),
+            shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
+            backgroundColor = Color.White
         ) {
             Column(modifier = if (searchValue.isEmpty()) Modifier.verticalScroll(rememberScrollState()) else Modifier.fillMaxHeight()) {
                 if (searchValue.isEmpty()) {
