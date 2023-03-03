@@ -36,7 +36,7 @@ import com.games.gamex.utils.Shimmer
 @Composable
 fun HomeScreen(
     onAllGenresClicked: () -> Unit,
-    onAllGamesClicked: () -> Unit,
+    onAllGamesClicked: (gameId: Int) -> Unit,
     onAllPlatformsClicked: () -> Unit,
     onSearchAllGamesClicked: () -> Unit,
     modifier: Modifier = Modifier,
@@ -66,7 +66,7 @@ fun HomeScreen(
 fun HomeContent(
     onValueChange: (String) -> Unit,
     onAllGenresClicked: () -> Unit,
-    onAllGamesClicked: () -> Unit,
+    onAllGamesClicked: (gameId: Int) -> Unit,
     onAllPlatformsClicked: () -> Unit,
     onSearchAllGamesClicked: () -> Unit,
     allGenres: LazyPagingItems<GenresResultItem>,
@@ -80,37 +80,34 @@ fun HomeContent(
     }
 
     Column(modifier = modifier.fillMaxSize()) {
-        Text(
-            modifier = Modifier.padding(
-                start = 20.dp, top = 20.dp, end = 20.dp, bottom = 4.dp
-            ),
-            text = stringResource(id = R.string.welcome),
-            color = Color.White,
-            fontFamily = FontFamily(
-                Font(resId = R.font.open_sans_bold)
-            ),
-            fontSize = 24.sp
-        )
-        Text(
-            modifier = Modifier.padding(horizontal = 20.dp),
-            text = stringResource(id = R.string.welcome_sub_title),
-            color = Color.White,
-            fontFamily = FontFamily(
-                Font(resId = R.font.open_sans_medium)
-            ),
-            fontSize = 16.sp
-        )
-        Spacer(modifier = Modifier.height(30.dp))
-        CustomSearch(
-            modifier = Modifier.padding(horizontal = 20.dp),
-            value = searchValue,
-            hint = stringResource(id = R.string.search_game),
-            onValueChange = {
-                searchValue = it
-                onValueChange(it)
-            }
-        )
-        Spacer(modifier = Modifier.height(50.dp))
+        Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 60.dp)) {
+            Text(
+                text = stringResource(id = R.string.welcome),
+                color = Color.White,
+                fontFamily = FontFamily(
+                    Font(resId = R.font.open_sans_bold)
+                ),
+                fontSize = 24.sp
+            )
+            Text(
+                modifier = Modifier.padding(top = 4.dp),
+                text = stringResource(id = R.string.welcome_sub_title),
+                color = Color.White,
+                fontFamily = FontFamily(
+                    Font(resId = R.font.open_sans_medium)
+                ),
+                fontSize = 16.sp
+            )
+            CustomSearch(
+                modifier = Modifier.padding(top = 30.dp),
+                value = searchValue,
+                hint = stringResource(id = R.string.search_game),
+                onValueChange = {
+                    searchValue = it
+                    onValueChange(it)
+                }
+            )
+        }
         Card(
             modifier = Modifier.fillMaxSize(),
             shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
@@ -175,7 +172,10 @@ fun Categories(onAllGenresClicked: () -> Unit, allGenres: LazyPagingItems<Genres
 }
 
 @Composable
-fun AllGamesHorizontal(onAllGamesClicked: () -> Unit, allGames: LazyPagingItems<GamesResultItem>) {
+fun AllGamesHorizontal(
+    onAllGamesClicked: (gameId: Int) -> Unit,
+    allGames: LazyPagingItems<GamesResultItem>
+) {
     Text(
         modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
         text = stringResource(id = R.string.all_games),
@@ -197,7 +197,7 @@ fun AllGamesHorizontal(onAllGamesClicked: () -> Unit, allGames: LazyPagingItems<
                 GameItem(
                     image = it?.image ?: "",
                     title = it?.name ?: "",
-                    onItemClicked = onAllGamesClicked,
+                    onItemClicked = { onAllGamesClicked(it?.id ?: 0) },
                 )
             }
         }

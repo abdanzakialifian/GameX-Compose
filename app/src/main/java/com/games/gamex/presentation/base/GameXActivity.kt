@@ -11,10 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.games.gamex.presentation.detail.view.DetailScreen
+import com.games.gamex.presentation.detail.viewmodel.DetailViewModel
 import com.games.gamex.presentation.home.view.HomeScreen
 import com.games.gamex.presentation.home.viewmodel.HomeViewModel
 import com.games.gamex.presentation.navigation.Screen
@@ -44,7 +47,7 @@ class GameXActivity : ComponentActivity() {
 fun GameXApp() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = Screen.SplashScreen.route) {
-        composable(Screen.SplashScreen.route) {
+        composable(route = Screen.SplashScreen.route) {
             SplashScreen(onNavigate = {
                 navController.navigate(Screen.HomeScreen.route) {
                     popUpTo(
@@ -55,18 +58,27 @@ fun GameXApp() {
                 }
             })
         }
-        composable(Screen.HomeScreen.route) {
+        composable(route = Screen.HomeScreen.route) {
             val viewModel = hiltViewModel<HomeViewModel>()
             HomeScreen(
                 onAllGenresClicked = { navController.navigate(Screen.DetailScreen.route) },
-                onAllGamesClicked = { navController.navigate(Screen.DetailScreen.route) },
+                onAllGamesClicked = { navController.navigate(Screen.DetailScreen.createRoute(it.toString())) },
                 onAllPlatformsClicked = { navController.navigate(Screen.DetailScreen.route) },
                 onSearchAllGamesClicked = { navController.navigate(Screen.DetailScreen.route) },
                 viewModel = viewModel,
             )
         }
-        composable(Screen.DetailScreen.route) {
-            DetailScreen()
+        composable(
+            route = Screen.DetailScreen.route,
+            arguments = listOf(
+                navArgument("gameId") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            val viewModel = hiltViewModel<DetailViewModel>()
+            val gameId = backStackEntry.arguments?.getString("gameId")
+            DetailScreen(gameId = gameId ?: "", viewModel = viewModel)
         }
     }
 }

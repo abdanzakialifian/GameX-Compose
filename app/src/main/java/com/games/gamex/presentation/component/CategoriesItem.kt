@@ -29,14 +29,13 @@ fun CategoriesItem(
     onItemClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier
-        .size(width = 90.dp, height = 110.dp)
-        .clickable { onItemClicked() }) {
+    Column(modifier = modifier.size(width = 90.dp, height = 110.dp)) {
         AsyncImage(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .size(80.dp)
-                .clip(CircleShape),
+                .clip(CircleShape)
+                .clickable { onItemClicked() },
             model = image,
             placeholder = painterResource(id = R.drawable.ic_load_64),
             error = painterResource(id = R.drawable.ic_broken_image_64),

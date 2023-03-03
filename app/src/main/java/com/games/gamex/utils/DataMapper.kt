@@ -1,8 +1,10 @@
 package com.games.gamex.utils
 
+import com.games.gamex.data.source.remote.response.DetailGameResponse
 import com.games.gamex.data.source.remote.response.GamesResultItemResponse
 import com.games.gamex.data.source.remote.response.GenresResultItemResponse
 import com.games.gamex.data.source.remote.response.PlatformsResultItemResponse
+import com.games.gamex.domain.model.DetailGame
 import com.games.gamex.domain.model.GamesResultItem
 import com.games.gamex.domain.model.GenresResultItem
 import com.games.gamex.domain.model.PlatformsResultItem
@@ -27,4 +29,8 @@ object DataMapper {
             name = input.name,
             gamesCount = input.gamesCount
         )
+
+    fun mapDetailGameResponseToDetailGame(input: DetailGameResponse): DetailGame = DetailGame(
+        imageBackground = input.backgroundImage
+    )
 }

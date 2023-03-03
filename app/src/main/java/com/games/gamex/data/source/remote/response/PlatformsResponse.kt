@@ -35,7 +35,7 @@ data class PlatformsResultItemResponse(
     val name: String? = null,
 
     @field:SerializedName("games")
-    val games: List<GamesItem>? = null,
+    val games: List<GamesItemResponse>? = null,
 
     @field:SerializedName("id")
     val id: Int? = null,

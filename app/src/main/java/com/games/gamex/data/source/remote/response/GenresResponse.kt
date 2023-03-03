@@ -17,7 +17,7 @@ data class GenresResponse(
 	val results: List<GenresResultItemResponse>? = null
 )
 
-data class GamesItem(
+data class GamesItemResponse(
 
 	@field:SerializedName("added")
 	val added: Int? = null,
@@ -41,7 +41,7 @@ data class GenresResultItemResponse(
 	val name: String? = null,
 
 	@field:SerializedName("games")
-	val games: List<GamesItem?>? = null,
+	val games: List<GamesItemResponse>? = null,
 
 	@field:SerializedName("id")
 	val id: Int? = null,

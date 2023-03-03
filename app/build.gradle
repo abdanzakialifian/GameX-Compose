@@ -77,6 +77,7 @@ dependencies {
     implementation "com.airbnb.android:lottie-compose:$lottie_version"
     implementation "androidx.paging:paging-compose:$paging_compose"
     implementation "io.coil-kt:coil-compose:$coil_compose"
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_compose_version"
 
     // networking
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
