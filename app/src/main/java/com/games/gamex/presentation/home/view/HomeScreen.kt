@@ -1,5 +1,6 @@
 package com.games.gamex.presentation.home.view
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -24,6 +25,10 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.games.gamex.R
 import com.games.gamex.domain.model.GamesResultItem
 import com.games.gamex.domain.model.GenresResultItem
@@ -79,6 +84,18 @@ fun HomeContent(
         mutableStateOf("")
     }
 
+    var isErrorCategories by remember {
+        mutableStateOf(false)
+    }
+
+    var isErrorAllGames by remember {
+        mutableStateOf(false)
+    }
+
+    var isErrorPlatforms by remember {
+        mutableStateOf(false)
+    }
+
     Column(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 60.dp)) {
             Text(
@@ -98,193 +115,285 @@ fun HomeContent(
                 ),
                 fontSize = 16.sp
             )
-            CustomSearch(
-                modifier = Modifier.padding(top = 30.dp),
+            CustomSearch(modifier = Modifier.padding(top = 30.dp),
                 value = searchValue,
                 hint = stringResource(id = R.string.search_game),
                 onValueChange = {
                     searchValue = it
                     onValueChange(it)
-                }
-            )
+                })
         }
         Card(
             modifier = Modifier.fillMaxSize(),
             shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
             backgroundColor = Color.White
         ) {
-            Column(modifier = if (searchValue.isEmpty()) Modifier.verticalScroll(rememberScrollState()) else Modifier.fillMaxHeight()) {
-                if (searchValue.isEmpty()) {
-                    Categories(onAllGenresClicked = onAllGenresClicked, allGenres = allGenres)
-                    AllGamesHorizontal(onAllGamesClicked = onAllGamesClicked, allGames = allGames)
-                    Platforms(
-                        onAllPlatformsClicked = onAllPlatformsClicked,
-                        allPlatforms = allPlatforms
+            if (searchValue.isEmpty()) {
+                if (isErrorCategories && isErrorAllGames && isErrorPlatforms) {
+                    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.error_animation))
+                    val progress by animateLottieCompositionAsState(
+                        composition = composition,
+                        speed = 2F,
+                        restartOnPlay = true
                     )
+
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        LottieAnimation(
+                            modifier = Modifier
+                                .size(250.dp)
+                                .align(Alignment.Center),
+                            composition = composition,
+                            progress = progress
+                        )
+                    }
                 } else {
-                    AllGamesVertical(
-                        onSearchAllGamesClicked = onSearchAllGamesClicked,
-                        searchAllGames = searchAllGames
-                    )
+                    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                        CategoriesContent(
+                            onAllGenresClicked = onAllGenresClicked,
+                            allGenres = allGenres,
+                            onError = { isErrorCategories = it }
+                        )
+                        AllGamesHorizontalContent(
+                            onAllGamesClicked = onAllGamesClicked,
+                            allGames = allGames,
+                            onError = { isErrorAllGames = it }
+                        )
+                        PlatformsContent(
+                            onAllPlatformsClicked = onAllPlatformsClicked,
+                            allPlatforms = allPlatforms,
+                            onError = { isErrorPlatforms = it }
+                        )
+                    }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun Categories(onAllGenresClicked: () -> Unit, allGenres: LazyPagingItems<GenresResultItem>) {
-    Text(
-        modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
-        text = stringResource(id = R.string.categories),
-        color = Color.Black,
-        fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
-        fontSize = 18.sp
-    )
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = 20.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        // initial load
-        when (allGenres.loadState.refresh) {
-            is LoadState.Loading -> items(count = 10) {
-                ShimmerAnimation(shimmer = Shimmer.CATEGORIES_ITEM_PLACEHOLDER)
-            }
-            is LoadState.Error -> {}
-            else -> items(allGenres, key = { it.id ?: 0 }) {
-                CategoriesItem(
-                    category = it?.name ?: "",
-                    image = it?.image ?: "",
-                    onItemClicked = onAllGenresClicked
+            } else {
+                AllGamesVerticalContent(
+                    onSearchAllGamesClicked = onSearchAllGamesClicked,
+                    searchAllGames = searchAllGames
                 )
             }
         }
-
-        // load more (pagination)
-        when (allGenres.loadState.append) {
-            is LoadState.Loading -> item {
-                ShimmerAnimation(shimmer = Shimmer.CATEGORIES_ITEM_PLACEHOLDER)
-            }
-            is LoadState.Error -> {}
-            else -> {}
-        }
     }
 }
 
 @Composable
-fun AllGamesHorizontal(
+fun CategoriesContent(
+    onAllGenresClicked: () -> Unit,
+    allGenres: LazyPagingItems<GenresResultItem>,
+    onError: (Boolean) -> Unit
+) {
+    // initial load
+    when (allGenres.loadState.refresh) {
+        is LoadState.Loading -> {
+            Text(
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
+                text = stringResource(id = R.string.categories),
+                color = Color.Black,
+                fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
+                fontSize = 18.sp
+            )
+
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(
+                        rememberScrollState()
+                    )
+                    .padding(paddingValues = PaddingValues(horizontal = 20.dp)),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                repeat(times = 10) {
+                    ShimmerAnimation(shimmer = Shimmer.CATEGORIES_ITEM_PLACEHOLDER)
+                }
+            }
+        }
+        is LoadState.NotLoading -> {
+            Text(
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
+                text = stringResource(id = R.string.categories),
+                color = Color.Black,
+                fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
+                fontSize = 18.sp
+            )
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(allGenres, key = { it.id ?: 0 }) {
+                    CategoriesItem(
+                        category = it?.name ?: "",
+                        image = it?.image ?: "",
+                        onItemClicked = onAllGenresClicked
+                    )
+                }
+
+                // load more (pagination)
+                when (allGenres.loadState.append) {
+                    is LoadState.Loading -> item {
+                        ShimmerAnimation(shimmer = Shimmer.CATEGORIES_ITEM_PLACEHOLDER)
+                    }
+                    is LoadState.Error -> {}
+                    else -> {}
+                }
+            }
+        }
+        is LoadState.Error -> onError(true)
+    }
+}
+
+@Composable
+fun AllGamesHorizontalContent(
     onAllGamesClicked: (gameId: Int) -> Unit,
-    allGames: LazyPagingItems<GamesResultItem>
+    allGames: LazyPagingItems<GamesResultItem>,
+    onError: (Boolean) -> Unit
 ) {
-    Text(
-        modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
-        text = stringResource(id = R.string.all_games),
-        color = Color.Black,
-        fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
-        fontSize = 18.sp
-    )
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = 20.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        // initial load
-        when (allGames.loadState.refresh) {
-            is LoadState.Loading -> items(count = 10) {
-                ShimmerAnimation(Shimmer.GAME_ITEM_PLACEHOLDER)
-            }
-            is LoadState.Error -> {}
-            else -> items(items = allGames, key = { it.id ?: 0 }) {
-                GameItem(
-                    image = it?.image ?: "",
-                    title = it?.name ?: "",
-                    onItemClicked = { onAllGamesClicked(it?.id ?: 0) },
-                )
-            }
-        }
-
-        // load more (pagination)
-        when (allGames.loadState.append) {
-            is LoadState.Loading -> item {
-                Column(
-                    modifier = Modifier
-                        .height(190.dp)
-                        .padding(horizontal = 8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(30.dp), color = colorResource(
-                            id = R.color.dark_grey
-                        )
+    // initial load
+    when (allGames.loadState.refresh) {
+        is LoadState.Loading -> {
+            Text(
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
+                text = stringResource(id = R.string.all_games),
+                color = Color.Black,
+                fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
+                fontSize = 18.sp
+            )
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(
+                        rememberScrollState()
                     )
+                    .padding(paddingValues = PaddingValues(horizontal = 20.dp)),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                repeat(times = 10) {
+                    ShimmerAnimation(Shimmer.GAME_ITEM_PLACEHOLDER)
                 }
             }
-            is LoadState.Error -> {}
-            else -> {}
         }
+        is LoadState.NotLoading -> {
+            Text(
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
+                text = stringResource(id = R.string.all_games),
+                color = Color.Black,
+                fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
+                fontSize = 18.sp
+            )
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(items = allGames, key = { it.id ?: 0 }) {
+                    GameItem(
+                        image = it?.image ?: "",
+                        title = it?.name ?: "",
+                        onItemClicked = { onAllGamesClicked(it?.id ?: 0) },
+                    )
+                }
+
+                // load more (pagination)
+                when (allGames.loadState.append) {
+                    is LoadState.Loading -> item {
+                        Column(
+                            modifier = Modifier
+                                .height(190.dp)
+                                .padding(horizontal = 8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(30.dp), color = colorResource(
+                                    id = R.color.dark_grey
+                                )
+                            )
+                        }
+                    }
+                    is LoadState.Error -> {}
+                    else -> {}
+                }
+            }
+        }
+        is LoadState.Error -> onError(true)
     }
 }
 
 @Composable
-fun Platforms(
+fun PlatformsContent(
     onAllPlatformsClicked: () -> Unit,
-    allPlatforms: LazyPagingItems<PlatformsResultItem>
+    allPlatforms: LazyPagingItems<PlatformsResultItem>,
+    onError: (Boolean) -> Unit
 ) {
-    Text(
-        modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp),
-        text = stringResource(id = R.string.platforms),
-        color = Color.Black,
-        fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
-        fontSize = 18.sp
-    )
-    LazyRow(
-        modifier = Modifier.padding(bottom = 40.dp),
-        contentPadding = PaddingValues(horizontal = 20.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        // initial load
-        when (allPlatforms.loadState.refresh) {
-            is LoadState.Loading -> items(count = 10) {
-                ShimmerAnimation(shimmer = Shimmer.PLATFORM_ITEM_PLACEHOLDER)
-            }
-            is LoadState.Error -> {}
-            else -> items(allPlatforms, key = { it.id ?: 0 }) {
-                PlatformItem(
-                    image = it?.image ?: "",
-                    name = it?.name ?: "",
-                    totalGames = it?.gamesCount ?: 0,
-                    onItemClicked = onAllPlatformsClicked
-                )
-            }
-        }
-
-        // load more (pagination)
-        when (allPlatforms.loadState.append) {
-            is LoadState.Loading -> item {
-                Column(
-                    modifier = Modifier
-                        .height(210.dp)
-                        .padding(horizontal = 8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(30.dp), color = colorResource(
-                            id = R.color.dark_grey
-                        )
+    // initial load
+    when (allPlatforms.loadState.refresh) {
+        is LoadState.Loading -> {
+            Text(
+                modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp),
+                text = stringResource(id = R.string.platforms),
+                color = Color.Black,
+                fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
+                fontSize = 18.sp
+            )
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(
+                        rememberScrollState()
                     )
+                    .padding(paddingValues = PaddingValues(horizontal = 20.dp)),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                repeat(times = 10) {
+                    ShimmerAnimation(shimmer = Shimmer.PLATFORM_ITEM_PLACEHOLDER)
                 }
             }
-            is LoadState.Error -> {}
-            else -> {}
         }
+        is LoadState.NotLoading -> {
+            Text(
+                modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp),
+                text = stringResource(id = R.string.platforms),
+                color = Color.Black,
+                fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
+                fontSize = 18.sp
+            )
+            LazyRow(
+                modifier = Modifier.padding(bottom = 40.dp),
+                contentPadding = PaddingValues(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(allPlatforms, key = { it.id ?: 0 }) {
+                    PlatformItem(
+                        image = it?.image ?: "",
+                        name = it?.name ?: "",
+                        totalGames = it?.gamesCount ?: 0,
+                        onItemClicked = onAllPlatformsClicked
+                    )
+                }
+
+                // load more (pagination)
+                when (allPlatforms.loadState.append) {
+                    is LoadState.Loading -> item {
+                        Column(
+                            modifier = Modifier
+                                .height(210.dp)
+                                .padding(horizontal = 8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(30.dp), color = colorResource(
+                                    id = R.color.dark_grey
+                                )
+                            )
+                        }
+                    }
+                    is LoadState.Error -> {}
+                    else -> {}
+                }
+            }
+        }
+        is LoadState.Error -> onError(true)
     }
 }
 
 @Composable
-fun AllGamesVertical(
-    onSearchAllGamesClicked: () -> Unit,
-    searchAllGames: LazyPagingItems<GamesResultItem>
+fun AllGamesVerticalContent(
+    onSearchAllGamesClicked: () -> Unit, searchAllGames: LazyPagingItems<GamesResultItem>
 ) {
     LazyColumn(
         modifier = Modifier.padding(horizontal = 20.dp),

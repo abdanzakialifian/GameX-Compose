@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -31,11 +32,11 @@ fun PlatformItem(
     modifier: Modifier = Modifier
 ) {
     var isLoading by remember {
-        mutableStateOf(false)
+        mutableStateOf(true)
     }
 
     var isError by remember {
-        mutableStateOf(false)
+        mutableStateOf(true)
     }
 
     Card(
@@ -50,7 +51,8 @@ fun PlatformItem(
             AsyncImage(
                 modifier = Modifier
                     .height(160.dp)
-                    .clip(RoundedCornerShape(20.dp)),
+                    .clip(RoundedCornerShape(20.dp))
+                    .align(Alignment.CenterHorizontally),
                 model = image,
                 placeholder = painterResource(id = R.drawable.ic_load_64),
                 error = painterResource(id = R.drawable.ic_broken_image_64),
