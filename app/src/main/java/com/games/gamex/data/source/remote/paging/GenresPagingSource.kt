@@ -5,6 +5,7 @@ import androidx.paging.PagingState
 import com.games.gamex.data.source.remote.response.GenresResultItemResponse
 import com.games.gamex.data.source.remote.services.ApiService
 import kotlinx.coroutines.delay
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 

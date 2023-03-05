@@ -4,6 +4,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -37,6 +38,8 @@ import com.games.gamex.presentation.component.*
 import com.games.gamex.presentation.home.viewmodel.HomeViewModel
 import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.utils.Shimmer
+import com.games.gamex.utils.isScrollToEnd
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -96,80 +99,90 @@ fun HomeContent(
         mutableStateOf(false)
     }
 
-    Column(modifier = modifier.fillMaxSize()) {
-        Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 60.dp)) {
-            Text(
-                text = stringResource(id = R.string.welcome),
-                color = Color.White,
-                fontFamily = FontFamily(
-                    Font(resId = R.font.open_sans_bold)
-                ),
-                fontSize = 24.sp
-            )
-            Text(
-                modifier = Modifier.padding(top = 4.dp),
-                text = stringResource(id = R.string.welcome_sub_title),
-                color = Color.White,
-                fontFamily = FontFamily(
-                    Font(resId = R.font.open_sans_medium)
-                ),
-                fontSize = 16.sp
-            )
-            CustomSearch(modifier = Modifier.padding(top = 30.dp),
-                value = searchValue,
-                hint = stringResource(id = R.string.search_game),
-                onValueChange = {
-                    searchValue = it
-                    onValueChange(it)
-                })
-        }
-        Card(
-            modifier = Modifier.fillMaxSize(),
-            shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
-            backgroundColor = Color.White
-        ) {
-            if (searchValue.isEmpty()) {
-                if (isErrorCategories && isErrorAllGames && isErrorPlatforms) {
-                    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.error_animation))
-                    val progress by animateLottieCompositionAsState(
-                        composition = composition,
-                        speed = 2F,
-                        restartOnPlay = true
-                    )
+    val scaffoldState = rememberScaffoldState()
 
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        LottieAnimation(
-                            modifier = Modifier
-                                .size(250.dp)
-                                .align(Alignment.Center),
-                            composition = composition,
-                            progress = progress
+    Scaffold(scaffoldState = scaffoldState) { paddingValues ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 60.dp)) {
+                Text(
+                    text = stringResource(id = R.string.welcome),
+                    color = Color.White,
+                    fontFamily = FontFamily(
+                        Font(resId = R.font.open_sans_bold)
+                    ),
+                    fontSize = 24.sp
+                )
+                Text(
+                    modifier = Modifier.padding(top = 4.dp),
+                    text = stringResource(id = R.string.welcome_sub_title),
+                    color = Color.White,
+                    fontFamily = FontFamily(
+                        Font(resId = R.font.open_sans_medium)
+                    ),
+                    fontSize = 16.sp
+                )
+                CustomSearch(modifier = Modifier.padding(top = 30.dp),
+                    value = searchValue,
+                    hint = stringResource(id = R.string.search_game),
+                    onValueChange = {
+                        searchValue = it
+                        onValueChange(it)
+                    })
+            }
+            Card(
+                modifier = Modifier.fillMaxSize(),
+                shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
+                backgroundColor = Color.White
+            ) {
+                if (searchValue.isEmpty()) {
+                    if (isErrorCategories && isErrorAllGames && isErrorPlatforms) {
+                        val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.error_animation))
+                        val progress by animateLottieCompositionAsState(
+                            composition = composition, speed = 2F, restartOnPlay = true
                         )
+
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            LottieAnimation(
+                                modifier = Modifier
+                                    .size(250.dp)
+                                    .align(Alignment.Center),
+                                composition = composition,
+                                progress = progress
+                            )
+                        }
+                    } else {
+                        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                            CategoriesContent(
+                                onAllGenresClicked = onAllGenresClicked,
+                                allGenres = allGenres,
+                                onError = { isErrorCategories = it },
+                                scaffoldState = scaffoldState
+                            )
+                            AllGamesHorizontalContent(
+                                onAllGamesClicked = onAllGamesClicked,
+                                allGames = allGames,
+                                onError = { isErrorAllGames = it },
+                                scaffoldState = scaffoldState
+                            )
+                            PlatformsContent(
+                                onAllPlatformsClicked = onAllPlatformsClicked,
+                                allPlatforms = allPlatforms,
+                                onError = { isErrorPlatforms = it },
+                                scaffoldState = scaffoldState
+                            )
+                        }
                     }
                 } else {
-                    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                        CategoriesContent(
-                            onAllGenresClicked = onAllGenresClicked,
-                            allGenres = allGenres,
-                            onError = { isErrorCategories = it }
-                        )
-                        AllGamesHorizontalContent(
-                            onAllGamesClicked = onAllGamesClicked,
-                            allGames = allGames,
-                            onError = { isErrorAllGames = it }
-                        )
-                        PlatformsContent(
-                            onAllPlatformsClicked = onAllPlatformsClicked,
-                            allPlatforms = allPlatforms,
-                            onError = { isErrorPlatforms = it }
-                        )
-                    }
+                    AllGamesVerticalContent(
+                        onSearchAllGamesClicked = onSearchAllGamesClicked,
+                        searchAllGames = searchAllGames,
+                        scaffoldState = scaffoldState
+                    )
                 }
-            } else {
-                AllGamesVerticalContent(
-                    onSearchAllGamesClicked = onSearchAllGamesClicked,
-                    searchAllGames = searchAllGames
-                )
             }
         }
     }
@@ -178,9 +191,33 @@ fun HomeContent(
 @Composable
 fun CategoriesContent(
     onAllGenresClicked: () -> Unit,
+    onError: (Boolean) -> Unit,
     allGenres: LazyPagingItems<GenresResultItem>,
-    onError: (Boolean) -> Unit
+    scaffoldState: ScaffoldState
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val scrollState = rememberLazyListState()
+
+    // observer when reached end of list
+    val endOfListReached by remember {
+        derivedStateOf {
+            scrollState.isScrollToEnd()
+        }
+    }
+    // act when end of list reached
+    LaunchedEffect(endOfListReached) {
+        allGenres.retry()
+    }
+
+    // handle error data while load more
+    if (allGenres.loadState.append is LoadState.Error) {
+        LaunchedEffect(Unit) {
+            coroutineScope.launch {
+                scaffoldState.snackbarHostState.showSnackbar(message = (allGenres.loadState.append as LoadState.Error).error.message.toString())
+            }
+        }
+    }
+
     // initial load
     when (allGenres.loadState.refresh) {
         is LoadState.Loading -> {
@@ -215,7 +252,8 @@ fun CategoriesContent(
             )
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                state = scrollState
             ) {
                 items(allGenres, key = { it.id ?: 0 }) {
                     CategoriesItem(
@@ -226,12 +264,10 @@ fun CategoriesContent(
                 }
 
                 // load more (pagination)
-                when (allGenres.loadState.append) {
-                    is LoadState.Loading -> item {
+                if (allGenres.loadState.append == LoadState.Loading) {
+                    item {
                         ShimmerAnimation(shimmer = Shimmer.CATEGORIES_ITEM_PLACEHOLDER)
                     }
-                    is LoadState.Error -> {}
-                    else -> {}
                 }
             }
         }
@@ -243,8 +279,32 @@ fun CategoriesContent(
 fun AllGamesHorizontalContent(
     onAllGamesClicked: (gameId: Int) -> Unit,
     allGames: LazyPagingItems<GamesResultItem>,
-    onError: (Boolean) -> Unit
+    onError: (Boolean) -> Unit,
+    scaffoldState: ScaffoldState
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val scrollState = rememberLazyListState()
+
+    // observer when reached end of list
+    val endOfListReached by remember {
+        derivedStateOf {
+            scrollState.isScrollToEnd()
+        }
+    }
+    // act when end of list reached
+    LaunchedEffect(endOfListReached) {
+        allGames.retry()
+    }
+
+    // handle error data while load more
+    if (allGames.loadState.append is LoadState.Error) {
+        LaunchedEffect(Unit) {
+            coroutineScope.launch {
+                scaffoldState.snackbarHostState.showSnackbar(message = (allGames.loadState.append as LoadState.Error).error.message.toString())
+            }
+        }
+    }
+
     // initial load
     when (allGames.loadState.refresh) {
         is LoadState.Loading -> {
@@ -278,7 +338,8 @@ fun AllGamesHorizontalContent(
             )
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                state = scrollState
             ) {
                 items(items = allGames, key = { it.id ?: 0 }) {
                     GameItem(
@@ -289,8 +350,8 @@ fun AllGamesHorizontalContent(
                 }
 
                 // load more (pagination)
-                when (allGames.loadState.append) {
-                    is LoadState.Loading -> item {
+                if (allGames.loadState.append == LoadState.Loading) {
+                    item {
                         Column(
                             modifier = Modifier
                                 .height(190.dp)
@@ -305,8 +366,6 @@ fun AllGamesHorizontalContent(
                             )
                         }
                     }
-                    is LoadState.Error -> {}
-                    else -> {}
                 }
             }
         }
@@ -318,8 +377,32 @@ fun AllGamesHorizontalContent(
 fun PlatformsContent(
     onAllPlatformsClicked: () -> Unit,
     allPlatforms: LazyPagingItems<PlatformsResultItem>,
-    onError: (Boolean) -> Unit
+    onError: (Boolean) -> Unit,
+    scaffoldState: ScaffoldState
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val scrollState = rememberLazyListState()
+
+    // observer when reached end of list
+    val endOfListReached by remember {
+        derivedStateOf {
+            scrollState.isScrollToEnd()
+        }
+    }
+    // act when end of list reached
+    LaunchedEffect(endOfListReached) {
+        allPlatforms.retry()
+    }
+
+    // handle error data while load more
+    if (allPlatforms.loadState.append is LoadState.Error) {
+        LaunchedEffect(Unit) {
+            coroutineScope.launch {
+                scaffoldState.snackbarHostState.showSnackbar(message = (allPlatforms.loadState.append as LoadState.Error).error.message.toString())
+            }
+        }
+    }
+
     // initial load
     when (allPlatforms.loadState.refresh) {
         is LoadState.Loading -> {
@@ -354,7 +437,8 @@ fun PlatformsContent(
             LazyRow(
                 modifier = Modifier.padding(bottom = 40.dp),
                 contentPadding = PaddingValues(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                state = scrollState
             ) {
                 items(allPlatforms, key = { it.id ?: 0 }) {
                     PlatformItem(
@@ -366,8 +450,8 @@ fun PlatformsContent(
                 }
 
                 // load more (pagination)
-                when (allPlatforms.loadState.append) {
-                    is LoadState.Loading -> item {
+                if (allPlatforms.loadState.append == LoadState.Loading) {
+                    item {
                         Column(
                             modifier = Modifier
                                 .height(210.dp)
@@ -382,8 +466,6 @@ fun PlatformsContent(
                             )
                         }
                     }
-                    is LoadState.Error -> {}
-                    else -> {}
                 }
             }
         }
@@ -393,50 +475,84 @@ fun PlatformsContent(
 
 @Composable
 fun AllGamesVerticalContent(
-    onSearchAllGamesClicked: () -> Unit, searchAllGames: LazyPagingItems<GamesResultItem>
+    onSearchAllGamesClicked: () -> Unit,
+    searchAllGames: LazyPagingItems<GamesResultItem>,
+    scaffoldState: ScaffoldState
 ) {
-    LazyColumn(
-        modifier = Modifier.padding(horizontal = 20.dp),
-        contentPadding = PaddingValues(vertical = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        // initial load
-        when (searchAllGames.loadState.refresh) {
-            is LoadState.Loading -> items(15) {
+    val coroutineScope = rememberCoroutineScope()
+    val scrollState = rememberLazyListState()
+
+    // observer when reached end of list
+    val endOfListReached by remember {
+        derivedStateOf {
+            scrollState.isScrollToEnd()
+        }
+    }
+    // act when end of list reached
+    LaunchedEffect(endOfListReached) {
+        searchAllGames.retry()
+    }
+
+    // handle error data while load more
+    if (searchAllGames.loadState.append is LoadState.Error) {
+        LaunchedEffect(Unit) {
+            coroutineScope.launch {
+                scaffoldState.snackbarHostState.showSnackbar(message = (searchAllGames.loadState.append as LoadState.Error).error.message.toString())
+            }
+        }
+    }
+
+    // initial load
+    when (searchAllGames.loadState.refresh) {
+        is LoadState.Loading -> Column(
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .padding(paddingValues = PaddingValues(vertical = 20.dp))
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            repeat(times = 15) {
                 ShimmerAnimation(shimmer = Shimmer.GAME_ITEM_SECOND_PLACEHOLDER)
             }
-            is LoadState.Error -> {}
-            else -> items(searchAllGames, key = { it.id ?: 0 }) {
-                GameItemSecond(
-                    image = it?.image ?: "",
-                    name = it?.name ?: "",
-                    date = it?.released ?: "",
-                    rating = it?.rating ?: 0.0F,
-                    onItemClicked = onSearchAllGamesClicked
-                )
-            }
         }
-
-        // load more (pagination)
-        when (searchAllGames.loadState.append) {
-            is LoadState.Loading -> item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(30.dp), color = colorResource(
-                            id = R.color.dark_grey
-                        )
+        is LoadState.NotLoading -> {
+            LazyColumn(
+                modifier = Modifier.padding(horizontal = 20.dp),
+                contentPadding = PaddingValues(vertical = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                state = scrollState
+            ) {
+                items(searchAllGames, key = { it.id ?: 0 }) {
+                    GameItemSecond(
+                        image = it?.image ?: "",
+                        name = it?.name ?: "",
+                        date = it?.released ?: "",
+                        rating = it?.rating ?: 0.0F,
+                        onItemClicked = onSearchAllGamesClicked
                     )
                 }
+
+                // load more (pagination)
+                if (searchAllGames.loadState.append == LoadState.Loading) {
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(30.dp), color = colorResource(
+                                    id = R.color.dark_grey
+                                )
+                            )
+                        }
+                    }
+                }
             }
-            is LoadState.Error -> {}
-            else -> {}
         }
+        is LoadState.Error -> {}
     }
 }
 

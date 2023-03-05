@@ -1,6 +1,7 @@
 package com.games.gamex.utils
 
 import android.os.Build
+import androidx.compose.foundation.lazy.LazyListState
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -17,3 +18,6 @@ fun String.convertDate(): String {
         simpleDateFormat.format(parser.parse(this) ?: "")
     }
 }
+
+fun LazyListState.isScrollToEnd() =
+    layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1

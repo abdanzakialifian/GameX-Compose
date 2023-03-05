@@ -35,14 +35,16 @@ class RemoteDataSource @Inject constructor(
         }).flow
 
     fun getAllGenres(): Flow<PagingData<GenresResultItemResponse>> = Pager(config = PagingConfig(
-        pageSize = 6, initialLoadSize = 6
+        pageSize = 10,
+        initialLoadSize = 10
     ), pagingSourceFactory = {
         genresPagingSource
     }).flow
 
     fun getAllPlatforms(): Flow<PagingData<PlatformsResultItemResponse>> =
         Pager(config = PagingConfig(
-            pageSize = 10, initialLoadSize = 10
+            pageSize = 10,
+            initialLoadSize = 10,
         ), pagingSourceFactory = {
             platformsPagingSource
         }).flow
