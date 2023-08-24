@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.items
+import androidx.paging.compose.itemKey
 import com.games.gamex.R
 import com.games.gamex.domain.model.ListResultItem
 import com.games.gamex.presentation.component.GameItemHorizontal
@@ -104,7 +104,10 @@ fun GamesHorizontalSection(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         state = scrollState
     ) {
-        items(items = gamesHorizontalPaging, key = { data -> data.id ?: 0 }) { game ->
+        items(
+            count = gamesHorizontalPaging.itemCount,
+            key = gamesHorizontalPaging.itemKey { data -> data.id ?: 0 }) { index ->
+            val game = gamesHorizontalPaging[index]
             GameItemHorizontal(
                 image = game?.image ?: "",
                 title = game?.name ?: "",

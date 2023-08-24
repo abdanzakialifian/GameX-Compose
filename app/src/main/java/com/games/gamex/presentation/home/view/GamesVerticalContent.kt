@@ -25,7 +25,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.items
+import androidx.paging.compose.itemKey
 import com.games.gamex.R
 import com.games.gamex.domain.model.ListResultItem
 import com.games.gamex.presentation.component.GameItemVertical
@@ -104,7 +104,10 @@ fun GamesVerticalSection(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         state = scrollState
     ) {
-        items(gamesVerticalPaging, key = { data -> data.id ?: 0 }) { game ->
+        items(
+            count = gamesVerticalPaging.itemCount,
+            key = gamesVerticalPaging.itemKey { data -> data.id ?: 0 }) { index ->
+            val game = gamesVerticalPaging[index]
             GameItemVertical(
                 image = game?.image ?: "",
                 name = game?.name ?: "",

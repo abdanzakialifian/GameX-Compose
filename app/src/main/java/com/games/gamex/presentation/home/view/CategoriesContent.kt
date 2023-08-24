@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.items
+import androidx.paging.compose.itemKey
 import com.games.gamex.R
 import com.games.gamex.domain.model.ListResultItem
 import com.games.gamex.presentation.component.CategoriesItem
@@ -100,7 +100,10 @@ fun CategoriesSection(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         state = scrollState
     ) {
-        items(genresPaging, key = { data -> data.id ?: 0 }) { genre ->
+        items(
+            count = genresPaging.itemCount,
+            key = genresPaging.itemKey { data -> data.id ?: 0 }) { index ->
+            val genre = genresPaging[index]
             CategoriesItem(
                 category = genre?.name ?: "",
                 image = genre?.image ?: "",

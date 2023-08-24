@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.items
+import androidx.paging.compose.itemKey
 import com.games.gamex.R
 import com.games.gamex.domain.model.ListResultItem
 import com.games.gamex.presentation.component.PlatformItem
@@ -104,7 +104,10 @@ fun PlatformsSection(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         state = scrollState
     ) {
-        items(platformsPaging, key = { data -> data.id ?: 0 }) { platform ->
+        items(
+            count = platformsPaging.itemCount,
+            key = platformsPaging.itemKey { data -> data.id ?: 0 }) { index ->
+            val platform = platformsPaging[index]
             PlatformItem(
                 image = platform?.image ?: "",
                 name = platform?.name ?: "",
