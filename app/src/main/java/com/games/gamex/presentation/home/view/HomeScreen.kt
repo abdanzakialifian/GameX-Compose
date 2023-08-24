@@ -1,15 +1,38 @@
 package com.games.gamex.presentation.home.view
 
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,10 +54,13 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.games.gamex.R
-import com.games.gamex.domain.model.GamesResultItem
-import com.games.gamex.domain.model.GenresResultItem
-import com.games.gamex.domain.model.PlatformsResultItem
-import com.games.gamex.presentation.component.*
+import com.games.gamex.domain.model.ListResultItem
+import com.games.gamex.presentation.component.CategoriesItem
+import com.games.gamex.presentation.component.CustomSearch
+import com.games.gamex.presentation.component.GameItem
+import com.games.gamex.presentation.component.GameItemSecond
+import com.games.gamex.presentation.component.PlatformItem
+import com.games.gamex.presentation.component.ShimmerAnimation
 import com.games.gamex.presentation.home.viewmodel.HomeViewModel
 import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.utils.Shimmer
@@ -77,10 +103,10 @@ fun HomeContent(
     onAllGamesClicked: (gameId: Int) -> Unit,
     onAllPlatformsClicked: () -> Unit,
     onSearchAllGamesClicked: () -> Unit,
-    allGenres: LazyPagingItems<GenresResultItem>,
-    allGames: LazyPagingItems<GamesResultItem>,
-    allPlatforms: LazyPagingItems<PlatformsResultItem>,
-    searchAllGames: LazyPagingItems<GamesResultItem>,
+    allGenres: LazyPagingItems<ListResultItem>,
+    allGames: LazyPagingItems<ListResultItem>,
+    allPlatforms: LazyPagingItems<ListResultItem>,
+    searchAllGames: LazyPagingItems<ListResultItem>,
     modifier: Modifier = Modifier
 ) {
     var searchValue by remember {
@@ -192,7 +218,7 @@ fun HomeContent(
 fun CategoriesContent(
     onAllGenresClicked: () -> Unit,
     onError: (Boolean) -> Unit,
-    allGenres: LazyPagingItems<GenresResultItem>,
+    allGenres: LazyPagingItems<ListResultItem>,
     scaffoldState: ScaffoldState
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -278,7 +304,7 @@ fun CategoriesContent(
 @Composable
 fun AllGamesHorizontalContent(
     onAllGamesClicked: (gameId: Int) -> Unit,
-    allGames: LazyPagingItems<GamesResultItem>,
+    allGames: LazyPagingItems<ListResultItem>,
     onError: (Boolean) -> Unit,
     scaffoldState: ScaffoldState
 ) {
@@ -376,7 +402,7 @@ fun AllGamesHorizontalContent(
 @Composable
 fun PlatformsContent(
     onAllPlatformsClicked: () -> Unit,
-    allPlatforms: LazyPagingItems<PlatformsResultItem>,
+    allPlatforms: LazyPagingItems<ListResultItem>,
     onError: (Boolean) -> Unit,
     scaffoldState: ScaffoldState
 ) {
@@ -476,7 +502,7 @@ fun PlatformsContent(
 @Composable
 fun AllGamesVerticalContent(
     onSearchAllGamesClicked: () -> Unit,
-    searchAllGames: LazyPagingItems<GamesResultItem>,
+    searchAllGames: LazyPagingItems<ListResultItem>,
     scaffoldState: ScaffoldState
 ) {
     val coroutineScope = rememberCoroutineScope()

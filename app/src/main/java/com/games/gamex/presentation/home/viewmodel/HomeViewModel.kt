@@ -3,17 +3,15 @@ package com.games.gamex.presentation.home.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
-import com.games.gamex.domain.model.GamesResultItem
-import com.games.gamex.domain.model.GenresResultItem
-import com.games.gamex.domain.model.PlatformsResultItem
-import com.games.gamex.domain.usecase.GameXInteractor
+import com.games.gamex.domain.model.ListResultItem
+import com.games.gamex.domain.usecase.home.HomeUseCaseWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val gameXInteractor: GameXInteractor) :
+class HomeViewModel @Inject constructor(private val homeUseCaseWrapper: HomeUseCaseWrapper) :
     ViewModel() {
 
     private val searchQuery = MutableStateFlow("")
@@ -23,30 +21,30 @@ class HomeViewModel @Inject constructor(private val gameXInteractor: GameXIntera
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val searchAllGames: Flow<PagingData<GamesResultItem>> =
+    val searchAllGames: Flow<PagingData<ListResultItem>> =
         searchQuery.flatMapLatest { searchQuery ->
-            gameXInteractor.getAllGames(searchQuery).stateIn(
+            homeUseCaseWrapper.getAllGames(searchQuery).stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(),
                 initialValue = PagingData.empty()
             )
         }
 
-    val getAllGames: Flow<PagingData<GamesResultItem>> = gameXInteractor.getAllGames("").stateIn(
+    val getAllGames: Flow<PagingData<ListResultItem>> = homeUseCaseWrapper.getAllGames("").stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
         initialValue = PagingData.empty()
     )
 
-    val getAllGenres: StateFlow<PagingData<GenresResultItem>> =
-        gameXInteractor.getAllGenres().stateIn(
+    val getAllGenres: StateFlow<PagingData<ListResultItem>> =
+        homeUseCaseWrapper.getAllGameGenres().stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
             initialValue = PagingData.empty()
         )
 
-    val getAllPlatforms: StateFlow<PagingData<PlatformsResultItem>> =
-        gameXInteractor.getAllPlatforms().stateIn(
+    val getAllPlatforms: StateFlow<PagingData<ListResultItem>> =
+        homeUseCaseWrapper.getAllGamePlatforms().stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
             initialValue = PagingData.empty()

@@ -5,29 +5,27 @@ import com.games.gamex.data.source.remote.response.GamesResultItemResponse
 import com.games.gamex.data.source.remote.response.GenresResultItemResponse
 import com.games.gamex.data.source.remote.response.PlatformsResultItemResponse
 import com.games.gamex.domain.model.DetailGame
-import com.games.gamex.domain.model.GamesResultItem
-import com.games.gamex.domain.model.GenresResultItem
-import com.games.gamex.domain.model.PlatformsResultItem
+import com.games.gamex.domain.model.ListResultItem
 
 object DataMapper {
-    fun mapGamesResultItemResponseToGamesResultItem(input: GamesResultItemResponse): GamesResultItem =
-        GamesResultItem(
-            id = input.id,
-            image = input.backgroundImage,
-            name = input.name,
-            released = input.released,
-            rating = input.rating.toString().toFloat()
+    fun GamesResultItemResponse.mapGamesResultItemResponseToListResultItem(): ListResultItem =
+        ListResultItem(
+            id = id,
+            image = backgroundImage,
+            name = name,
+            released = released,
+            rating = rating.toString().toFloat()
         )
 
-    fun mapGenresResultItemResponseToGenresResultItem(input: GenresResultItemResponse): GenresResultItem =
-        GenresResultItem(id = input.id, name = input.name, image = input.imageBackground)
+    fun GenresResultItemResponse.mapGenresResultItemResponseToListResultItem(): ListResultItem =
+        ListResultItem(id = id, name = name, image = imageBackground)
 
-    fun mapPlatformsResultItemResponseToPlatformsResultItem(input: PlatformsResultItemResponse): PlatformsResultItem =
-        PlatformsResultItem(
-            id = input.id,
-            image = input.imageBackground,
-            name = input.name,
-            gamesCount = input.gamesCount
+    fun PlatformsResultItemResponse.mapPlatformsResultItemResponseToListResultItem(): ListResultItem =
+        ListResultItem(
+            id = id,
+            image = imageBackground,
+            name = name,
+            gamesCount = gamesCount
         )
 
     fun mapDetailGameResponseToDetailGame(input: DetailGameResponse): DetailGame = DetailGame(

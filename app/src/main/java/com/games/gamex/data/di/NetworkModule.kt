@@ -36,9 +36,9 @@ class NetworkModule {
                     .build()
                 chain.proceed(requestBuilder)
             }
-            .connectTimeout(3, TimeUnit.SECONDS)
-            .readTimeout(3, TimeUnit.SECONDS)
-            .writeTimeout(3, TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
             .build()
         return okHttpClient
     }

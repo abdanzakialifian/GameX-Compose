@@ -12,8 +12,10 @@ import com.games.gamex.data.source.remote.response.GenresResultItemResponse
 import com.games.gamex.data.source.remote.response.PlatformsResultItemResponse
 import com.games.gamex.data.source.remote.services.ApiService
 import com.games.gamex.utils.UiState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -32,14 +34,13 @@ class RemoteDataSource @Inject constructor(
             gamesPagingSource.apply {
                 setQuerySearch(querySearch)
             }
-        }).flow
+        }).flow.flowOn(Dispatchers.IO)
 
     fun getAllGenres(): Flow<PagingData<GenresResultItemResponse>> = Pager(config = PagingConfig(
-        pageSize = 10,
-        initialLoadSize = 10
+        pageSize = 10, initialLoadSize = 10
     ), pagingSourceFactory = {
         genresPagingSource
-    }).flow
+    }).flow.flowOn(Dispatchers.IO)
 
     fun getAllPlatforms(): Flow<PagingData<PlatformsResultItemResponse>> =
         Pager(config = PagingConfig(
@@ -47,7 +48,7 @@ class RemoteDataSource @Inject constructor(
             initialLoadSize = 10,
         ), pagingSourceFactory = {
             platformsPagingSource
-        }).flow
+        }).flow.flowOn(Dispatchers.IO)
 
     fun getDetailGame(id: String): Flow<UiState<DetailGameResponse>> = flow {
         val response = apiService.getDetailGame(id)
@@ -58,5 +59,5 @@ class RemoteDataSource @Inject constructor(
         } else {
             emit(UiState.Error(response.message()))
         }
-    }
+    }.flowOn(Dispatchers.IO)
 }

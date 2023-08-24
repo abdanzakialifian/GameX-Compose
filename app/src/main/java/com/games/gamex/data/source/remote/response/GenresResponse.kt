@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class GenresResponse(
 
 	@field:SerializedName("next")
-	val next: Any? = null,
+	val next: String? = null,
 
 	@field:SerializedName("previous")
 	val previous: Any? = null,

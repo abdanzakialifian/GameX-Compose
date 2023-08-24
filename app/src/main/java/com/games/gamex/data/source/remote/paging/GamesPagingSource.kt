@@ -4,7 +4,6 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.games.gamex.data.source.remote.response.GamesResultItemResponse
 import com.games.gamex.data.source.remote.services.ApiService
-import kotlinx.coroutines.delay
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,7 +11,6 @@ import javax.inject.Singleton
 class GamesPagingSource @Inject constructor(private val apiService: ApiService) :
     PagingSource<Int, GamesResultItemResponse>() {
 
-    private var totalItem = 0
     private var querySearch = ""
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GamesResultItemResponse> {
@@ -20,19 +18,20 @@ class GamesPagingSource @Inject constructor(private val apiService: ApiService) 
 
         return try {
             val response = apiService.getGames(position, params.loadSize, querySearch)
-            delay(500L)
-            val responseBody = response.body()?.results
-            totalItem += responseBody?.size ?: 0
+            val responseBody = response.body()?.results ?: listOf()
+            val next = response.body()?.next
 
-            val nextKey = if (totalItem >= (response.body()?.count ?: 0)) {
+            val nextKey = if (next?.isEmpty() == true || next == null) {
                 null
             } else {
                 position + INITIAL_POSITION
             }
 
+            val prevKey = if (position == INITIAL_POSITION) null else position
+
             LoadResult.Page(
-                data = responseBody ?: listOf(),
-                prevKey = if (position == INITIAL_POSITION) null else position,
+                data = responseBody,
+                prevKey = prevKey,
                 nextKey = nextKey
             )
         } catch (e: Exception) {
