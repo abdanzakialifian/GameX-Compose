@@ -21,29 +21,34 @@ class HomeViewModel @Inject constructor(private val homeUseCaseWrapper: HomeUseC
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val searchAllGames: Flow<PagingData<ListResultItem>> =
+    val searchAllGames: StateFlow<PagingData<ListResultItem>> =
         searchQuery.flatMapLatest { searchQuery ->
             homeUseCaseWrapper.getAllGames(searchQuery).stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(),
                 initialValue = PagingData.empty()
             )
-        }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = PagingData.empty()
+        )
 
-    val getAllGames: Flow<PagingData<ListResultItem>> = homeUseCaseWrapper.getAllGames("").stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
-        initialValue = PagingData.empty()
-    )
+    val getAllGames: StateFlow<PagingData<ListResultItem>> =
+        homeUseCaseWrapper.getAllGames("").stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = PagingData.empty()
+        )
 
-    val getAllGenres: StateFlow<PagingData<ListResultItem>> =
+    val getAllGameGenres: StateFlow<PagingData<ListResultItem>> =
         homeUseCaseWrapper.getAllGameGenres().stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
             initialValue = PagingData.empty()
         )
 
-    val getAllPlatforms: StateFlow<PagingData<ListResultItem>> =
+    val getAllGamePlatforms: StateFlow<PagingData<ListResultItem>> =
         homeUseCaseWrapper.getAllGamePlatforms().stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),

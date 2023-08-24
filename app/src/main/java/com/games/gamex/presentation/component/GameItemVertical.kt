@@ -30,7 +30,7 @@ import com.gowtham.ratingbar.RatingBarStyle
 import com.gowtham.ratingbar.StepSize
 
 @Composable
-fun GameItemSecond(
+fun GameItemVertical(
     image: String,
     name: String,
     date: String,
@@ -99,7 +99,7 @@ fun GameItemSecond(
 @Composable
 fun GameItemSecondPreview() {
     GameXTheme {
-        GameItemSecond(
+        GameItemVertical(
             image = "",
             name = "GTA-V",
             date = "2011-04-18",

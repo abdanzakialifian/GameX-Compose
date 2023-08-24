@@ -1,6 +1,10 @@
 package com.games.gamex.presentation.component
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -32,9 +36,9 @@ fun ShimmerAnimation(shimmer: Shimmer) {
     )
 
     when (shimmer) {
-        Shimmer.GAME_ITEM_PLACEHOLDER -> GameItemPlaceholder(brush = brush)
+        Shimmer.GAME_ITEM_PLACEHOLDER -> GameItemHorizontalPlaceholder(brush = brush)
         Shimmer.CATEGORIES_ITEM_PLACEHOLDER -> CategoriesItemPlaceholder(brush = brush)
         Shimmer.PLATFORM_ITEM_PLACEHOLDER -> PlatformItemPlaceholder(brush = brush)
-        Shimmer.GAME_ITEM_SECOND_PLACEHOLDER -> GameItemSecondPlaceholder(brush = brush)
+        Shimmer.GAME_ITEM_SECOND_PLACEHOLDER -> GameItemVerticalPlaceholder(brush = brush)
     }
 }

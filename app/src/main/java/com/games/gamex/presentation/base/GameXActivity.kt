@@ -30,55 +30,58 @@ class GameXActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            GameXTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background,
-                ) {
-                    GameXApp()
-                }
-            }
+            GameXApp()
         }
     }
 }
 
 @Composable
 fun GameXApp() {
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Screen.SplashScreen.route) {
-        composable(route = Screen.SplashScreen.route) {
-            SplashScreen(onNavigate = {
-                navController.navigate(Screen.HomeScreen.route) {
-                    popUpTo(
-                        Screen.SplashScreen.route
-                    ) {
-                        inclusive = true
-                    }
+    GameXTheme {
+        // A surface container using the 'background' color from the theme
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colors.background,
+        ) {
+            val navController = rememberNavController()
+            NavHost(navController = navController, startDestination = Screen.SplashScreen.route) {
+                composable(route = Screen.SplashScreen.route) {
+                    SplashScreen(onNavigate = {
+                        navController.navigate(Screen.HomeScreen.route) {
+                            popUpTo(
+                                Screen.SplashScreen.route
+                            ) {
+                                inclusive = true
+                            }
+                        }
+                    })
                 }
-            })
-        }
-        composable(route = Screen.HomeScreen.route) {
-            val viewModel = hiltViewModel<HomeViewModel>()
-            HomeScreen(
-                onAllGenresClicked = { navController.navigate(Screen.DetailScreen.route) },
-                onAllGamesClicked = { navController.navigate(Screen.DetailScreen.createRoute(it.toString())) },
-                onAllPlatformsClicked = { navController.navigate(Screen.DetailScreen.route) },
-                onSearchAllGamesClicked = { navController.navigate(Screen.DetailScreen.route) },
-                viewModel = viewModel,
-            )
-        }
-        composable(
-            route = Screen.DetailScreen.route,
-            arguments = listOf(
-                navArgument("gameId") {
-                    type = NavType.StringType
+                composable(route = Screen.HomeScreen.route) {
+                    val viewModel = hiltViewModel<HomeViewModel>()
+                    HomeScreen(
+                        onGenreClicked = { navController.navigate(Screen.DetailScreen.route) },
+                        onGameHorizontalClicked = {
+                            navController.navigate(
+                                Screen.DetailScreen.createRoute(
+                                    it.toString()
+                                )
+                            )
+                        },
+                        onPlatformClicked = { navController.navigate(Screen.DetailScreen.route) },
+                        onGameVerticalClicked = { navController.navigate(Screen.DetailScreen.route) },
+                        viewModel = viewModel,
+                    )
                 }
-            )
-        ) { backStackEntry ->
-            val viewModel = hiltViewModel<DetailViewModel>()
-            val gameId = backStackEntry.arguments?.getString("gameId")
-            DetailScreen(gameId = gameId ?: "", viewModel = viewModel)
+                composable(
+                    route = Screen.DetailScreen.route, arguments = listOf(navArgument("gameId") {
+                        type = NavType.StringType
+                    })
+                ) { backStackEntry ->
+                    val viewModel = hiltViewModel<DetailViewModel>()
+                    val gameId = backStackEntry.arguments?.getString("gameId")
+                    DetailScreen(gameId = gameId ?: "", viewModel = viewModel)
+                }
+            }
         }
     }
 }
@@ -86,7 +89,5 @@ fun GameXApp() {
 @Preview(showBackground = true, showSystemUi = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun GameXPreview() {
-    GameXTheme {
-        GameXApp()
-    }
+    GameXApp()
 }
