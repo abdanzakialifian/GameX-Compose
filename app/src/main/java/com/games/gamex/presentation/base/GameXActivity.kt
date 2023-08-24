@@ -57,7 +57,6 @@ fun GameXApp() {
                     })
                 }
                 composable(route = Screen.HomeScreen.route) {
-                    val viewModel = hiltViewModel<HomeViewModel>()
                     HomeScreen(
                         onGenreClicked = { navController.navigate(Screen.DetailScreen.route) },
                         onGameHorizontalClicked = {
@@ -69,7 +68,6 @@ fun GameXApp() {
                         },
                         onPlatformClicked = { navController.navigate(Screen.DetailScreen.route) },
                         onGameVerticalClicked = { navController.navigate(Screen.DetailScreen.route) },
-                        viewModel = viewModel,
                     )
                 }
                 composable(

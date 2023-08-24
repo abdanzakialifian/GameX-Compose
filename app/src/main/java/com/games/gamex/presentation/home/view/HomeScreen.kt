@@ -27,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.airbnb.lottie.compose.LottieAnimation
@@ -46,13 +46,21 @@ fun HomeScreen(
     onPlatformClicked: () -> Unit,
     onGameVerticalClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
+
+    var searchQuery by remember {
+        mutableStateOf("")
+    }
 
     val getAllGamesHorizontalState = viewModel.getAllGames.collectAsLazyPagingItems()
     val getAllGameGenresState = viewModel.getAllGameGenres.collectAsLazyPagingItems()
     val getAllGamePlatformsState = viewModel.getAllGamePlatforms.collectAsLazyPagingItems()
-    val getAllGamesVerticalState = viewModel.searchAllGames.collectAsLazyPagingItems()
+    val getAllGamesVerticalState = if (searchQuery.isNotEmpty()) {
+        viewModel.searchAllGames.collectAsLazyPagingItems()
+    } else {
+        viewModel.emptyFlow.collectAsLazyPagingItems()
+    }
 
     HomeContent(
         genresPaging = getAllGameGenresState,
@@ -60,6 +68,7 @@ fun HomeScreen(
         platformsPaging = getAllGamePlatformsState,
         gamesVerticalPaging = getAllGamesVerticalState,
         onValueChange = { value ->
+            searchQuery = value
             viewModel.setSearchQuery(searchQuery = value)
         },
         onGenreClicked = onGenreClicked,
@@ -83,22 +92,18 @@ fun HomeContent(
     onGameVerticalClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var searchValue by remember {
+    var searchQuery by remember {
         mutableStateOf("")
     }
-
     var isErrorCategories by remember {
         mutableStateOf(false)
     }
-
     var isErrorHorizontalGames by remember {
         mutableStateOf(false)
     }
-
     var isErrorPlatforms by remember {
         mutableStateOf(false)
     }
-
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(scaffoldState = scaffoldState) { paddingValues ->
@@ -125,35 +130,24 @@ fun HomeContent(
                     ),
                     fontSize = 16.sp
                 )
-                CustomSearch(modifier = Modifier.padding(top = 30.dp),
-                    value = searchValue,
+                CustomSearch(
+                    modifier = Modifier.padding(top = 30.dp),
+                    value = searchQuery,
                     hint = stringResource(id = R.string.search_game),
                     onValueChange = { value ->
-                        searchValue = value
+                        searchQuery = value
                         onValueChange(value)
-                    })
+                    }
+                )
             }
             Card(
                 modifier = Modifier.fillMaxSize(),
                 shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
                 backgroundColor = Color.White
             ) {
-                if (searchValue.isEmpty()) {
+                if (searchQuery.isEmpty()) {
                     if (isErrorCategories && isErrorHorizontalGames && isErrorPlatforms) {
-                        val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.error_animation))
-                        val progress by animateLottieCompositionAsState(
-                            composition = composition, speed = 2F, restartOnPlay = true
-                        )
-
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            LottieAnimation(
-                                modifier = Modifier
-                                    .size(250.dp)
-                                    .align(Alignment.Center),
-                                composition = composition,
-                                progress = progress
-                            )
-                        }
+                        HomeErrorSection()
                     } else {
                         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                             CategoriesContent(
@@ -164,18 +158,22 @@ fun HomeContent(
                                     isErrorCategories = isError
                                 },
                             )
-                            GamesHorizontalContent(gamesHorizontalPaging = gamesHorizontalPaging,
+                            GamesHorizontalContent(
+                                gamesHorizontalPaging = gamesHorizontalPaging,
                                 scaffoldState = scaffoldState,
                                 onGameHorizontalClicked = onGameHorizontalClicked,
                                 onFetchError = { isError ->
                                     isErrorHorizontalGames = isError
-                                })
-                            PlatformsContent(platformsPaging = platformsPaging,
+                                }
+                            )
+                            PlatformsContent(
+                                platformsPaging = platformsPaging,
                                 scaffoldState = scaffoldState,
                                 onPlatformClicked = onPlatformClicked,
                                 onFetchError = { isError ->
                                     isErrorPlatforms = isError
-                                })
+                                }
+                            )
                         }
                     }
                 } else {
@@ -190,11 +188,31 @@ fun HomeContent(
     }
 }
 
+@Composable
+fun HomeErrorSection() {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.error_animation))
+    val progress by animateLottieCompositionAsState(
+        composition = composition, speed = 2F, restartOnPlay = true
+    )
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        LottieAnimation(
+            modifier = Modifier
+                .size(250.dp)
+                .align(Alignment.Center),
+            composition = composition,
+            progress = progress
+        )
+    }
+}
+
 @Preview(showBackground = true, showSystemUi = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(onGenreClicked = {},
+    HomeScreen(
+        onGenreClicked = {},
         onGameHorizontalClicked = {},
         onPlatformClicked = {},
-        onGameVerticalClicked = {})
+        onGameVerticalClicked = {}
+    )
 }
