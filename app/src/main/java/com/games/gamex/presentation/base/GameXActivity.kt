@@ -10,19 +10,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.games.gamex.presentation.detail.view.DetailScreen
-import com.games.gamex.presentation.detail.viewmodel.DetailViewModel
 import com.games.gamex.presentation.home.view.HomeScreen
-import com.games.gamex.presentation.home.viewmodel.HomeViewModel
 import com.games.gamex.presentation.navigation.Screen
 import com.games.gamex.presentation.splash.SplashScreen
 import com.games.gamex.presentation.ui.theme.GameXTheme
+import com.games.gamex.utils.GAME_ID
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -59,10 +57,10 @@ fun GameXApp() {
                 composable(route = Screen.HomeScreen.route) {
                     HomeScreen(
                         onGenreClicked = { navController.navigate(Screen.DetailScreen.route) },
-                        onGameHorizontalClicked = {
+                        onGameHorizontalClicked = { gameId ->
                             navController.navigate(
                                 Screen.DetailScreen.createRoute(
-                                    it.toString()
+                                    gameId.toString()
                                 )
                             )
                         },
@@ -71,13 +69,12 @@ fun GameXApp() {
                     )
                 }
                 composable(
-                    route = Screen.DetailScreen.route, arguments = listOf(navArgument("gameId") {
+                    route = Screen.DetailScreen.route, arguments = listOf(navArgument(GAME_ID) {
                         type = NavType.StringType
                     })
                 ) { backStackEntry ->
-                    val viewModel = hiltViewModel<DetailViewModel>()
-                    val gameId = backStackEntry.arguments?.getString("gameId")
-                    DetailScreen(gameId = gameId ?: "", viewModel = viewModel)
+                    val gameId = backStackEntry.arguments?.getString(GAME_ID)
+                    DetailScreen(gameId = gameId ?: "")
                 }
             }
         }
