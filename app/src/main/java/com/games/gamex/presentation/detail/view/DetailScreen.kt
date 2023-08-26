@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -206,6 +207,7 @@ fun DetailContent(
                                         .clip(RoundedCornerShape(10.dp)),
                                     model = screenshot.second,
                                     placeholder = ColorPainter(GreyPlaceholder),
+                                    error = painterResource(id = R.drawable.ic_broken_image_64),
                                     contentDescription = "Image Screenshot",
                                     contentScale = ContentScale.Crop
                                 )
