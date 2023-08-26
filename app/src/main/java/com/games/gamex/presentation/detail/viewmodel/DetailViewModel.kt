@@ -17,6 +17,7 @@ class DetailViewModel @Inject constructor(private val getDetailGameUseCase: GetD
 
     fun setGameId(gameId: String) {
         this.gameId.value = gameId
+
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

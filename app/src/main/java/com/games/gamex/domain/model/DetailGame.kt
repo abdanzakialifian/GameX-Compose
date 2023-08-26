@@ -9,4 +9,6 @@ data class DetailGame(
     val genres: List<ListResultItem>? = null,
     val rating: Double? = null,
     val description: String? = null,
+    val dominantColor: String? = null,
+    val saturatedColor: String? = null,
 )

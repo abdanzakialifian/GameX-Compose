@@ -101,4 +101,10 @@ dependencies {
 
     // rating bar
     implementation "com.github.a914-gowtham:compose-ratingbar:$rating_bar_version"
+
+    // system bars customization
+    implementation "com.google.accompanist:accompanist-systemuicontroller:0.30.1"
+
+    // palette
+    implementation "androidx.palette:palette-ktx:1.0.0"
 }

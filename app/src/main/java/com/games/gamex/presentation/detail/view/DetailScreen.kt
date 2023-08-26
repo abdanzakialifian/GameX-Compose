@@ -1,5 +1,6 @@
 package com.games.gamex.presentation.detail.view
 
+import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -32,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
@@ -48,30 +50,65 @@ import com.games.gamex.R
 import com.games.gamex.domain.model.DetailGame
 import com.games.gamex.presentation.detail.viewmodel.DetailViewModel
 import com.games.gamex.presentation.ui.theme.GameXTheme
+import com.games.gamex.utils.PaletteGenerator.convertImageUrlToBitmap
+import com.games.gamex.utils.PaletteGenerator.extractColorsFromBitmap
 import com.games.gamex.utils.UiState
 
 @Composable
 fun DetailScreen(
-    gameId: String, modifier: Modifier = Modifier, viewModel: DetailViewModel = hiltViewModel()
+    gameId: String,
+    onColorPalette: (Map<String, String>) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: DetailViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
+
+    var imageUrl by remember {
+        mutableStateOf("")
+    }
+
+    LaunchedEffect(key1 = imageUrl) {
+        try {
+            val bitmap = convertImageUrlToBitmap(imageUrl, context)
+            if (bitmap != null) {
+                val colors = extractColorsFromBitmap(bitmap)
+                onColorPalette(colors)
+            }
+        } catch (e: Exception) {
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     LaunchedEffect(key1 = Unit) {
         viewModel.setGameId(gameId)
     }
 
     val getDetailGameState by viewModel.getDetailGame.collectAsStateWithLifecycle(initialValue = UiState.Loading)
 
-    DetailContent(uiState = getDetailGameState, modifier = modifier)
+    DetailContent(
+        uiState = getDetailGameState,
+        onImageUrl = { url -> imageUrl = url },
+        modifier = modifier
+    )
 }
 
 @Composable
-fun DetailContent(uiState: UiState<DetailGame>, modifier: Modifier = Modifier) {
+fun DetailContent(
+    uiState: UiState<DetailGame>,
+    onImageUrl: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     when (uiState) {
         is UiState.Loading -> {}
+
         is UiState.Success -> {
             val data = uiState.data
+
             val genres = data.genres?.map {
                 it.name
             }?.joinToString(", ")
+
+            onImageUrl(data.backgroundImageAdditional ?: "")
 
             Box(modifier = modifier) {
                 AsyncImage(
@@ -181,8 +218,7 @@ fun ShowMoreLess(data: DetailGame, modifier: Modifier = Modifier) {
             modifier = Modifier.animateContentSize(
                 // add animation expandable
                 animationSpec = tween(
-                    durationMillis = 300,
-                    easing = LinearOutSlowInEasing
+                    durationMillis = 300, easing = LinearOutSlowInEasing
                 )
             ),
             text = data.description ?: "",
@@ -195,25 +231,22 @@ fun ShowMoreLess(data: DetailGame, modifier: Modifier = Modifier) {
             fontSize = 12.sp
         )
 
-        Text(
-            modifier = Modifier
-                .clickable(
-                    // remove ripple click
-                    interactionSource = remember {
-                        MutableInteractionSource()
-                    },
-                    indication = null
-                ) {
-                    isShowMore = !isShowMore
-                }
-                .padding(vertical = 4.dp),
+        Text(modifier = Modifier
+            .clickable(
+                // remove ripple click
+                interactionSource = remember {
+                    MutableInteractionSource()
+                }, indication = null
+            ) {
+                isShowMore = !isShowMore
+            }
+            .padding(vertical = 4.dp),
             text = if (isShowMore) "Show Less" else "Show More",
             fontFamily = FontFamily(
                 Font(R.font.open_sans_medium)
             ),
             color = colorResource(id = R.color.purple),
-            fontSize = 12.sp
-        )
+            fontSize = 12.sp)
     }
 }
 
@@ -221,6 +254,6 @@ fun ShowMoreLess(data: DetailGame, modifier: Modifier = Modifier) {
 @Composable
 fun DetailScreenPreview() {
     GameXTheme {
-        DetailScreen(gameId = "1")
+        DetailScreen(gameId = "1", onColorPalette = {})
     }
 }
