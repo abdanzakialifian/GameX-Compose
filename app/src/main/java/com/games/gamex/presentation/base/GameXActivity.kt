@@ -42,7 +42,10 @@ fun GameXApp() {
             color = MaterialTheme.colors.background,
         ) {
             val navController = rememberNavController()
-            NavHost(navController = navController, startDestination = Screen.SplashScreen.route) {
+            NavHost(
+                navController = navController,
+                startDestination = Screen.SplashScreen.route,
+            ) {
                 composable(route = Screen.SplashScreen.route) {
                     SplashScreen(onNavigate = {
                         navController.navigate(Screen.HomeScreen.route) {
@@ -69,9 +72,12 @@ fun GameXApp() {
                     )
                 }
                 composable(
-                    route = Screen.DetailScreen.route, arguments = listOf(navArgument(GAME_ID) {
-                        type = NavType.StringType
-                    })
+                    route = Screen.DetailScreen.route,
+                    arguments = listOf(
+                        navArgument(GAME_ID) {
+                            type = NavType.StringType
+                        },
+                    ),
                 ) { backStackEntry ->
                     val gameId = backStackEntry.arguments?.getString(GAME_ID)
                     DetailScreen(gameId = gameId ?: "")

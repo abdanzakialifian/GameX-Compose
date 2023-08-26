@@ -7,6 +7,7 @@ import com.games.gamex.domain.interfaces.GameXRepository
 import com.games.gamex.domain.model.DetailGame
 import com.games.gamex.domain.model.ListResultItem
 import com.games.gamex.utils.DataMapper
+import com.games.gamex.utils.DataMapper.mapDetailGameResponseToDetailGame
 import com.games.gamex.utils.DataMapper.mapGamesResultItemResponseToListResultItem
 import com.games.gamex.utils.DataMapper.mapGenresResultItemResponseToListResultItem
 import com.games.gamex.utils.DataMapper.mapPlatformsResultItemResponseToListResultItem
@@ -45,7 +46,7 @@ class GameXRepositoryImpl @Inject constructor(private val remoteDataSource: Remo
             when (uiState) {
                 is UiState.Loading -> UiState.Loading
                 is UiState.Success -> {
-                    val mapper = DataMapper.mapDetailGameResponseToDetailGame(uiState.data)
+                    val mapper = uiState.data.mapDetailGameResponseToDetailGame()
                     UiState.Success(mapper)
                 }
                 is UiState.Error -> {

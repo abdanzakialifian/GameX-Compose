@@ -14,7 +14,7 @@ data class DetailGameResponse(
 	val nameOriginal: String? = null,
 
 	@field:SerializedName("rating")
-	val rating: Any? = null,
+	val rating: Double? = null,
 
 	@field:SerializedName("game_series_count")
 	val gameSeriesCount: Int? = null,

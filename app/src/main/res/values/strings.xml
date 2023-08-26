@@ -8,4 +8,5 @@
     <string name="platforms">Platforms</string>
     <string name="total_games">Total games : %d</string>
     <string name="release_date">Released : %s</string>
+    <string name="overview">Overview</string>
 </resources>

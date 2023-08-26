@@ -28,7 +28,17 @@ object DataMapper {
             gamesCount = gamesCount
         )
 
-    fun mapDetailGameResponseToDetailGame(input: DetailGameResponse): DetailGame = DetailGame(
-        imageBackground = input.backgroundImage
+    fun DetailGameResponse.mapDetailGameResponseToDetailGame(): DetailGame = DetailGame(
+        name = name,
+        imageBackground = backgroundImage,
+        backgroundImageAdditional = backgroundImageAdditional,
+        genres = genres?.map { genre ->
+            ListResultItem(
+                id = genre.id,
+                name = genre.name,
+            )
+        },
+        rating = rating,
+        description = descriptionRaw
     )
 }
