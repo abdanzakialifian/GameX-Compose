@@ -1,7 +1,5 @@
 package com.games.gamex.domain.model
 
-import com.games.gamex.data.source.remote.response.StoresItemResponse
-
 data class DetailGame(
     val name: String? = null,
     val imageBackground: String? = null,
@@ -9,6 +7,5 @@ data class DetailGame(
     val genres: List<ListResultItem>? = null,
     val rating: Double? = null,
     val description: String? = null,
-    val dominantColor: String? = null,
-    val saturatedColor: String? = null,
+    var images: List<Pair<Int, String>>? = null
 )

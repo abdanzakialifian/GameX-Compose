@@ -6,7 +6,6 @@ import com.games.gamex.data.source.remote.RemoteDataSource
 import com.games.gamex.domain.interfaces.GameXRepository
 import com.games.gamex.domain.model.DetailGame
 import com.games.gamex.domain.model.ListResultItem
-import com.games.gamex.utils.DataMapper
 import com.games.gamex.utils.DataMapper.mapDetailGameResponseToDetailGame
 import com.games.gamex.utils.DataMapper.mapGamesResultItemResponseToListResultItem
 import com.games.gamex.utils.DataMapper.mapGenresResultItemResponseToListResultItem
@@ -45,10 +44,32 @@ class GameXRepositoryImpl @Inject constructor(private val remoteDataSource: Remo
         remoteDataSource.getDetailGame(id).map { uiState ->
             when (uiState) {
                 is UiState.Loading -> UiState.Loading
+
                 is UiState.Success -> {
                     val mapper = uiState.data.mapDetailGameResponseToDetailGame()
                     UiState.Success(mapper)
                 }
+
+                is UiState.Error -> {
+                    val error = uiState.message
+                    UiState.Error(error)
+                }
+            }
+        }
+
+    override fun getScreenshotsGame(id: String): Flow<UiState<List<Pair<Int, String>>>> =
+        remoteDataSource.getScreenshotsGame(id).map { uiState ->
+            when (uiState) {
+                is UiState.Loading -> UiState.Loading
+
+                is UiState.Success -> {
+                    val results = uiState.data.results ?: listOf()
+                    val images = results.map {
+                        Pair(it.id ?: 0, it.image ?: "")
+                    }
+                    UiState.Success(images)
+                }
+
                 is UiState.Error -> {
                     val error = uiState.message
                     UiState.Error(error)

@@ -11,4 +11,5 @@ interface GameXRepository {
     fun getAllGameGenres(): Flow<PagingData<ListResultItem>>
     fun getAllGamePlatforms(): Flow<PagingData<ListResultItem>>
     fun getDetailGame(id: String): Flow<UiState<DetailGame>>
+    fun getScreenshotsGame(id: String): Flow<UiState<List<Pair<Int, String>>>>
 }

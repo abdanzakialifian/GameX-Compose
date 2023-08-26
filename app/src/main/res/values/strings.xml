@@ -9,4 +9,6 @@
     <string name="total_games">Total games : %d</string>
     <string name="release_date">Released : %s</string>
     <string name="overview">Overview</string>
+    <string name="read_more">Read More</string>
+    <string name="show_less">Show Less</string>
 </resources>

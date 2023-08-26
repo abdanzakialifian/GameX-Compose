@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.games.gamex.R
 import com.games.gamex.presentation.ui.theme.GameXTheme
+import com.games.gamex.presentation.ui.theme.GreyPlaceholder
 
 @Composable
 fun CategoriesItem(
@@ -37,7 +39,7 @@ fun CategoriesItem(
                 .clip(CircleShape)
                 .clickable { onItemClicked() },
             model = image,
-            placeholder = painterResource(id = R.drawable.ic_load_64),
+            placeholder = ColorPainter(GreyPlaceholder),
             error = painterResource(id = R.drawable.ic_broken_image_64),
             contentDescription = "Image Categories",
             contentScale = ContentScale.Crop,

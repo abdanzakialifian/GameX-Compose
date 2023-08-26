@@ -10,6 +10,7 @@ import com.games.gamex.data.source.remote.response.DetailGameResponse
 import com.games.gamex.data.source.remote.response.GamesResultItemResponse
 import com.games.gamex.data.source.remote.response.GenresResultItemResponse
 import com.games.gamex.data.source.remote.response.PlatformsResultItemResponse
+import com.games.gamex.data.source.remote.response.ScreenshotsGameResponse
 import com.games.gamex.data.source.remote.services.ApiService
 import com.games.gamex.utils.UiState
 import kotlinx.coroutines.Dispatchers
@@ -52,6 +53,17 @@ class RemoteDataSource @Inject constructor(
 
     fun getDetailGame(id: String): Flow<UiState<DetailGameResponse>> = flow {
         val response = apiService.getDetailGame(id)
+        val responseBody = response.body()
+        emit(UiState.Loading)
+        if (response.isSuccessful && responseBody != null) {
+            emit(UiState.Success(responseBody))
+        } else {
+            emit(UiState.Error(response.message()))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getScreenshotsGame(id: String): Flow<UiState<ScreenshotsGameResponse>> = flow {
+        val response = apiService.getScreenshotsGame(id)
         val responseBody = response.body()
         emit(UiState.Loading)
         if (response.isSuccessful && responseBody != null) {

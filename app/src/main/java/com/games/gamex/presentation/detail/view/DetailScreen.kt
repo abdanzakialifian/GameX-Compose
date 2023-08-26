@@ -6,14 +6,18 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -32,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -50,6 +55,7 @@ import com.games.gamex.R
 import com.games.gamex.domain.model.DetailGame
 import com.games.gamex.presentation.detail.viewmodel.DetailViewModel
 import com.games.gamex.presentation.ui.theme.GameXTheme
+import com.games.gamex.presentation.ui.theme.GreyPlaceholder
 import com.games.gamex.utils.PaletteGenerator.convertImageUrlToBitmap
 import com.games.gamex.utils.PaletteGenerator.extractColorsFromBitmap
 import com.games.gamex.utils.UiState
@@ -86,17 +92,13 @@ fun DetailScreen(
     val getDetailGameState by viewModel.getDetailGame.collectAsStateWithLifecycle(initialValue = UiState.Loading)
 
     DetailContent(
-        uiState = getDetailGameState,
-        onImageUrl = { url -> imageUrl = url },
-        modifier = modifier
+        uiState = getDetailGameState, onImageUrl = { url -> imageUrl = url }, modifier = modifier
     )
 }
 
 @Composable
 fun DetailContent(
-    uiState: UiState<DetailGame>,
-    onImageUrl: (String) -> Unit,
-    modifier: Modifier = Modifier
+    uiState: UiState<DetailGame>, onImageUrl: (String) -> Unit, modifier: Modifier = Modifier
 ) {
     when (uiState) {
         is UiState.Loading -> {}
@@ -131,9 +133,9 @@ fun DetailContent(
                     Column(
                         modifier = Modifier
                             .verticalScroll(rememberScrollState())
-                            .padding(20.dp)
+                            .padding(top = 20.dp)
                     ) {
-                        Row {
+                        Row(Modifier.padding(horizontal = 20.dp)) {
                             AsyncImage(
                                 modifier = Modifier
                                     .size(height = 80.dp, width = 80.dp)
@@ -142,7 +144,11 @@ fun DetailContent(
                                 contentDescription = "Image Game",
                                 contentScale = ContentScale.Crop
                             )
-                            Column(modifier = Modifier.padding(start = 10.dp)) {
+                            Column(
+                                modifier = Modifier
+                                    .padding(start = 10.dp)
+                                    .align(Alignment.CenterVertically)
+                            ) {
                                 Text(
                                     text = data.name ?: "",
                                     maxLines = 1,
@@ -186,18 +192,39 @@ fun DetailContent(
                                 }
                             }
                         }
-                        Text(
+                        LazyRow(
                             modifier = Modifier.padding(top = 20.dp),
-                            text = stringResource(id = R.string.overview),
-                            fontFamily = FontFamily(
-                                Font(R.font.open_sans_bold)
-                            ),
-                            fontSize = 16.sp
-                        )
-                        ShowMoreLess(
-                            modifier = Modifier.padding(top = 4.dp),
-                            data = data,
-                        )
+                            contentPadding = PaddingValues(horizontal = 20.dp),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            items(
+                                data.images ?: listOf(),
+                                key = { data -> data.first }) { screenshot ->
+                                AsyncImage(
+                                    modifier = Modifier
+                                        .size(width = 230.dp, height = 150.dp)
+                                        .clip(RoundedCornerShape(10.dp)),
+                                    model = screenshot.second,
+                                    placeholder = ColorPainter(GreyPlaceholder),
+                                    contentDescription = "Image Screenshot",
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                        }
+                        Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+                            Text(
+                                modifier = Modifier.padding(top = 20.dp),
+                                text = stringResource(id = R.string.overview),
+                                fontFamily = FontFamily(
+                                    Font(R.font.open_sans_bold)
+                                ),
+                                fontSize = 16.sp
+                            )
+                            ShowMoreLess(
+                                modifier = Modifier.padding(top = 4.dp),
+                                data = data,
+                            )
+                        }
                     }
                 }
             }
@@ -241,7 +268,7 @@ fun ShowMoreLess(data: DetailGame, modifier: Modifier = Modifier) {
                 isShowMore = !isShowMore
             }
             .padding(vertical = 4.dp),
-            text = if (isShowMore) "Show Less" else "Show More",
+            text = if (isShowMore) stringResource(id = R.string.show_less) else stringResource(id = R.string.read_more),
             fontFamily = FontFamily(
                 Font(R.font.open_sans_medium)
             ),

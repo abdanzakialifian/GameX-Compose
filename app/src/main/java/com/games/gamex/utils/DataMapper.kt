@@ -40,7 +40,5 @@ object DataMapper {
         },
         rating = rating,
         description = descriptionRaw,
-        dominantColor = dominantColor,
-        saturatedColor = saturatedColor
     )
 }

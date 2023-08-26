@@ -4,6 +4,7 @@ import com.games.gamex.data.source.remote.response.DetailGameResponse
 import com.games.gamex.data.source.remote.response.GamesResponse
 import com.games.gamex.data.source.remote.response.GenresResponse
 import com.games.gamex.data.source.remote.response.PlatformsResponse
+import com.games.gamex.data.source.remote.response.ScreenshotsGameResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -33,4 +34,9 @@ interface ApiService {
     suspend fun getDetailGame(
         @Path("id") id: String
     ): Response<DetailGameResponse>
+
+    @GET("games/{id}/screenshots")
+    suspend fun getScreenshotsGame(
+        @Path("id") id: String
+    ): Response<ScreenshotsGameResponse>
 }
