@@ -29,7 +29,15 @@ class GetDetailGame @Inject constructor(private val gameXRepository: GameXReposi
                 }
 
                 detailGame
-            }.flowOn(Dispatchers.IO).catch { throwable ->
+            }.zip(gameXRepository.getGameSeries(gameId)) { detail, series ->
+                if (series is UiState.Success) {
+                    detail.gameSeries = series.data.filter { data -> data.image != "" }
+                    detail.gameSeriesCount = series.data[0].gamesCount
+                }
+                detail
+            }
+            .flowOn(Dispatchers.IO)
+            .catch { throwable ->
                 emit(UiState.Error(throwable.message ?: ""))
             }.collect { gameDetail ->
                 emit(UiState.Success(gameDetail))

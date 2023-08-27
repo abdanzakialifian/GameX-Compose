@@ -1,6 +1,7 @@
 package com.games.gamex.utils
 
 import com.games.gamex.data.source.remote.response.DetailGameResponse
+import com.games.gamex.data.source.remote.response.GamesResponse
 import com.games.gamex.data.source.remote.response.GamesResultItemResponse
 import com.games.gamex.data.source.remote.response.GenresResultItemResponse
 import com.games.gamex.data.source.remote.response.PlatformsResultItemResponse
@@ -41,4 +42,16 @@ object DataMapper {
         rating = rating,
         description = descriptionRaw,
     )
+
+    fun GamesResponse.mapGamesResponseToListResultItem(): List<ListResultItem> =
+        results?.map { data ->
+            ListResultItem(
+                id = data.id,
+                image = data.backgroundImage,
+                name = data.name,
+                released = data.released,
+                rating = data.rating.toString().toFloat(),
+                gamesCount = count
+            )
+        } ?: listOf()
 }

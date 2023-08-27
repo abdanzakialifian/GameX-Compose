@@ -39,4 +39,11 @@ interface ApiService {
     suspend fun getScreenshotsGame(
         @Path("id") id: String
     ): Response<ScreenshotsGameResponse>
+
+    @GET("games/{game_pk}/game-series")
+    suspend fun getGameSeries(
+        @Path("game_pk") id: String,
+        @Query("page") page: Int,
+        @Query("page_size") pageSize: Int
+    ): Response<GamesResponse>
 }

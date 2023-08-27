@@ -11,4 +11,6 @@
     <string name="overview">Overview</string>
     <string name="read_more">Read More</string>
     <string name="show_less">Show Less</string>
+    <string name="similar_games">Similar Games</string>
+    <string name="see_all">See all</string>
 </resources>

@@ -21,11 +21,11 @@ class DetailViewModel @Inject constructor(private val getDetailGameUseCase: GetD
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val getDetailGame: Flow<UiState<DetailGame>> = gameId.flatMapLatest { id ->
-        getDetailGameUseCase(id).stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = UiState.Loading
-        )
-    }
+    val getDetailGame: StateFlow<UiState<DetailGame>> = gameId.flatMapLatest { id ->
+        getDetailGameUseCase(id)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = UiState.Loading
+    )
 }

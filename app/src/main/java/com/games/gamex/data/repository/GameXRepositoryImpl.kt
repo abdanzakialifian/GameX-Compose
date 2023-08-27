@@ -7,6 +7,7 @@ import com.games.gamex.domain.interfaces.GameXRepository
 import com.games.gamex.domain.model.DetailGame
 import com.games.gamex.domain.model.ListResultItem
 import com.games.gamex.utils.DataMapper.mapDetailGameResponseToDetailGame
+import com.games.gamex.utils.DataMapper.mapGamesResponseToListResultItem
 import com.games.gamex.utils.DataMapper.mapGamesResultItemResponseToListResultItem
 import com.games.gamex.utils.DataMapper.mapGenresResultItemResponseToListResultItem
 import com.games.gamex.utils.DataMapper.mapPlatformsResultItemResponseToListResultItem
@@ -68,6 +69,30 @@ class GameXRepositoryImpl @Inject constructor(private val remoteDataSource: Remo
                         Pair(it.id ?: 0, it.image ?: "")
                     }
                     UiState.Success(images)
+                }
+
+                is UiState.Error -> {
+                    val error = uiState.message
+                    UiState.Error(error)
+                }
+            }
+        }
+
+    override fun getGameSeriesPaging(gameId: String): Flow<PagingData<ListResultItem>> =
+        remoteDataSource.getGameSeriesPaging(gameId).map { pagingData ->
+            pagingData.map { map ->
+                map.mapGamesResultItemResponseToListResultItem()
+            }
+        }
+
+    override fun getGameSeries(gameId: String): Flow<UiState<List<ListResultItem>>> =
+        remoteDataSource.getGameSeries(gameId).map { uiState ->
+            when (uiState) {
+                is UiState.Loading -> UiState.Loading
+
+                is UiState.Success -> {
+                    val mapper = uiState.data.mapGamesResponseToListResultItem()
+                    UiState.Success(mapper)
                 }
 
                 is UiState.Error -> {

@@ -1,5 +1,7 @@
 package com.games.gamex.domain.model
 
+import androidx.paging.PagingData
+
 data class DetailGame(
     val name: String? = null,
     val imageBackground: String? = null,
@@ -7,5 +9,7 @@ data class DetailGame(
     val genres: List<ListResultItem>? = null,
     val rating: Double? = null,
     val description: String? = null,
-    var images: List<Pair<Int, String>>? = null
+    var images: List<Pair<Int, String>>? = null,
+    var gameSeries: List<ListResultItem>? = null,
+    var gameSeriesCount: Int? = null
 )

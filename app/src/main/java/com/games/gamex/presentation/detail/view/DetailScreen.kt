@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -19,12 +20,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,9 +57,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.games.gamex.R
 import com.games.gamex.domain.model.DetailGame
+import com.games.gamex.presentation.component.GameItemHorizontal
 import com.games.gamex.presentation.detail.viewmodel.DetailViewModel
 import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.presentation.ui.theme.GreyPlaceholder
+import com.games.gamex.presentation.ui.theme.Purple
+import com.games.gamex.presentation.ui.theme.WhiteTransparent
 import com.games.gamex.utils.PaletteGenerator.convertImageUrlToBitmap
 import com.games.gamex.utils.PaletteGenerator.extractColorsFromBitmap
 import com.games.gamex.utils.UiState
@@ -123,6 +129,23 @@ fun DetailContent(
                     contentDescription = "Image Background",
                     contentScale = ContentScale.Crop
                 )
+
+                Box(
+                    Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(WhiteTransparent)
+                        .align(Alignment.TopStart)
+                ) {
+                    Icon(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .size(20.dp),
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back Button"
+                    )
+                }
 
                 Card(
                     modifier = Modifier
@@ -198,8 +221,7 @@ fun DetailContent(
                             contentPadding = PaddingValues(horizontal = 20.dp),
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            items(
-                                data.images ?: listOf(),
+                            items(data.images ?: listOf(),
                                 key = { data -> data.first }) { screenshot ->
                                 AsyncImage(
                                     modifier = Modifier
@@ -226,6 +248,44 @@ fun DetailContent(
                                 modifier = Modifier.padding(top = 4.dp),
                                 data = data,
                             )
+                            if (!data.gameSeries.isNullOrEmpty()) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        modifier = Modifier.padding(top = 20.dp),
+                                        text = stringResource(id = R.string.similar_games),
+                                        fontFamily = FontFamily(
+                                            Font(R.font.open_sans_bold)
+                                        ),
+                                        fontSize = 16.sp
+                                    )
+                                    if ((data.gameSeriesCount ?: 0) > 6) {
+                                        Text(
+                                            modifier = Modifier.padding(top = 20.dp),
+                                            text = stringResource(id = R.string.see_all),
+                                            fontFamily = FontFamily(
+                                                Font(R.font.open_sans_semi_bold)
+                                            ),
+                                            color = Purple,
+                                            fontSize = 14.sp
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        LazyRow(
+                            modifier = Modifier.padding(top = 10.dp),
+                            contentPadding = PaddingValues(horizontal = 20.dp),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            items(data.gameSeries ?: listOf(),
+                                key = { data -> data.id ?: 0 }) { gameSeries ->
+                                GameItemHorizontal(image = gameSeries.image ?: "",
+                                    title = gameSeries.name ?: "",
+                                    onItemClicked = { })
+                            }
                         }
                     }
                 }
