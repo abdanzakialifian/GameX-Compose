@@ -10,6 +10,5 @@ data class DetailGame(
     val rating: Double? = null,
     val description: String? = null,
     var images: List<Pair<Int, String>>? = null,
-    var gameSeries: List<ListResultItem>? = null,
-    var gameSeriesCount: Int? = null
+    var gameSeries: Pair<Int, List<ListResultItem>>? = null,
 )

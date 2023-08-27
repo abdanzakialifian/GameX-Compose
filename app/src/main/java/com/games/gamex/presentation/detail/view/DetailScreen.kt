@@ -248,7 +248,7 @@ fun DetailContent(
                                 modifier = Modifier.padding(top = 4.dp),
                                 data = data,
                             )
-                            if (!data.gameSeries.isNullOrEmpty()) {
+                            if (!data.gameSeries?.second.isNullOrEmpty()) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween
@@ -261,7 +261,7 @@ fun DetailContent(
                                         ),
                                         fontSize = 16.sp
                                     )
-                                    if ((data.gameSeriesCount ?: 0) > 6) {
+                                    if ((data.gameSeries?.first ?: 0) > 6) {
                                         Text(
                                             modifier = Modifier.padding(top = 20.dp),
                                             text = stringResource(id = R.string.see_all),
@@ -280,7 +280,7 @@ fun DetailContent(
                             contentPadding = PaddingValues(horizontal = 20.dp),
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            items(data.gameSeries ?: listOf(),
+                            items(data.gameSeries?.second ?: listOf(),
                                 key = { data -> data.id ?: 0 }) { gameSeries ->
                                 GameItemHorizontal(image = gameSeries.image ?: "",
                                     title = gameSeries.name ?: "",

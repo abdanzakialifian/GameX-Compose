@@ -18,22 +18,12 @@ class GetDetailGame @Inject constructor(private val gameXRepository: GameXReposi
         emit(UiState.Loading)
         gameXRepository.getDetailGame(gameId)
             .zip(gameXRepository.getScreenshotsGame(gameId)) { detail, images ->
-                var detailGame = DetailGame()
-
-                if (detail is UiState.Success) {
-                    detailGame = detail.data
-                }
-
-                if (images is UiState.Success) {
-                    detailGame.images = images.data.filter { data -> data.second != "" }
-                }
-
-                detailGame
+                detail.images = images.filter { data -> data.second != "" }
+                detail
             }.zip(gameXRepository.getGameSeries(gameId)) { detail, series ->
-                if (series is UiState.Success) {
-                    detail.gameSeries = series.data.filter { data -> data.image != "" }
-                    detail.gameSeriesCount = series.data[0].gamesCount
-                }
+                val gamesSeriesCount = series.first
+                val listGameSeries = series.second.filter { data -> data.image != "" }
+                detail.gameSeries = Pair(gamesSeriesCount, listGameSeries)
                 detail
             }
             .flowOn(Dispatchers.IO)

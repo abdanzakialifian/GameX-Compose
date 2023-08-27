@@ -14,7 +14,6 @@ import com.games.gamex.data.source.remote.response.GenresResultItemResponse
 import com.games.gamex.data.source.remote.response.PlatformsResultItemResponse
 import com.games.gamex.data.source.remote.response.ScreenshotsGameResponse
 import com.games.gamex.data.source.remote.services.ApiService
-import com.games.gamex.utils.UiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -54,46 +53,39 @@ class RemoteDataSource @Inject constructor(
             platformsPagingSource
         }).flow.flowOn(Dispatchers.IO)
 
-    fun getDetailGame(id: String): Flow<UiState<DetailGameResponse>> = flow {
+    fun getDetailGame(id: String): Flow<DetailGameResponse> = flow {
         val response = apiService.getDetailGame(id)
         val responseBody = response.body()
-        emit(UiState.Loading)
-        if (response.isSuccessful && responseBody != null) {
-            emit(UiState.Success(responseBody))
-        } else {
-            emit(UiState.Error(response.message()))
+        responseBody?.let { detailGameResponse ->
+            emit(detailGameResponse)
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getScreenshotsGame(id: String): Flow<UiState<ScreenshotsGameResponse>> = flow {
+    fun getScreenshotsGame(id: String): Flow<ScreenshotsGameResponse> = flow {
         val response = apiService.getScreenshotsGame(id)
         val responseBody = response.body()
-        emit(UiState.Loading)
-        if (response.isSuccessful && responseBody != null) {
-            emit(UiState.Success(responseBody))
-        } else {
-            emit(UiState.Error(response.message()))
+        responseBody?.let { screenshotsGameResponse ->
+            emit(screenshotsGameResponse)
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getGameSeries(gameId: String): Flow<GamesResponse> = flow {
+        val response = apiService.getGameSeries(gameId, 1, 6)
+        val responseBody = response.body()
+        responseBody?.let { gamesResponse ->
+            emit(gamesResponse)
         }
     }.flowOn(Dispatchers.IO)
 
     fun getGameSeriesPaging(gameId: String): Flow<PagingData<GamesResultItemResponse>> =
-        Pager(config = PagingConfig(
-            pageSize = 10,
-            initialLoadSize = 10,
-        ), pagingSourceFactory = {
-            gameSeriesPagingSource.apply {
-                setGameId(gameId)
+        Pager(
+            config = PagingConfig(
+                pageSize = 10,
+                initialLoadSize = 10,
+            ), pagingSourceFactory = {
+                gameSeriesPagingSource.apply {
+                    setGameId(gameId)
+                }
             }
-        }).flow.flowOn(Dispatchers.IO)
-
-    fun getGameSeries(gameId: String): Flow<UiState<GamesResponse>> = flow {
-        val response = apiService.getGameSeries(gameId, 1, 6)
-        val responseBody = response.body()
-        emit(UiState.Loading)
-        if (response.isSuccessful && responseBody != null) {
-            emit(UiState.Success(responseBody))
-        } else {
-            emit(UiState.Error(response.message()))
-        }
-    }.flowOn(Dispatchers.IO)
+        ).flow.flowOn(Dispatchers.IO)
 }
