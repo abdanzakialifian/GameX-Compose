@@ -11,13 +11,16 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -25,6 +28,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -62,7 +66,9 @@ import com.games.gamex.presentation.detail.viewmodel.DetailViewModel
 import com.games.gamex.presentation.detail.viewmodel.DetailViewModelImpl
 import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.presentation.ui.theme.GreyPlaceholder
+import com.games.gamex.presentation.ui.theme.LightPurple
 import com.games.gamex.presentation.ui.theme.Purple
+import com.games.gamex.presentation.ui.theme.WhiteHeavy
 import com.games.gamex.presentation.ui.theme.WhiteTransparent
 import com.games.gamex.utils.PaletteGenerator.convertImageUrlToBitmap
 import com.games.gamex.utils.PaletteGenerator.extractColorsFromBitmap
@@ -228,29 +234,54 @@ fun DetailContent(
 
                         Row(
                             modifier = Modifier
-                                .padding(horizontal = 20.dp, vertical = 20.dp)
-                                .fillMaxSize()
+                                .height(IntrinsicSize.Min)
+                                .padding(30.dp)
+                                .fillMaxSize(),
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "Release Date",
+                                    fontFamily = FontFamily(Font(R.font.open_sans_medium)),
+                                    fontSize = 12.sp,
+                                    color = colorResource(id = R.color.dark_grey)
+                                )
+                                Text(
+                                    modifier = Modifier.padding(top = 8.dp),
+                                    text = data.released?.convertDate() ?: "",
+                                    fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
+                                    fontSize = 14.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+
+                            Divider(
                                 modifier = Modifier
-                                    .fillMaxSize()
-                                    .weight(1F),
-                                horizontalAlignment = Alignment.CenterHorizontally,
+                                    .fillMaxHeight()
+                                    .width(1.dp),
+                                color = WhiteHeavy,
+                            )
+
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
                                     text = "Metascore",
                                     fontFamily = FontFamily(Font(R.font.open_sans_medium)),
-                                    fontSize = 10.sp,
+                                    fontSize = 12.sp,
                                     color = colorResource(id = R.color.dark_grey)
                                 )
                                 Box(
                                     modifier = Modifier
-                                        .padding(top = 8.dp)
-                                        .size(50.dp)
+                                        .padding(top = 6.dp)
+                                        .size(35.dp)
                                         .border(
-                                            width = 2.dp,
-                                            color = Purple,
-                                            shape = RoundedCornerShape(10.dp)
+                                            width = 1.5.dp,
+                                            color = LightPurple,
+                                            shape = RoundedCornerShape(8.dp)
                                         )
                                 ) {
                                     Text(
@@ -259,53 +290,39 @@ fun DetailContent(
                                         text = data.metacritic.toString(),
                                         color = Purple,
                                         fontSize = 14.sp,
-                                        fontFamily = FontFamily(Font(R.font.open_sans_medium))
+                                        fontFamily = FontFamily(Font(R.font.open_sans_bold))
                                     )
                                 }
                             }
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .weight(1F),
-                            ) {
-                                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text(
-                                        text = "Release Date",
-                                        fontFamily = FontFamily(Font(R.font.open_sans_medium)),
-                                        fontSize = 10.sp,
-                                        color = colorResource(id = R.color.dark_grey)
-                                    )
-                                    Text(
-                                        modifier = Modifier.padding(top = 4.dp),
-                                        text = data.released?.convertDate() ?: "",
-                                        fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
-                                        fontSize = 12.sp,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                }
 
-                                Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text(
-                                        text = "Publisher",
-                                        fontFamily = FontFamily(Font(R.font.open_sans_medium)),
-                                        fontSize = 10.sp,
-                                        color = colorResource(id = R.color.dark_grey)
-                                    )
-                                    Text(
-                                        modifier = Modifier.padding(top = 4.dp),
-                                        text = publisher ?: "",
-                                        fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
-                                        fontSize = 12.sp,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                }
+                            Divider(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .width(1.dp),
+                                color = WhiteHeavy,
+                            )
+
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "Publisher",
+                                    fontFamily = FontFamily(Font(R.font.open_sans_medium)),
+                                    fontSize = 12.sp,
+                                    color = colorResource(id = R.color.dark_grey)
+                                )
+                                Text(
+                                    modifier = Modifier.padding(top = 8.dp),
+                                    text = publisher ?: "",
+                                    fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
+                                    fontSize = 14.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
                             }
                         }
 
                         LazyRow(
-                            modifier = Modifier.padding(top = 20.dp),
                             contentPadding = PaddingValues(horizontal = 20.dp),
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
@@ -323,9 +340,8 @@ fun DetailContent(
                                 )
                             }
                         }
-                        Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+                        Column(modifier = Modifier.padding(20.dp)) {
                             Text(
-                                modifier = Modifier.padding(top = 20.dp),
                                 text = stringResource(id = R.string.overview),
                                 fontFamily = FontFamily(
                                     Font(R.font.open_sans_bold)
@@ -333,38 +349,38 @@ fun DetailContent(
                                 fontSize = 16.sp
                             )
                             ShowMoreLess(
-                                modifier = Modifier.padding(top = 4.dp),
+                                modifier = Modifier.padding(top = 6.dp),
                                 data = data,
                             )
-                            if (!data.gameSeries?.second.isNullOrEmpty()) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
+                        }
+                        if (!data.gameSeries?.second.isNullOrEmpty()) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.similar_games),
+                                    fontFamily = FontFamily(
+                                        Font(R.font.open_sans_bold)
+                                    ),
+                                    fontSize = 16.sp
+                                )
+                                if ((data.gameSeries?.first ?: 0) > 6) {
                                     Text(
-                                        modifier = Modifier.padding(top = 20.dp),
-                                        text = stringResource(id = R.string.similar_games),
+                                        text = stringResource(id = R.string.see_all),
                                         fontFamily = FontFamily(
-                                            Font(R.font.open_sans_bold)
+                                            Font(R.font.open_sans_semi_bold)
                                         ),
-                                        fontSize = 16.sp
+                                        color = Purple,
+                                        fontSize = 14.sp
                                     )
-                                    if ((data.gameSeries?.first ?: 0) > 6) {
-                                        Text(
-                                            modifier = Modifier.padding(top = 20.dp),
-                                            text = stringResource(id = R.string.see_all),
-                                            fontFamily = FontFamily(
-                                                Font(R.font.open_sans_semi_bold)
-                                            ),
-                                            color = Purple,
-                                            fontSize = 14.sp
-                                        )
-                                    }
                                 }
                             }
                         }
                         LazyRow(
-                            modifier = Modifier.padding(top = 10.dp),
+                            modifier = Modifier.padding(top = 14.dp),
                             contentPadding = PaddingValues(horizontal = 20.dp),
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
@@ -405,7 +421,8 @@ fun ShowMoreLess(data: DetailGame, modifier: Modifier = Modifier) {
                 Font(R.font.open_sans_regular)
             ),
             color = colorResource(id = R.color.dark_grey),
-            fontSize = 12.sp
+            fontSize = 12.sp,
+            lineHeight = 20.sp
         )
 
         Text(modifier = Modifier
