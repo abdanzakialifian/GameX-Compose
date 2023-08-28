@@ -28,7 +28,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -59,6 +58,7 @@ import com.games.gamex.R
 import com.games.gamex.domain.model.DetailGame
 import com.games.gamex.presentation.component.GameItemHorizontal
 import com.games.gamex.presentation.detail.viewmodel.DetailViewModel
+import com.games.gamex.presentation.detail.viewmodel.DetailViewModelImpl
 import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.presentation.ui.theme.GreyPlaceholder
 import com.games.gamex.presentation.ui.theme.Purple
@@ -66,13 +66,18 @@ import com.games.gamex.presentation.ui.theme.WhiteTransparent
 import com.games.gamex.utils.PaletteGenerator.convertImageUrlToBitmap
 import com.games.gamex.utils.PaletteGenerator.extractColorsFromBitmap
 import com.games.gamex.utils.UiState
+import com.gowtham.ratingbar.RatingBar
+import com.gowtham.ratingbar.RatingBarStyle
+import com.gowtham.ratingbar.StepSize
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun DetailScreen(
     gameId: String,
     onColorPalette: (Map<String, String>) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: DetailViewModel = hiltViewModel(),
+    viewModel: DetailViewModel = hiltViewModel<DetailViewModelImpl>(),
 ) {
     val context = LocalContext.current
 
@@ -194,19 +199,21 @@ fun DetailContent(
                                     fontSize = 12.sp
                                 )
                                 Row(
-                                    modifier = Modifier.padding(top = 4.dp),
+                                    modifier = Modifier.padding(top = 6.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Icon(
-                                        modifier = Modifier.size(20.dp),
-                                        imageVector = Icons.Default.Star,
-                                        contentDescription = "Image Star",
-                                        tint = colorResource(
-                                            id = R.color.orange
-                                        )
+                                    RatingBar(
+                                        value = data.rating?.toFloat() ?: 0F,
+                                        stepSize = StepSize.HALF,
+                                        isIndicator = true,
+                                        size = 16.dp,
+                                        style = RatingBarStyle.Fill(),
+                                        spaceBetween = 2.dp,
+                                        onValueChange = {},
+                                        onRatingChanged = {},
                                     )
                                     Text(
-                                        modifier = Modifier.padding(start = 2.dp),
+                                        modifier = Modifier.padding(start = 4.dp),
                                         text = data.rating?.toString() ?: "",
                                         fontFamily = FontFamily(
                                             Font(R.font.open_sans_semi_bold)
@@ -342,7 +349,21 @@ fun ShowMoreLess(data: DetailGame, modifier: Modifier = Modifier) {
 @Preview(showBackground = true, showSystemUi = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun DetailScreenPreview() {
+    val detail = DetailGame(
+        name = "The Witcher",
+        imageBackground = "",
+        backgroundImageAdditional = "",
+        genres = listOf(),
+        rating = 4.5,
+        description = "This is Description",
+        images = listOf(),
+        gameSeries = Pair(1, listOf())
+    )
+
     GameXTheme {
-        DetailScreen(gameId = "1", onColorPalette = {})
+        DetailScreen(gameId = "1", onColorPalette = {}, viewModel = object : DetailViewModel() {
+            override val getDetailGame: StateFlow<UiState<DetailGame>>
+                get() = MutableStateFlow(UiState.Success(detail))
+        })
     }
 }

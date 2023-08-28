@@ -1,7 +1,13 @@
 package com.games.gamex.presentation.component
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
@@ -27,7 +33,6 @@ import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.presentation.ui.theme.GreyPlaceholder
 import com.games.gamex.utils.convertDate
 import com.gowtham.ratingbar.RatingBar
-import com.gowtham.ratingbar.RatingBarConfig
 import com.gowtham.ratingbar.RatingBarStyle
 import com.gowtham.ratingbar.StepSize
 
@@ -80,17 +85,13 @@ fun GameItemVertical(
                 Spacer(modifier = Modifier.height(4.dp))
                 RatingBar(
                     value = rating,
+                    stepSize = StepSize.HALF,
+                    isIndicator = true,
+                    size = 16.dp,
+                    style = RatingBarStyle.Fill(),
+                    spaceBetween = 2.dp,
                     onValueChange = {},
                     onRatingChanged = {},
-                    config = RatingBarConfig()
-                        .activeColor(colorResource(id = R.color.orange))
-                        .inactiveColor(Color.LightGray)
-                        .inactiveBorderColor(Color.LightGray)
-                        .stepSize(StepSize.HALF)
-                        .numStars(5)
-                        .isIndicator(true)
-                        .size(16.dp)
-                        .style(RatingBarStyle.Normal)
                 )
             }
         }
