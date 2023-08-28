@@ -33,12 +33,14 @@ object DataMapper {
         imageBackground = backgroundImage,
         backgroundImageAdditional = backgroundImageAdditional,
         genres = genres?.map { genre ->
-            ListResultItem(
-                id = genre.id,
-                name = genre.name,
-            )
+            genre.name ?: ""
         },
         rating = rating,
         description = descriptionRaw,
+        metacritic = metacritic,
+        released = released,
+        publishers = publishers?.map { publisher ->
+            publisher.name ?: ""
+        }
     )
 }

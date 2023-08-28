@@ -5,6 +5,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -66,6 +67,7 @@ import com.games.gamex.presentation.ui.theme.WhiteTransparent
 import com.games.gamex.utils.PaletteGenerator.convertImageUrlToBitmap
 import com.games.gamex.utils.PaletteGenerator.extractColorsFromBitmap
 import com.games.gamex.utils.UiState
+import com.games.gamex.utils.convertDate
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarStyle
 import com.gowtham.ratingbar.StepSize
@@ -118,9 +120,9 @@ fun DetailContent(
         is UiState.Success -> {
             val data = uiState.data
 
-            val genres = data.genres?.map {
-                it.name
-            }?.joinToString(", ")
+            val genres = data.genres?.joinToString(", ")
+
+            val publisher = data.publishers?.joinToString(", ")
 
             onImageUrl(data.backgroundImageAdditional ?: "")
 
@@ -223,6 +225,85 @@ fun DetailContent(
                                 }
                             }
                         }
+
+                        Row(
+                            modifier = Modifier
+                                .padding(horizontal = 20.dp, vertical = 20.dp)
+                                .fillMaxSize()
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .weight(1F),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                Text(
+                                    text = "Metascore",
+                                    fontFamily = FontFamily(Font(R.font.open_sans_medium)),
+                                    fontSize = 10.sp,
+                                    color = colorResource(id = R.color.dark_grey)
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .padding(top = 8.dp)
+                                        .size(50.dp)
+                                        .border(
+                                            width = 2.dp,
+                                            color = Purple,
+                                            shape = RoundedCornerShape(10.dp)
+                                        )
+                                ) {
+                                    Text(
+                                        modifier = Modifier
+                                            .align(Alignment.Center),
+                                        text = data.metacritic.toString(),
+                                        color = Purple,
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.open_sans_medium))
+                                    )
+                                }
+                            }
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .weight(1F),
+                            ) {
+                                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(
+                                        text = "Release Date",
+                                        fontFamily = FontFamily(Font(R.font.open_sans_medium)),
+                                        fontSize = 10.sp,
+                                        color = colorResource(id = R.color.dark_grey)
+                                    )
+                                    Text(
+                                        modifier = Modifier.padding(top = 4.dp),
+                                        text = data.released?.convertDate() ?: "",
+                                        fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
+                                        fontSize = 12.sp,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+
+                                Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(
+                                        text = "Publisher",
+                                        fontFamily = FontFamily(Font(R.font.open_sans_medium)),
+                                        fontSize = 10.sp,
+                                        color = colorResource(id = R.color.dark_grey)
+                                    )
+                                    Text(
+                                        modifier = Modifier.padding(top = 4.dp),
+                                        text = publisher ?: "",
+                                        fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
+                                        fontSize = 12.sp,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                            }
+                        }
+
                         LazyRow(
                             modifier = Modifier.padding(top = 20.dp),
                             contentPadding = PaddingValues(horizontal = 20.dp),
@@ -353,7 +434,11 @@ fun DetailScreenPreview() {
         name = "The Witcher",
         imageBackground = "",
         backgroundImageAdditional = "",
-        genres = listOf(),
+        genres = listOf(
+            "Action",
+            "Adventure",
+            "RPG"
+        ),
         rating = 4.5,
         description = "This is Description",
         images = listOf(),
