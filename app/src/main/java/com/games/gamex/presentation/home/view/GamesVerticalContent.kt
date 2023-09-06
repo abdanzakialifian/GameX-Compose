@@ -9,10 +9,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -22,23 +21,28 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.games.gamex.R
 import com.games.gamex.domain.model.ListResultItem
 import com.games.gamex.presentation.component.GameItemVertical
 import com.games.gamex.presentation.component.ShimmerAnimation
+import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.utils.Shimmer
 import com.games.gamex.utils.isScrollToEnd
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 @Composable
 fun GamesVerticalContent(
     gamesVerticalPaging: LazyPagingItems<ListResultItem>,
     scaffoldState: ScaffoldState,
-    onGameVerticalClicked: () -> Unit,
+    onGameVerticalClicked: (gameId: Int) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberLazyListState()
@@ -78,25 +82,10 @@ fun GamesVerticalContent(
 }
 
 @Composable
-fun GamesVerticalSectionPlaceholder() {
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 20.dp)
-            .padding(paddingValues = PaddingValues(vertical = 20.dp))
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        repeat(times = 15) {
-            ShimmerAnimation(shimmer = Shimmer.GAME_ITEM_SECOND_PLACEHOLDER)
-        }
-    }
-}
-
-@Composable
 fun GamesVerticalSection(
     scrollState: LazyListState,
     gamesVerticalPaging: LazyPagingItems<ListResultItem>,
-    onGameVerticalClicked: () -> Unit
+    onGameVerticalClicked: (gameId: Int) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.padding(horizontal = 20.dp),
@@ -113,7 +102,9 @@ fun GamesVerticalSection(
                 name = game?.name ?: "",
                 date = game?.released ?: "",
                 rating = game?.rating ?: 0.0F,
-                onItemClicked = onGameVerticalClicked
+                onItemClicked = {
+                    onGameVerticalClicked(game?.id ?: 0)
+                }
             )
         }
 
@@ -135,5 +126,34 @@ fun GamesVerticalSection(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun GamesVerticalSectionPlaceholder() {
+    LazyColumn(
+        contentPadding = PaddingValues(vertical = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier.padding(horizontal = 20.dp)
+    ) {
+        items(count = 15) {
+            ShimmerAnimation(shimmer = Shimmer.GAME_ITEM_VERTICAL_PLACEHOLDER)
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GamesVerticalContentPreview() {
+    val listResultPagingItems =
+        flowOf(PagingData.empty<ListResultItem>()).collectAsLazyPagingItems()
+    val scaffoldState = rememberScaffoldState()
+
+    GameXTheme {
+        GamesVerticalContent(
+            gamesVerticalPaging = listResultPagingItems,
+            scaffoldState = scaffoldState,
+            onGameVerticalClicked = { },
+        )
     }
 }

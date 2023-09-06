@@ -18,7 +18,7 @@ fun ShimmerAnimation(shimmer: Shimmer) {
         Color.LightGray.copy(alpha = 0.2F),
         Color.LightGray.copy(alpha = 0.6F)
     )
-    val transition = rememberInfiniteTransition()
+    val transition = rememberInfiniteTransition(label = "transition")
     val translateAnimation = transition.animateFloat(
         initialValue = 0F,
         targetValue = 1000F,
@@ -27,7 +27,7 @@ fun ShimmerAnimation(shimmer: Shimmer) {
                 durationMillis = 1000,
                 easing = FastOutSlowInEasing
             )
-        )
+        ), label = "transition animation"
     )
     val brush = Brush.linearGradient(
         colors = shimmerColors,
@@ -36,9 +36,9 @@ fun ShimmerAnimation(shimmer: Shimmer) {
     )
 
     when (shimmer) {
-        Shimmer.GAME_ITEM_PLACEHOLDER -> GameItemHorizontalPlaceholder(brush = brush)
+        Shimmer.GAME_ITEM_HORIZONTAL_PLACEHOLDER -> GameItemHorizontalPlaceholder(brush = brush)
         Shimmer.CATEGORIES_ITEM_PLACEHOLDER -> CategoriesItemPlaceholder(brush = brush)
         Shimmer.PLATFORM_ITEM_PLACEHOLDER -> PlatformItemPlaceholder(brush = brush)
-        Shimmer.GAME_ITEM_SECOND_PLACEHOLDER -> GameItemVerticalPlaceholder(brush = brush)
+        Shimmer.GAME_ITEM_VERTICAL_PLACEHOLDER -> GameItemVerticalPlaceholder(brush = brush)
     }
 }

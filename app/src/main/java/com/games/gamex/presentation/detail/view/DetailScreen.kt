@@ -337,7 +337,7 @@ fun DetailContentInformationSubHeader(data: DetailGame, modifier: Modifier = Mod
                 Text(
                     modifier = Modifier
                         .align(Alignment.Center),
-                    text = data.metacritic.toString(),
+                    text = (data.metacritic ?: 0).toString(),
                     color = Purple,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.open_sans_bold))
@@ -453,53 +453,57 @@ fun Overview(data: DetailGame, modifier: Modifier = Modifier) {
         mutableStateOf(false)
     }
 
-    Column(modifier = modifier) {
-        Text(
-            text = stringResource(id = R.string.overview),
-            fontFamily = FontFamily(
-                Font(R.font.open_sans_bold)
-            ),
-            fontSize = 16.sp
-        )
-
-        Text(
-            modifier = Modifier
-                .padding(top = 6.dp)
-                .animateContentSize(
-                    // add animation expandable
-                    animationSpec = tween(
-                        durationMillis = 300, easing = LinearOutSlowInEasing
-                    )
+    if (!data.description.isNullOrEmpty()) {
+        Column(modifier = modifier) {
+            Text(
+                text = stringResource(id = R.string.overview),
+                fontFamily = FontFamily(
+                    Font(R.font.open_sans_bold)
                 ),
-            text = data.description ?: "",
-            maxLines = if (isShowMore) Int.MAX_VALUE else 3,
-            overflow = if (isShowMore) TextOverflow.Clip else TextOverflow.Ellipsis,
-            fontFamily = FontFamily(
-                Font(R.font.open_sans_regular)
-            ),
-            color = colorResource(id = R.color.dark_grey),
-            fontSize = 12.sp,
-            lineHeight = 20.sp
-        )
+                fontSize = 16.sp
+            )
 
-        Text(
-            modifier = Modifier
-                .clickable(
-                    // remove ripple click
-                    interactionSource = remember {
-                        MutableInteractionSource()
-                    }, indication = null
-                ) {
-                    isShowMore = !isShowMore
-                }
-                .padding(vertical = 4.dp),
-            text = if (isShowMore) stringResource(id = R.string.show_less) else stringResource(id = R.string.read_more),
-            fontFamily = FontFamily(
-                Font(R.font.open_sans_medium)
-            ),
-            color = colorResource(id = R.color.purple),
-            fontSize = 12.sp
-        )
+            Text(
+                modifier = Modifier
+                    .padding(top = 6.dp)
+                    .animateContentSize(
+                        // add animation expandable
+                        animationSpec = tween(
+                            durationMillis = 300, easing = LinearOutSlowInEasing
+                        )
+                    ),
+                text = data.description,
+                maxLines = if (isShowMore) Int.MAX_VALUE else 3,
+                overflow = if (isShowMore) TextOverflow.Clip else TextOverflow.Ellipsis,
+                fontFamily = FontFamily(
+                    Font(R.font.open_sans_regular)
+                ),
+                color = colorResource(id = R.color.dark_grey),
+                fontSize = 12.sp,
+                lineHeight = 20.sp
+            )
+
+            Text(
+                modifier = Modifier
+                    .clickable(
+                        // remove ripple click
+                        interactionSource = remember {
+                            MutableInteractionSource()
+                        }, indication = null
+                    ) {
+                        isShowMore = !isShowMore
+                    }
+                    .padding(vertical = 4.dp),
+                text = if (isShowMore) stringResource(id = R.string.show_less) else stringResource(
+                    id = R.string.read_more
+                ),
+                fontFamily = FontFamily(
+                    Font(R.font.open_sans_medium)
+                ),
+                color = colorResource(id = R.color.purple),
+                fontSize = 12.sp
+            )
+        }
     }
 }
 

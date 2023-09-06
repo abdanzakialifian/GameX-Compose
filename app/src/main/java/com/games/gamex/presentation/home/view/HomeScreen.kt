@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.airbnb.lottie.compose.LottieAnimation
@@ -38,13 +39,15 @@ import com.games.gamex.R
 import com.games.gamex.domain.model.ListResultItem
 import com.games.gamex.presentation.component.CustomSearch
 import com.games.gamex.presentation.home.viewmodel.HomeViewModel
+import com.games.gamex.presentation.ui.theme.GameXTheme
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun HomeScreen(
     onGenreClicked: () -> Unit,
     onGameHorizontalClicked: (gameId: Int) -> Unit,
     onPlatformClicked: () -> Unit,
-    onGameVerticalClicked: () -> Unit,
+    onGameVerticalClicked: (gameId: Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -89,7 +92,7 @@ fun HomeContent(
     onGenreClicked: () -> Unit,
     onGameHorizontalClicked: (gameId: Int) -> Unit,
     onPlatformClicked: () -> Unit,
-    onGameVerticalClicked: () -> Unit,
+    onGameVerticalClicked: (gameId: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var searchQuery by remember {
@@ -157,6 +160,7 @@ fun HomeContent(
                                 onFetchError = { isError ->
                                     isErrorCategories = isError
                                 },
+                                modifier = Modifier.padding(top = 20.dp)
                             )
                             GamesHorizontalContent(
                                 gamesHorizontalPaging = gamesHorizontalPaging,
@@ -164,7 +168,8 @@ fun HomeContent(
                                 onGameHorizontalClicked = onGameHorizontalClicked,
                                 onFetchError = { isError ->
                                     isErrorHorizontalGames = isError
-                                }
+                                },
+                                modifier = Modifier.padding(top = 20.dp)
                             )
                             PlatformsContent(
                                 platformsPaging = platformsPaging,
@@ -172,7 +177,8 @@ fun HomeContent(
                                 onPlatformClicked = onPlatformClicked,
                                 onFetchError = { isError ->
                                     isErrorPlatforms = isError
-                                }
+                                },
+                                modifier = Modifier.padding(top = 20.dp)
                             )
                         }
                     }
@@ -209,10 +215,19 @@ fun HomeErrorSection() {
 @Preview(showBackground = true, showSystemUi = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(
-        onGenreClicked = {},
-        onGameHorizontalClicked = {},
-        onPlatformClicked = {},
-        onGameVerticalClicked = {}
-    )
+    GameXTheme {
+        val listResultPagingItems =
+            flowOf(PagingData.empty<ListResultItem>()).collectAsLazyPagingItems()
+        HomeContent(
+            genresPaging = listResultPagingItems,
+            gamesHorizontalPaging = listResultPagingItems,
+            platformsPaging = listResultPagingItems,
+            gamesVerticalPaging = listResultPagingItems,
+            onValueChange = {},
+            onGenreClicked = { },
+            onGameHorizontalClicked = {},
+            onPlatformClicked = { },
+            onGameVerticalClicked = { }
+        )
+    }
 }

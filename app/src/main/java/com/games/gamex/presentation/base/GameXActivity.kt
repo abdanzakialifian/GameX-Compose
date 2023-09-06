@@ -105,7 +105,13 @@ fun GameXApp() {
                             )
                         },
                         onPlatformClicked = { navController.navigate(Screen.DetailScreen.route) },
-                        onGameVerticalClicked = { navController.navigate(Screen.DetailScreen.route) },
+                        onGameVerticalClicked = { gameId ->
+                            navController.navigate(
+                                Screen.DetailScreen.createRoute(
+                                    gameId.toString()
+                                )
+                            )
+                        },
                     )
                 }
                 composable(
