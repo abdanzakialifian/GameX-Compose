@@ -63,7 +63,6 @@ import com.games.gamex.R
 import com.games.gamex.domain.model.DetailGame
 import com.games.gamex.presentation.component.GameItemHorizontal
 import com.games.gamex.presentation.detail.viewmodel.DetailViewModel
-import com.games.gamex.presentation.detail.viewmodel.DetailViewModelImpl
 import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.presentation.ui.theme.GreyPlaceholder
 import com.games.gamex.presentation.ui.theme.LightPurple
@@ -77,15 +76,14 @@ import com.games.gamex.utils.convertDate
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarStyle
 import com.gowtham.ratingbar.StepSize
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun DetailScreen(
     gameId: String,
     onColorPalette: (Map<String, String>) -> Unit,
+    onImageBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: DetailViewModel = hiltViewModel<DetailViewModelImpl>(),
+    viewModel: DetailViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
 
@@ -93,6 +91,9 @@ fun DetailScreen(
         mutableStateOf("")
     }
 
+    val getDetailGameState by viewModel.getDetailGame.collectAsStateWithLifecycle(initialValue = UiState.Loading)
+
+    // get color from image background
     LaunchedEffect(key1 = imageUrl) {
         try {
             val bitmap = convertImageUrlToBitmap(imageUrl, context)
@@ -109,26 +110,28 @@ fun DetailScreen(
         viewModel.setGameId(gameId)
     }
 
-    val getDetailGameState by viewModel.getDetailGame.collectAsStateWithLifecycle(initialValue = UiState.Loading)
-
     DetailContent(
-        uiState = getDetailGameState, onImageUrl = { url -> imageUrl = url }, modifier = modifier
+        uiState = getDetailGameState,
+        onImageUrl = { url ->
+            imageUrl = url
+        },
+        onImageBackClick = onImageBackClick,
+        modifier = modifier
     )
 }
 
 @Composable
 fun DetailContent(
-    uiState: UiState<DetailGame>, onImageUrl: (String) -> Unit, modifier: Modifier = Modifier
+    uiState: UiState<DetailGame>,
+    onImageUrl: (String) -> Unit,
+    onImageBackClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     when (uiState) {
         is UiState.Loading -> {}
 
         is UiState.Success -> {
             val data = uiState.data
-
-            val genres = data.genres?.joinToString(", ")
-
-            val publisher = data.publishers?.joinToString(", ")
 
             onImageUrl(data.backgroundImageAdditional ?: "")
 
@@ -150,6 +153,7 @@ fun DetailContent(
                         .clip(CircleShape)
                         .background(WhiteTransparent)
                         .align(Alignment.TopStart)
+                        .clickable { onImageBackClick() }
                 ) {
                     Icon(
                         modifier = Modifier
@@ -160,239 +164,7 @@ fun DetailContent(
                     )
                 }
 
-                Card(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 250.dp),
-                    shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
-                    backgroundColor = Color.White
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .verticalScroll(rememberScrollState())
-                            .padding(top = 20.dp)
-                    ) {
-                        Row(Modifier.padding(horizontal = 20.dp)) {
-                            AsyncImage(
-                                modifier = Modifier
-                                    .size(height = 80.dp, width = 80.dp)
-                                    .clip(RoundedCornerShape(10.dp)),
-                                model = data.imageBackground,
-                                contentDescription = "Image Game",
-                                contentScale = ContentScale.Crop
-                            )
-                            Column(
-                                modifier = Modifier
-                                    .padding(start = 10.dp)
-                                    .align(Alignment.CenterVertically)
-                            ) {
-                                Text(
-                                    text = data.name ?: "",
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontFamily = FontFamily(
-                                        Font(R.font.open_sans_bold)
-                                    ),
-                                    fontSize = 18.sp
-                                )
-                                Text(
-                                    modifier = Modifier.padding(top = 4.dp),
-                                    text = genres ?: "",
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontFamily = FontFamily(
-                                        Font(R.font.open_sans_regular),
-                                    ),
-                                    color = colorResource(id = R.color.dark_grey),
-                                    fontSize = 12.sp
-                                )
-                                Row(
-                                    modifier = Modifier.padding(top = 6.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    RatingBar(
-                                        value = data.rating?.toFloat() ?: 0F,
-                                        stepSize = StepSize.HALF,
-                                        isIndicator = true,
-                                        size = 16.dp,
-                                        style = RatingBarStyle.Fill(),
-                                        spaceBetween = 2.dp,
-                                        onValueChange = {},
-                                        onRatingChanged = {},
-                                    )
-                                    Text(
-                                        modifier = Modifier.padding(start = 4.dp),
-                                        text = data.rating?.toString() ?: "",
-                                        fontFamily = FontFamily(
-                                            Font(R.font.open_sans_semi_bold)
-                                        ),
-                                        fontSize = 12.sp
-                                    )
-                                }
-                            }
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .height(IntrinsicSize.Min)
-                                .padding(30.dp)
-                                .fillMaxSize(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = "Release Date",
-                                    fontFamily = FontFamily(Font(R.font.open_sans_medium)),
-                                    fontSize = 12.sp,
-                                    color = colorResource(id = R.color.dark_grey)
-                                )
-                                Text(
-                                    modifier = Modifier.padding(top = 8.dp),
-                                    text = data.released?.convertDate() ?: "",
-                                    fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
-                                    fontSize = 14.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
-
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .width(1.dp),
-                                color = WhiteHeavy,
-                            )
-
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = "Metascore",
-                                    fontFamily = FontFamily(Font(R.font.open_sans_medium)),
-                                    fontSize = 12.sp,
-                                    color = colorResource(id = R.color.dark_grey)
-                                )
-                                Box(
-                                    modifier = Modifier
-                                        .padding(top = 6.dp)
-                                        .size(35.dp)
-                                        .border(
-                                            width = 1.5.dp,
-                                            color = LightPurple,
-                                            shape = RoundedCornerShape(8.dp)
-                                        )
-                                ) {
-                                    Text(
-                                        modifier = Modifier
-                                            .align(Alignment.Center),
-                                        text = data.metacritic.toString(),
-                                        color = Purple,
-                                        fontSize = 14.sp,
-                                        fontFamily = FontFamily(Font(R.font.open_sans_bold))
-                                    )
-                                }
-                            }
-
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .width(1.dp),
-                                color = WhiteHeavy,
-                            )
-
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = "Publisher",
-                                    fontFamily = FontFamily(Font(R.font.open_sans_medium)),
-                                    fontSize = 12.sp,
-                                    color = colorResource(id = R.color.dark_grey)
-                                )
-                                Text(
-                                    modifier = Modifier.padding(top = 8.dp),
-                                    text = publisher ?: "",
-                                    fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
-                                    fontSize = 14.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
-                        }
-
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 20.dp),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            items(data.images ?: listOf(),
-                                key = { data -> data.first }) { screenshot ->
-                                AsyncImage(
-                                    modifier = Modifier
-                                        .size(width = 230.dp, height = 150.dp)
-                                        .clip(RoundedCornerShape(10.dp)),
-                                    model = screenshot.second,
-                                    placeholder = ColorPainter(GreyPlaceholder),
-                                    error = painterResource(id = R.drawable.ic_broken_image_64),
-                                    contentDescription = "Image Screenshot",
-                                    contentScale = ContentScale.Crop
-                                )
-                            }
-                        }
-                        Column(modifier = Modifier.padding(20.dp)) {
-                            Text(
-                                text = stringResource(id = R.string.overview),
-                                fontFamily = FontFamily(
-                                    Font(R.font.open_sans_bold)
-                                ),
-                                fontSize = 16.sp
-                            )
-                            ShowMoreLess(
-                                modifier = Modifier.padding(top = 6.dp),
-                                data = data,
-                            )
-                        }
-                        if (!data.gameSeries?.second.isNullOrEmpty()) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 20.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = stringResource(id = R.string.similar_games),
-                                    fontFamily = FontFamily(
-                                        Font(R.font.open_sans_bold)
-                                    ),
-                                    fontSize = 16.sp
-                                )
-                                if ((data.gameSeries?.first ?: 0) > 6) {
-                                    Text(
-                                        text = stringResource(id = R.string.see_all),
-                                        fontFamily = FontFamily(
-                                            Font(R.font.open_sans_semi_bold)
-                                        ),
-                                        color = Purple,
-                                        fontSize = 14.sp
-                                    )
-                                }
-                            }
-                        }
-                        LazyRow(
-                            modifier = Modifier.padding(top = 14.dp),
-                            contentPadding = PaddingValues(horizontal = 20.dp),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            items(data.gameSeries?.second ?: listOf(),
-                                key = { data -> data.id ?: 0 }) { gameSeries ->
-                                GameItemHorizontal(image = gameSeries.image ?: "",
-                                    title = gameSeries.name ?: "",
-                                    onItemClicked = { })
-                            }
-                        }
-                    }
-                }
+                DetailContentInformation(data)
             }
         }
 
@@ -401,19 +173,304 @@ fun DetailContent(
 }
 
 @Composable
-fun ShowMoreLess(data: DetailGame, modifier: Modifier = Modifier) {
+fun DetailContentInformation(data: DetailGame, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(top = 250.dp),
+        shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
+        backgroundColor = Color.White
+    ) {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(top = 20.dp)
+        ) {
+            DetailContentInformationHeader(data)
+
+            DetailContentInformationSubHeader(data)
+
+            ImageScreenshot(data.images)
+
+            Overview(
+                data = data,
+                modifier = Modifier.padding(20.dp),
+            )
+
+            SimilarGames(data)
+        }
+    }
+}
+
+@Composable
+fun DetailContentInformationHeader(data: DetailGame, modifier: Modifier = Modifier) {
+    val genres = data.genres?.joinToString(", ")
+
+    Row(modifier.padding(horizontal = 20.dp)) {
+        AsyncImage(
+            modifier = Modifier
+                .size(height = 80.dp, width = 80.dp)
+                .clip(RoundedCornerShape(10.dp)),
+            model = data.imageBackground,
+            contentDescription = "Image Game",
+            contentScale = ContentScale.Crop
+        )
+
+        Column(
+            modifier = Modifier
+                .padding(start = 10.dp)
+                .align(Alignment.CenterVertically)
+        ) {
+            Text(
+                text = data.name ?: "",
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                fontFamily = FontFamily(
+                    Font(R.font.open_sans_bold)
+                ),
+                fontSize = 18.sp
+            )
+
+            Text(
+                modifier = Modifier.padding(top = 4.dp),
+                text = genres ?: "",
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                fontFamily = FontFamily(
+                    Font(R.font.open_sans_regular),
+                ),
+                color = colorResource(id = R.color.dark_grey),
+                fontSize = 12.sp
+            )
+
+            Row(
+                modifier = Modifier.padding(top = 6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RatingBar(
+                    value = data.rating?.toFloat() ?: 0F,
+                    stepSize = StepSize.HALF,
+                    isIndicator = true,
+                    size = 16.dp,
+                    style = RatingBarStyle.Fill(),
+                    spaceBetween = 2.dp,
+                    onValueChange = {},
+                    onRatingChanged = {},
+                )
+
+                Text(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = data.rating?.toString() ?: "",
+                    fontFamily = FontFamily(
+                        Font(R.font.open_sans_semi_bold)
+                    ),
+                    fontSize = 12.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun DetailContentInformationSubHeader(data: DetailGame, modifier: Modifier = Modifier) {
+    val publisher = data.publishers?.joinToString(", ")
+
+    Row(
+        modifier = modifier
+            .height(IntrinsicSize.Min)
+            .padding(30.dp)
+            .fillMaxSize(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Column(
+            modifier = modifier
+                .weight(1F),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Release Date",
+                fontFamily = FontFamily(Font(R.font.open_sans_medium)),
+                fontSize = 12.sp,
+                color = colorResource(id = R.color.dark_grey)
+            )
+
+            Text(
+                modifier = Modifier.padding(top = 8.dp),
+                text = data.released?.convertDate() ?: "",
+                fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
+                fontSize = 14.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        Divider(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxHeight()
+                .width(1.dp),
+            color = WhiteHeavy,
+        )
+
+        Column(
+            modifier = modifier
+                .weight(1F),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Metascore",
+                fontFamily = FontFamily(Font(R.font.open_sans_medium)),
+                fontSize = 12.sp,
+                color = colorResource(id = R.color.dark_grey)
+            )
+
+            Box(
+                modifier = Modifier
+                    .padding(top = 6.dp)
+                    .size(35.dp)
+                    .border(
+                        width = 1.5.dp,
+                        color = LightPurple,
+                        shape = RoundedCornerShape(8.dp)
+                    )
+            ) {
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.Center),
+                    text = data.metacritic.toString(),
+                    color = Purple,
+                    fontSize = 14.sp,
+                    fontFamily = FontFamily(Font(R.font.open_sans_bold))
+                )
+            }
+        }
+
+        Divider(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxHeight()
+                .width(1.dp),
+            color = WhiteHeavy,
+        )
+
+        Column(
+            modifier = modifier
+                .weight(1F),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Publisher",
+                fontFamily = FontFamily(Font(R.font.open_sans_medium)),
+                fontSize = 12.sp,
+                color = colorResource(id = R.color.dark_grey)
+            )
+
+            Text(
+                modifier = Modifier.padding(top = 8.dp),
+                text = publisher ?: "",
+                fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
+                fontSize = 14.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+fun ImageScreenshot(images: List<Pair<Int, String>>?, modifier: Modifier = Modifier) {
+    LazyRow(
+        modifier = modifier,
+        contentPadding = PaddingValues(horizontal = 20.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        items(images ?: listOf(),
+            key = { data -> data.first }) { screenshot ->
+            AsyncImage(
+                modifier = Modifier
+                    .size(width = 230.dp, height = 150.dp)
+                    .clip(RoundedCornerShape(10.dp)),
+                model = screenshot.second,
+                placeholder = ColorPainter(GreyPlaceholder),
+                error = painterResource(id = R.drawable.ic_broken_image_64),
+                contentDescription = "Image Screenshot",
+                contentScale = ContentScale.Crop
+            )
+        }
+    }
+}
+
+@Composable
+fun SimilarGames(data: DetailGame, modifier: Modifier = Modifier) {
+    if (!data.gameSeries?.second.isNullOrEmpty()) {
+        Column(modifier = modifier) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(id = R.string.similar_games),
+                    fontFamily = FontFamily(
+                        Font(R.font.open_sans_bold)
+                    ),
+                    fontSize = 16.sp
+                )
+
+                if ((data.gameSeries?.first ?: 0) > 6) {
+                    Text(
+                        text = stringResource(id = R.string.see_all),
+                        fontFamily = FontFamily(
+                            Font(R.font.open_sans_semi_bold)
+                        ),
+                        color = Purple,
+                        fontSize = 14.sp
+                    )
+                }
+            }
+
+            LazyRow(
+                modifier = Modifier.padding(vertical = 14.dp),
+                contentPadding = PaddingValues(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(data.gameSeries?.second ?: listOf(),
+                    key = { data -> data.id ?: 0 }) { gameSeries ->
+                    GameItemHorizontal(image = gameSeries.image ?: "",
+                        title = gameSeries.name ?: "",
+                        onItemClicked = { }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun Overview(data: DetailGame, modifier: Modifier = Modifier) {
     var isShowMore by remember {
         mutableStateOf(false)
     }
 
     Column(modifier = modifier) {
         Text(
-            modifier = Modifier.animateContentSize(
-                // add animation expandable
-                animationSpec = tween(
-                    durationMillis = 300, easing = LinearOutSlowInEasing
-                )
+            text = stringResource(id = R.string.overview),
+            fontFamily = FontFamily(
+                Font(R.font.open_sans_bold)
             ),
+            fontSize = 16.sp
+        )
+
+        Text(
+            modifier = Modifier
+                .padding(top = 6.dp)
+                .animateContentSize(
+                    // add animation expandable
+                    animationSpec = tween(
+                        durationMillis = 300, easing = LinearOutSlowInEasing
+                    )
+                ),
             text = data.description ?: "",
             maxLines = if (isShowMore) Int.MAX_VALUE else 3,
             overflow = if (isShowMore) TextOverflow.Clip else TextOverflow.Ellipsis,
@@ -425,22 +482,24 @@ fun ShowMoreLess(data: DetailGame, modifier: Modifier = Modifier) {
             lineHeight = 20.sp
         )
 
-        Text(modifier = Modifier
-            .clickable(
-                // remove ripple click
-                interactionSource = remember {
-                    MutableInteractionSource()
-                }, indication = null
-            ) {
-                isShowMore = !isShowMore
-            }
-            .padding(vertical = 4.dp),
+        Text(
+            modifier = Modifier
+                .clickable(
+                    // remove ripple click
+                    interactionSource = remember {
+                        MutableInteractionSource()
+                    }, indication = null
+                ) {
+                    isShowMore = !isShowMore
+                }
+                .padding(vertical = 4.dp),
             text = if (isShowMore) stringResource(id = R.string.show_less) else stringResource(id = R.string.read_more),
             fontFamily = FontFamily(
                 Font(R.font.open_sans_medium)
             ),
             color = colorResource(id = R.color.purple),
-            fontSize = 12.sp)
+            fontSize = 12.sp
+        )
     }
 }
 
@@ -459,13 +518,12 @@ fun DetailScreenPreview() {
         rating = 4.5,
         description = "This is Description",
         images = listOf(),
-        gameSeries = Pair(1, listOf())
+        gameSeries = Pair(1, listOf()),
+        metacritic = 93,
+        publishers = listOf()
     )
 
     GameXTheme {
-        DetailScreen(gameId = "1", onColorPalette = {}, viewModel = object : DetailViewModel() {
-            override val getDetailGame: StateFlow<UiState<DetailGame>>
-                get() = MutableStateFlow(UiState.Success(detail))
-        })
+        DetailContent(uiState = UiState.Success(detail), onImageUrl = {}, onImageBackClick = { })
     }
 }

@@ -119,6 +119,8 @@ fun GameXApp() {
                     val gameId = backStackEntry.arguments?.getString(GAME_ID)
                     DetailScreen(gameId = gameId ?: "", onColorPalette = { colors ->
                         vibrant = colors[VIBRANT] ?: colorStringPurple
+                    }, onImageBackClick = {
+                        navController.navigateUp()
                     })
                 }
             }
