@@ -9,7 +9,7 @@ buildscript {
         coroutines_version = '1.6.4'
         lifecycle_version = '2.7.0-alpha01'
         timber_version = '5.0.1'
-        nav_version = '2.7.0'
+        nav_version = '2.7.1'
         hilt_navigation_version = '1.0.0'
         lottie_version = '5.0.3'
         paging_version = '3.1.1'

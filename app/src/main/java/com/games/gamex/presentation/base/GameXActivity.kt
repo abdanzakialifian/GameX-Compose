@@ -4,6 +4,7 @@ import android.graphics.Color.parseColor
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -123,11 +124,13 @@ fun GameXApp() {
                     ),
                 ) { backStackEntry ->
                     val gameId = backStackEntry.arguments?.getString(GAME_ID)
-                    DetailScreen(gameId = gameId ?: "", onColorPalette = { colors ->
-                        vibrant = colors[VIBRANT] ?: colorStringPurple
-                    }, onImageBackClick = {
-                        navController.navigateUp()
-                    })
+                    AnimatedVisibility(visible = true) {
+                        DetailScreen(gameId = gameId ?: "", onColorPalette = { colors ->
+                            vibrant = colors[VIBRANT] ?: colorStringPurple
+                        }, onImageBackClick = {
+                            navController.navigateUp()
+                        })
+                    }
                 }
             }
         }

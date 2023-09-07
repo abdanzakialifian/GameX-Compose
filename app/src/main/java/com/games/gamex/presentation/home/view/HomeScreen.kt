@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,7 +53,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
 
-    var searchQuery by remember {
+    var searchQuery by rememberSaveable {
         mutableStateOf("")
     }
 
@@ -70,6 +71,7 @@ fun HomeScreen(
         gamesHorizontalPaging = getAllGamesHorizontalState,
         platformsPaging = getAllGamePlatformsState,
         gamesVerticalPaging = getAllGamesVerticalState,
+        searchQuery = searchQuery,
         onValueChange = { value ->
             searchQuery = value
             viewModel.setSearchQuery(searchQuery = value)
@@ -88,6 +90,7 @@ fun HomeContent(
     gamesHorizontalPaging: LazyPagingItems<ListResultItem>,
     platformsPaging: LazyPagingItems<ListResultItem>,
     gamesVerticalPaging: LazyPagingItems<ListResultItem>,
+    searchQuery: String,
     onValueChange: (String) -> Unit,
     onGenreClicked: () -> Unit,
     onGameHorizontalClicked: (gameId: Int) -> Unit,
@@ -95,9 +98,6 @@ fun HomeContent(
     onGameVerticalClicked: (gameId: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var searchQuery by remember {
-        mutableStateOf("")
-    }
     var isErrorCategories by remember {
         mutableStateOf(false)
     }
@@ -138,7 +138,6 @@ fun HomeContent(
                     value = searchQuery,
                     hint = stringResource(id = R.string.search_game),
                     onValueChange = { value ->
-                        searchQuery = value
                         onValueChange(value)
                     }
                 )
@@ -223,6 +222,7 @@ fun HomeScreenPreview() {
             gamesHorizontalPaging = listResultPagingItems,
             platformsPaging = listResultPagingItems,
             gamesVerticalPaging = listResultPagingItems,
+            searchQuery = "",
             onValueChange = {},
             onGenreClicked = { },
             onGameHorizontalClicked = {},
