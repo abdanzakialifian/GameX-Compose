@@ -62,6 +62,7 @@ import coil.compose.AsyncImage
 import com.games.gamex.R
 import com.games.gamex.domain.model.DetailGame
 import com.games.gamex.presentation.component.GameItemHorizontal
+import com.games.gamex.presentation.component.ShimmerAnimation
 import com.games.gamex.presentation.detail.viewmodel.DetailViewModel
 import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.presentation.ui.theme.GreyPlaceholder
@@ -71,6 +72,7 @@ import com.games.gamex.presentation.ui.theme.WhiteHeavy
 import com.games.gamex.presentation.ui.theme.WhiteTransparent
 import com.games.gamex.utils.PaletteGenerator.convertImageUrlToBitmap
 import com.games.gamex.utils.PaletteGenerator.extractColorsFromBitmap
+import com.games.gamex.utils.Shimmer
 import com.games.gamex.utils.UiState
 import com.games.gamex.utils.convertDate
 import com.gowtham.ratingbar.RatingBar
@@ -111,12 +113,9 @@ fun DetailScreen(
     }
 
     DetailContent(
-        uiState = getDetailGameState,
-        onImageUrl = { url ->
+        uiState = getDetailGameState, onImageUrl = { url ->
             imageUrl = url
-        },
-        onImageBackClick = onImageBackClick,
-        modifier = modifier
+        }, onImageBackClick = onImageBackClick, modifier = modifier
     )
 }
 
@@ -125,10 +124,11 @@ fun DetailContent(
     uiState: UiState<DetailGame>,
     onImageUrl: (String) -> Unit,
     onImageBackClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isPreview: Boolean = false,
 ) {
     when (uiState) {
-        is UiState.Loading -> {}
+        is UiState.Loading -> ShimmerAnimation(shimmer = Shimmer.GAME_DETAIL_PlACEHOLDER)
 
         is UiState.Success -> {
             val data = uiState.data
@@ -136,15 +136,25 @@ fun DetailContent(
             onImageUrl(data.backgroundImageAdditional ?: "")
 
             Box(modifier = modifier) {
-                AsyncImage(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp)
-                        .align(Alignment.TopCenter),
-                    model = data.backgroundImageAdditional,
-                    contentDescription = "Image Background",
-                    contentScale = ContentScale.Crop
-                )
+                if (isPreview) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp)
+                            .align(Alignment.TopCenter)
+                            .background(color = Color.LightGray)
+                    )
+                } else {
+                    AsyncImage(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp)
+                            .align(Alignment.TopCenter),
+                        model = data.backgroundImageAdditional,
+                        contentDescription = "Image Background",
+                        contentScale = ContentScale.Crop
+                    )
+                }
 
                 Box(
                     Modifier
@@ -153,8 +163,7 @@ fun DetailContent(
                         .clip(CircleShape)
                         .background(WhiteTransparent)
                         .align(Alignment.TopStart)
-                        .clickable { onImageBackClick() }
-                ) {
+                        .clickable { onImageBackClick() }) {
                     Icon(
                         modifier = Modifier
                             .align(Alignment.Center)
@@ -164,7 +173,7 @@ fun DetailContent(
                     )
                 }
 
-                DetailContentInformation(data)
+                DetailContentInformation(data = data, isPreview = isPreview)
             }
         }
 
@@ -173,7 +182,11 @@ fun DetailContent(
 }
 
 @Composable
-fun DetailContentInformation(data: DetailGame, modifier: Modifier = Modifier) {
+fun DetailContentInformation(
+    data: DetailGame,
+    modifier: Modifier = Modifier,
+    isPreview: Boolean = false,
+) {
     Card(
         modifier = modifier
             .fillMaxSize()
@@ -186,35 +199,47 @@ fun DetailContentInformation(data: DetailGame, modifier: Modifier = Modifier) {
                 .verticalScroll(rememberScrollState())
                 .padding(top = 20.dp)
         ) {
-            DetailContentInformationHeader(data)
+            DetailContentInformationHeader(data = data, isPreview = isPreview)
 
             DetailContentInformationSubHeader(data)
 
-            ImageScreenshot(data.images)
+            ImageScreenshot(images = data.images, isPreview = isPreview)
 
             Overview(
                 data = data,
                 modifier = Modifier.padding(20.dp),
             )
 
-            SimilarGames(data)
+            SimilarGames(data = data, isPreview = isPreview)
         }
     }
 }
 
 @Composable
-fun DetailContentInformationHeader(data: DetailGame, modifier: Modifier = Modifier) {
+fun DetailContentInformationHeader(
+    data: DetailGame,
+    modifier: Modifier = Modifier,
+    isPreview: Boolean = false,
+) {
     val genres = data.genres?.joinToString(", ")
 
     Row(modifier.padding(horizontal = 20.dp)) {
-        AsyncImage(
-            modifier = Modifier
-                .size(height = 80.dp, width = 80.dp)
-                .clip(RoundedCornerShape(10.dp)),
-            model = data.imageBackground,
-            contentDescription = "Image Game",
-            contentScale = ContentScale.Crop
-        )
+        if (isPreview) {
+            Box(
+                modifier = Modifier
+                    .size(height = 80.dp, width = 80.dp)
+                    .background(color = Color.LightGray, shape = RoundedCornerShape(10.dp)),
+            )
+        } else {
+            AsyncImage(
+                modifier = Modifier
+                    .size(height = 80.dp, width = 80.dp)
+                    .clip(RoundedCornerShape(10.dp)),
+                model = data.imageBackground,
+                contentDescription = "Image Game",
+                contentScale = ContentScale.Crop
+            )
+        }
 
         Column(
             modifier = Modifier
@@ -283,9 +308,7 @@ fun DetailContentInformationSubHeader(data: DetailGame, modifier: Modifier = Mod
         horizontalArrangement = Arrangement.Center
     ) {
         Column(
-            modifier = modifier
-                .weight(1F),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = modifier.weight(1F), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = "Release Date",
@@ -313,9 +336,7 @@ fun DetailContentInformationSubHeader(data: DetailGame, modifier: Modifier = Mod
         )
 
         Column(
-            modifier = modifier
-                .weight(1F),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = modifier.weight(1F), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = "Metascore",
@@ -329,14 +350,11 @@ fun DetailContentInformationSubHeader(data: DetailGame, modifier: Modifier = Mod
                     .padding(top = 6.dp)
                     .size(35.dp)
                     .border(
-                        width = 1.5.dp,
-                        color = LightPurple,
-                        shape = RoundedCornerShape(8.dp)
+                        width = 1.5.dp, color = LightPurple, shape = RoundedCornerShape(8.dp)
                     )
             ) {
                 Text(
-                    modifier = Modifier
-                        .align(Alignment.Center),
+                    modifier = Modifier.align(Alignment.Center),
                     text = (data.metacritic ?: 0).toString(),
                     color = Purple,
                     fontSize = 14.sp,
@@ -354,9 +372,7 @@ fun DetailContentInformationSubHeader(data: DetailGame, modifier: Modifier = Mod
         )
 
         Column(
-            modifier = modifier
-                .weight(1F),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = modifier.weight(1F), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = "Publisher",
@@ -378,31 +394,48 @@ fun DetailContentInformationSubHeader(data: DetailGame, modifier: Modifier = Mod
 }
 
 @Composable
-fun ImageScreenshot(images: List<Pair<Int, String>>?, modifier: Modifier = Modifier) {
-    LazyRow(
-        modifier = modifier,
-        contentPadding = PaddingValues(horizontal = 20.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        items(images ?: listOf(),
-            key = { data -> data.first }) { screenshot ->
-            AsyncImage(
-                modifier = Modifier
-                    .size(width = 230.dp, height = 150.dp)
-                    .clip(RoundedCornerShape(10.dp)),
-                model = screenshot.second,
-                placeholder = ColorPainter(GreyPlaceholder),
-                error = painterResource(id = R.drawable.ic_broken_image_64),
-                contentDescription = "Image Screenshot",
-                contentScale = ContentScale.Crop
-            )
+fun ImageScreenshot(
+    images: List<Pair<Int, String>>?, modifier: Modifier = Modifier, isPreview: Boolean = false
+) {
+    if (isPreview) {
+        LazyRow(
+            modifier = modifier,
+            contentPadding = PaddingValues(horizontal = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            items(10) {
+                Box(
+                    modifier = Modifier
+                        .size(width = 230.dp, height = 150.dp)
+                        .background(color = Color.LightGray, shape = RoundedCornerShape(10.dp))
+                )
+            }
+        }
+    } else {
+        LazyRow(
+            modifier = modifier,
+            contentPadding = PaddingValues(horizontal = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            items(images ?: listOf(), key = { data -> data.first }) { screenshot ->
+                AsyncImage(
+                    modifier = Modifier
+                        .size(width = 230.dp, height = 150.dp)
+                        .clip(RoundedCornerShape(10.dp)),
+                    model = screenshot.second,
+                    placeholder = ColorPainter(GreyPlaceholder),
+                    error = painterResource(id = R.drawable.ic_broken_image_64),
+                    contentDescription = "Image Screenshot",
+                    contentScale = ContentScale.Crop
+                )
+            }
         }
     }
 }
 
 @Composable
-fun SimilarGames(data: DetailGame, modifier: Modifier = Modifier) {
-    if (!data.gameSeries?.second.isNullOrEmpty()) {
+fun SimilarGames(data: DetailGame, modifier: Modifier = Modifier, isPreview: Boolean = false) {
+    if (isPreview) {
         Column(modifier = modifier) {
             Row(
                 modifier = Modifier
@@ -411,23 +444,16 @@ fun SimilarGames(data: DetailGame, modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = stringResource(id = R.string.similar_games),
-                    fontFamily = FontFamily(
+                    text = stringResource(id = R.string.similar_games), fontFamily = FontFamily(
                         Font(R.font.open_sans_bold)
-                    ),
-                    fontSize = 16.sp
+                    ), fontSize = 16.sp
                 )
 
-                if ((data.gameSeries?.first ?: 0) > 6) {
-                    Text(
-                        text = stringResource(id = R.string.see_all),
-                        fontFamily = FontFamily(
-                            Font(R.font.open_sans_semi_bold)
-                        ),
-                        color = Purple,
-                        fontSize = 14.sp
-                    )
-                }
+                Text(
+                    text = stringResource(id = R.string.see_all), fontFamily = FontFamily(
+                        Font(R.font.open_sans_semi_bold)
+                    ), color = Purple, fontSize = 14.sp
+                )
             }
 
             LazyRow(
@@ -435,12 +461,51 @@ fun SimilarGames(data: DetailGame, modifier: Modifier = Modifier) {
                 contentPadding = PaddingValues(horizontal = 20.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                items(data.gameSeries?.second ?: listOf(),
-                    key = { data -> data.id ?: 0 }) { gameSeries ->
-                    GameItemHorizontal(image = gameSeries.image ?: "",
-                        title = gameSeries.name ?: "",
+                items(10) {
+                    GameItemHorizontal(
+                        image = "",
+                        title = "",
                         onItemClicked = { }
                     )
+                }
+            }
+        }
+    } else {
+        if (!data.gameSeries?.second.isNullOrEmpty()) {
+            Column(modifier = modifier) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.similar_games), fontFamily = FontFamily(
+                            Font(R.font.open_sans_bold)
+                        ), fontSize = 16.sp
+                    )
+
+                    if ((data.gameSeries?.first ?: 0) > 6) {
+                        Text(
+                            text = stringResource(id = R.string.see_all), fontFamily = FontFamily(
+                                Font(R.font.open_sans_semi_bold)
+                            ), color = Purple, fontSize = 14.sp
+                        )
+                    }
+                }
+
+                LazyRow(
+                    modifier = Modifier.padding(vertical = 14.dp),
+                    contentPadding = PaddingValues(horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(
+                        data.gameSeries?.second ?: listOf(),
+                        key = { data -> data.id ?: 0 }) { gameSeries ->
+                        GameItemHorizontal(image = gameSeries.image ?: "",
+                            title = gameSeries.name ?: "",
+                            onItemClicked = { })
+                    }
                 }
             }
         }
@@ -456,11 +521,9 @@ fun Overview(data: DetailGame, modifier: Modifier = Modifier) {
     if (!data.description.isNullOrEmpty()) {
         Column(modifier = modifier) {
             Text(
-                text = stringResource(id = R.string.overview),
-                fontFamily = FontFamily(
+                text = stringResource(id = R.string.overview), fontFamily = FontFamily(
                     Font(R.font.open_sans_bold)
-                ),
-                fontSize = 16.sp
+                ), fontSize = 16.sp
             )
 
             Text(
@@ -483,17 +546,16 @@ fun Overview(data: DetailGame, modifier: Modifier = Modifier) {
                 lineHeight = 20.sp
             )
 
-            Text(
-                modifier = Modifier
-                    .clickable(
-                        // remove ripple click
-                        interactionSource = remember {
-                            MutableInteractionSource()
-                        }, indication = null
-                    ) {
-                        isShowMore = !isShowMore
-                    }
-                    .padding(vertical = 4.dp),
+            Text(modifier = Modifier
+                .clickable(
+                    // remove ripple click
+                    interactionSource = remember {
+                        MutableInteractionSource()
+                    }, indication = null
+                ) {
+                    isShowMore = !isShowMore
+                }
+                .padding(vertical = 4.dp),
                 text = if (isShowMore) stringResource(id = R.string.show_less) else stringResource(
                     id = R.string.read_more
                 ),
@@ -501,33 +563,36 @@ fun Overview(data: DetailGame, modifier: Modifier = Modifier) {
                     Font(R.font.open_sans_medium)
                 ),
                 color = colorResource(id = R.color.purple),
-                fontSize = 12.sp
-            )
+                fontSize = 12.sp)
         }
     }
 }
 
 @Preview(showBackground = true, showSystemUi = true, device = Devices.PIXEL_4_XL)
 @Composable
-fun DetailScreenPreview() {
+fun DetailScreenSuccessPreview() {
     val detail = DetailGame(
         name = "The Witcher",
         imageBackground = "",
         backgroundImageAdditional = "",
         genres = listOf(
-            "Action",
-            "Adventure",
-            "RPG"
+            "Action", "Adventure", "RPG"
         ),
         rating = 4.5,
         description = "This is Description",
         images = listOf(),
         gameSeries = Pair(1, listOf()),
         metacritic = 93,
-        publishers = listOf()
+        publishers = listOf("CD PROJEKT RED"),
+        released = "2015-05-18"
     )
 
     GameXTheme {
-        DetailContent(uiState = UiState.Success(detail), onImageUrl = {}, onImageBackClick = { })
+        DetailContent(
+            uiState = UiState.Success(detail),
+            onImageUrl = {},
+            onImageBackClick = { },
+            isPreview = true
+        )
     }
 }
