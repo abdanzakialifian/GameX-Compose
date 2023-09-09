@@ -8,7 +8,6 @@ import com.games.gamex.data.source.remote.paging.GamesPagingSource
 import com.games.gamex.data.source.remote.paging.GenresPagingSource
 import com.games.gamex.data.source.remote.paging.PlatformsPagingSource
 import com.games.gamex.data.source.remote.response.DetailGameResponse
-import com.games.gamex.data.source.remote.response.GamesResponse
 import com.games.gamex.data.source.remote.response.GamesResultItemResponse
 import com.games.gamex.data.source.remote.response.GenresResultItemResponse
 import com.games.gamex.data.source.remote.response.PlatformsResultItemResponse
@@ -69,22 +68,17 @@ class RemoteDataSource @Inject constructor(
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getGameSeries(gameId: String): Flow<GamesResponse> = flow {
-        val response = apiService.getGameSeries(gameId, 1, 6)
-        val responseBody = response.body()
-        responseBody?.let { gamesResponse ->
-            emit(gamesResponse)
-        }
-    }.flowOn(Dispatchers.IO)
-
-    fun getGameSeriesPaging(gameId: String): Flow<PagingData<GamesResultItemResponse>> =
+    fun getGameSeriesPaging(
+        gameId: String,
+        isOnePage: Boolean
+    ): Flow<PagingData<GamesResultItemResponse>> =
         Pager(
             config = PagingConfig(
                 pageSize = 10,
                 initialLoadSize = 10,
             ), pagingSourceFactory = {
                 gameSeriesPagingSource.apply {
-                    setGameId(gameId)
+                    setDataGameSeries(gameId, isOnePage)
                 }
             }
         ).flow.flowOn(Dispatchers.IO)

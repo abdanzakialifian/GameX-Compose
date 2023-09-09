@@ -12,35 +12,33 @@ class GameSeriesPagingSource @Inject constructor(private val apiService: ApiServ
     PagingSource<Int, GamesResultItemResponse>() {
 
     private var gameId = ""
+    private var isOnePage = false
+
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GamesResultItemResponse> {
         val position = params.key ?: INITIAL_POSITION
 
-//        return try {
-//            val response = apiService.getGameSeries(position, params.loadSize, gameId)
-//            val responseBody = response.body()?.results ?: listOf()
-//            val next = response.body()?.next
-//
-//            val nextKey = if (next?.isEmpty() == true || next == null) {
-//                null
-//            } else {
-//                position + INITIAL_POSITION
-//            }
-//
-//            val prevKey = if (position == INITIAL_POSITION) null else position
-//
-//            LoadResult.Page(
-//                data = responseBody,
-//                prevKey = prevKey,
-//                nextKey = nextKey
-//            )
-//        } catch (e: Exception) {
-//            LoadResult.Error(e)
-//        }
-        return LoadResult.Page(
-            data = listOf(GamesResultItemResponse()),
-            prevKey = 0,
-            nextKey = 0
-        )
+        return try {
+            val page = if (isOnePage) INITIAL_POSITION else position
+            val response = apiService.getGameSeries(gameId, page, params.loadSize)
+            val responseBody = response.body()?.results ?: listOf()
+            val next = response.body()?.next
+
+            val nextKey = if (next?.isEmpty() == true || next == null) {
+                null
+            } else {
+                position + INITIAL_POSITION
+            }
+
+            val prevKey = if (position == INITIAL_POSITION) null else position
+
+            LoadResult.Page(
+                data = responseBody,
+                prevKey = prevKey,
+                nextKey = nextKey
+            )
+        } catch (e: Exception) {
+            LoadResult.Error(e)
+        }
     }
 
     override fun getRefreshKey(state: PagingState<Int, GamesResultItemResponse>): Int? =
@@ -49,8 +47,9 @@ class GameSeriesPagingSource @Inject constructor(private val apiService: ApiServ
                 ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
         }
 
-    fun setGameId(gameId: String) {
+    fun setDataGameSeries(gameId: String, isOnePage: Boolean) {
         this.gameId = gameId
+        this.isOnePage = isOnePage
     }
 
     companion object {

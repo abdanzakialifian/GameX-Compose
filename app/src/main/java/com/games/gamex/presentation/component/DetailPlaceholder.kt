@@ -44,13 +44,17 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.games.gamex.R
+import com.games.gamex.domain.model.ListResultItem
 import com.games.gamex.presentation.detail.view.DetailContent
 import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.presentation.ui.theme.Purple
 import com.games.gamex.presentation.ui.theme.WhiteHeavy
 import com.games.gamex.presentation.ui.theme.WhiteTransparent
 import com.games.gamex.utils.UiState
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun DetailPlaceholder(brush: Brush, modifier: Modifier = Modifier) {
@@ -453,7 +457,15 @@ fun SimilarGamesPlaceholder(brush: Brush, modifier: Modifier = Modifier) {
 )
 @Composable
 fun DetailScreenLoadingPreview() {
+    val listResultPagingItems =
+        flowOf(PagingData.empty<ListResultItem>()).collectAsLazyPagingItems()
+
     GameXTheme {
-        DetailContent(uiState = UiState.Loading, onImageUrl = {}, onImageBackClick = { })
+        DetailContent(
+            uiState = UiState.Loading,
+            gameSeriesPagingItems = listResultPagingItems,
+            onImageUrl = {},
+            onImageBackClick = { }
+        )
     }
 }

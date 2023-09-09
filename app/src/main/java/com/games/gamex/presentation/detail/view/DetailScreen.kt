@@ -58,9 +58,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import coil.compose.AsyncImage
 import com.games.gamex.R
 import com.games.gamex.domain.model.DetailGame
+import com.games.gamex.domain.model.ListResultItem
 import com.games.gamex.presentation.component.GameItemHorizontal
 import com.games.gamex.presentation.component.ShimmerAnimation
 import com.games.gamex.presentation.detail.viewmodel.DetailViewModel
@@ -78,6 +83,8 @@ import com.games.gamex.utils.convertDate
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarStyle
 import com.gowtham.ratingbar.StepSize
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun DetailScreen(
@@ -93,7 +100,15 @@ fun DetailScreen(
         mutableStateOf("")
     }
 
-    val getDetailGameState by viewModel.getDetailGame.collectAsStateWithLifecycle(initialValue = UiState.Loading)
+    val getDetailGamePair by viewModel.getDetailGame.collectAsStateWithLifecycle(
+        initialValue = Pair(
+            UiState.Loading, MutableStateFlow(PagingData.empty())
+        )
+    )
+
+    val getDetailGameState = getDetailGamePair.first
+
+    val getGameSeriesPagingItems = getDetailGamePair.second.collectAsLazyPagingItems()
 
     // get color from image background
     LaunchedEffect(key1 = imageUrl) {
@@ -109,19 +124,24 @@ fun DetailScreen(
     }
 
     LaunchedEffect(key1 = Unit) {
-        viewModel.setGameId(gameId)
+        viewModel.setDataGameSeries(gameId, true)
     }
 
     DetailContent(
-        uiState = getDetailGameState, onImageUrl = { url ->
+        uiState = getDetailGameState,
+        gameSeriesPagingItems = getGameSeriesPagingItems,
+        onImageUrl = { url ->
             imageUrl = url
-        }, onImageBackClick = onImageBackClick, modifier = modifier
+        },
+        onImageBackClick = onImageBackClick,
+        modifier = modifier
     )
 }
 
 @Composable
 fun DetailContent(
     uiState: UiState<DetailGame>,
+    gameSeriesPagingItems: LazyPagingItems<ListResultItem>,
     onImageUrl: (String) -> Unit,
     onImageBackClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -151,6 +171,7 @@ fun DetailContent(
                             .height(300.dp)
                             .align(Alignment.TopCenter),
                         model = data.backgroundImageAdditional,
+                        placeholder = ColorPainter(GreyPlaceholder),
                         contentDescription = "Image Background",
                         contentScale = ContentScale.Crop
                     )
@@ -173,7 +194,11 @@ fun DetailContent(
                     )
                 }
 
-                DetailContentInformation(data = data, isPreview = isPreview)
+                DetailContentInformation(
+                    data = data,
+                    gameSeriesPagingItems = gameSeriesPagingItems,
+                    isPreview = isPreview
+                )
             }
         }
 
@@ -184,6 +209,7 @@ fun DetailContent(
 @Composable
 fun DetailContentInformation(
     data: DetailGame,
+    gameSeriesPagingItems: LazyPagingItems<ListResultItem>,
     modifier: Modifier = Modifier,
     isPreview: Boolean = false,
 ) {
@@ -199,29 +225,42 @@ fun DetailContentInformation(
                 .verticalScroll(rememberScrollState())
                 .padding(top = 20.dp)
         ) {
-            DetailContentInformationHeader(data = data, isPreview = isPreview)
+            DetailContentInformationHeader(
+                genres = data.genres,
+                imageBackground = data.imageBackground,
+                name = data.name,
+                rating = data.rating,
+                isPreview = isPreview
+            )
 
-            DetailContentInformationSubHeader(data)
+            DetailContentInformationSubHeader(
+                publishers = data.publishers, released = data.released, metacritic = data.metacritic
+            )
 
             ImageScreenshot(images = data.images, isPreview = isPreview)
 
             Overview(
-                data = data,
+                description = data.description,
                 modifier = Modifier.padding(20.dp),
             )
 
-            SimilarGames(data = data, isPreview = isPreview)
+            SimilarGames(
+                gameSeriesPagingItems = gameSeriesPagingItems, isPreview = isPreview
+            )
         }
     }
 }
 
 @Composable
 fun DetailContentInformationHeader(
-    data: DetailGame,
+    genres: List<String>?,
+    imageBackground: String?,
+    name: String?,
+    rating: Double?,
     modifier: Modifier = Modifier,
     isPreview: Boolean = false,
 ) {
-    val genres = data.genres?.joinToString(", ")
+    val genre = genres?.joinToString(", ")
 
     Row(modifier.padding(horizontal = 20.dp)) {
         if (isPreview) {
@@ -235,7 +274,9 @@ fun DetailContentInformationHeader(
                 modifier = Modifier
                     .size(height = 80.dp, width = 80.dp)
                     .clip(RoundedCornerShape(10.dp)),
-                model = data.imageBackground,
+                model = imageBackground,
+                placeholder = ColorPainter(GreyPlaceholder),
+                error = painterResource(id = R.drawable.ic_broken_image_64),
                 contentDescription = "Image Game",
                 contentScale = ContentScale.Crop
             )
@@ -247,7 +288,7 @@ fun DetailContentInformationHeader(
                 .align(Alignment.CenterVertically)
         ) {
             Text(
-                text = data.name ?: "",
+                text = name ?: "No Game Name",
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 fontFamily = FontFamily(
@@ -258,7 +299,7 @@ fun DetailContentInformationHeader(
 
             Text(
                 modifier = Modifier.padding(top = 4.dp),
-                text = genres ?: "",
+                text = if (!genre.isNullOrEmpty()) genre else "-",
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 fontFamily = FontFamily(
@@ -273,7 +314,7 @@ fun DetailContentInformationHeader(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RatingBar(
-                    value = data.rating?.toFloat() ?: 0F,
+                    value = rating?.toFloat() ?: 0F,
                     stepSize = StepSize.HALF,
                     isIndicator = true,
                     size = 16.dp,
@@ -285,7 +326,7 @@ fun DetailContentInformationHeader(
 
                 Text(
                     modifier = Modifier.padding(start = 4.dp),
-                    text = data.rating?.toString() ?: "",
+                    text = rating?.toString() ?: "0",
                     fontFamily = FontFamily(
                         Font(R.font.open_sans_semi_bold)
                     ),
@@ -297,8 +338,10 @@ fun DetailContentInformationHeader(
 }
 
 @Composable
-fun DetailContentInformationSubHeader(data: DetailGame, modifier: Modifier = Modifier) {
-    val publisher = data.publishers?.joinToString(", ")
+fun DetailContentInformationSubHeader(
+    publishers: List<String>?, released: String?, metacritic: Int?, modifier: Modifier = Modifier
+) {
+    val publisher = publishers?.joinToString(", ")
 
     Row(
         modifier = modifier
@@ -319,7 +362,7 @@ fun DetailContentInformationSubHeader(data: DetailGame, modifier: Modifier = Mod
 
             Text(
                 modifier = Modifier.padding(top = 8.dp),
-                text = data.released?.convertDate() ?: "",
+                text = released?.convertDate() ?: "-",
                 fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
                 fontSize = 14.sp,
                 maxLines = 1,
@@ -355,7 +398,7 @@ fun DetailContentInformationSubHeader(data: DetailGame, modifier: Modifier = Mod
             ) {
                 Text(
                     modifier = Modifier.align(Alignment.Center),
-                    text = (data.metacritic ?: 0).toString(),
+                    text = (metacritic ?: 0).toString(),
                     color = Purple,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.open_sans_bold))
@@ -383,7 +426,7 @@ fun DetailContentInformationSubHeader(data: DetailGame, modifier: Modifier = Mod
 
             Text(
                 modifier = Modifier.padding(top = 8.dp),
-                text = publisher ?: "",
+                text = if (!publisher.isNullOrEmpty()) publisher else "-",
                 fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
                 fontSize = 14.sp,
                 maxLines = 1,
@@ -434,7 +477,11 @@ fun ImageScreenshot(
 }
 
 @Composable
-fun SimilarGames(data: DetailGame, modifier: Modifier = Modifier, isPreview: Boolean = false) {
+fun SimilarGames(
+    gameSeriesPagingItems: LazyPagingItems<ListResultItem>,
+    modifier: Modifier = Modifier,
+    isPreview: Boolean = false
+) {
     if (isPreview) {
         Column(modifier = modifier) {
             Row(
@@ -462,16 +509,12 @@ fun SimilarGames(data: DetailGame, modifier: Modifier = Modifier, isPreview: Boo
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(10) {
-                    GameItemHorizontal(
-                        image = "",
-                        title = "",
-                        onItemClicked = { }
-                    )
+                    GameItemHorizontal(image = "", title = "", onItemClicked = { })
                 }
             }
         }
     } else {
-        if (!data.gameSeries?.second.isNullOrEmpty()) {
+        if (gameSeriesPagingItems.itemCount > 0) {
             Column(modifier = modifier) {
                 Row(
                     modifier = Modifier
@@ -485,7 +528,7 @@ fun SimilarGames(data: DetailGame, modifier: Modifier = Modifier, isPreview: Boo
                         ), fontSize = 16.sp
                     )
 
-                    if ((data.gameSeries?.first ?: 0) > 6) {
+                    if (gameSeriesPagingItems.itemCount > 10) {
                         Text(
                             text = stringResource(id = R.string.see_all), fontFamily = FontFamily(
                                 Font(R.font.open_sans_semi_bold)
@@ -499,11 +542,12 @@ fun SimilarGames(data: DetailGame, modifier: Modifier = Modifier, isPreview: Boo
                     contentPadding = PaddingValues(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(
-                        data.gameSeries?.second ?: listOf(),
-                        key = { data -> data.id ?: 0 }) { gameSeries ->
-                        GameItemHorizontal(image = gameSeries.image ?: "",
-                            title = gameSeries.name ?: "",
+                    items(count = gameSeriesPagingItems.itemCount,
+                        key = gameSeriesPagingItems.itemKey { data -> data.id ?: 0 }) { index ->
+                        val game = gameSeriesPagingItems[index]
+                        GameItemHorizontal(
+                            image = game?.image ?: "",
+                            title = game?.name ?: "",
                             onItemClicked = { })
                     }
                 }
@@ -513,12 +557,12 @@ fun SimilarGames(data: DetailGame, modifier: Modifier = Modifier, isPreview: Boo
 }
 
 @Composable
-fun Overview(data: DetailGame, modifier: Modifier = Modifier) {
+fun Overview(description: String?, modifier: Modifier = Modifier) {
     var isShowMore by remember {
         mutableStateOf(false)
     }
 
-    if (!data.description.isNullOrEmpty()) {
+    if (!description.isNullOrEmpty()) {
         Column(modifier = modifier) {
             Text(
                 text = stringResource(id = R.string.overview), fontFamily = FontFamily(
@@ -535,7 +579,7 @@ fun Overview(data: DetailGame, modifier: Modifier = Modifier) {
                             durationMillis = 300, easing = LinearOutSlowInEasing
                         )
                     ),
-                text = data.description,
+                text = description,
                 maxLines = if (isShowMore) Int.MAX_VALUE else 3,
                 overflow = if (isShowMore) TextOverflow.Clip else TextOverflow.Ellipsis,
                 fontFamily = FontFamily(
@@ -581,15 +625,17 @@ fun DetailScreenSuccessPreview() {
         rating = 4.5,
         description = "This is Description",
         images = listOf(),
-        gameSeries = Pair(1, listOf()),
         metacritic = 93,
         publishers = listOf("CD PROJEKT RED"),
         released = "2015-05-18"
     )
+    val listResultPagingItems =
+        flowOf(PagingData.empty<ListResultItem>()).collectAsLazyPagingItems()
 
     GameXTheme {
         DetailContent(
             uiState = UiState.Success(detail),
+            gameSeriesPagingItems = listResultPagingItems,
             onImageUrl = {},
             onImageBackClick = { },
             isPreview = true
