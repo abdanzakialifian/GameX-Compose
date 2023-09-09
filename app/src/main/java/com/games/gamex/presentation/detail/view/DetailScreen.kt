@@ -148,7 +148,7 @@ fun DetailContent(
     isPreview: Boolean = false,
 ) {
     when (uiState) {
-        is UiState.Loading -> ShimmerAnimation(shimmer = Shimmer.GAME_DETAIL_PlACEHOLDER)
+        is UiState.Loading -> ShimmerAnimation(shimmer = Shimmer.GAME_DETAIL_PLACEHOLDER)
 
         is UiState.Success -> {
             val data = uiState.data

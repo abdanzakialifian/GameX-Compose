@@ -1,6 +1,5 @@
 package com.games.gamex.presentation.base
 
-import android.graphics.Color.parseColor
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,7 +15,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavType
@@ -33,6 +31,7 @@ import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.presentation.ui.theme.Purple
 import com.games.gamex.utils.GAME_ID
 import com.games.gamex.utils.VIBRANT
+import com.games.gamex.utils.fromHex
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -75,7 +74,7 @@ fun GameXApp() {
             } else {
                 LaunchedEffect(key1 = vibrant) {
                     systemUiController.setStatusBarColor(
-                        color = Color(parseColor(vibrant))
+                        color = vibrant.fromHex()
                     )
                 }
             }

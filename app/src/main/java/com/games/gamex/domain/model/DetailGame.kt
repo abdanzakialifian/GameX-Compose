@@ -1,9 +1,5 @@
 package com.games.gamex.domain.model
 
-import androidx.paging.PagingData
-import com.games.gamex.data.source.remote.response.PublishersItemResponse
-import kotlinx.coroutines.flow.StateFlow
-
 data class DetailGame(
     val name: String? = null,
     val imageBackground: String? = null,

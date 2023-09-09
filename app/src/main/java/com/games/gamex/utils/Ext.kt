@@ -23,4 +23,4 @@ fun String.convertDate(): String {
 fun LazyListState.isScrollToEnd() =
     layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
 
-fun String.fromHex() = Color(android.graphics.Color.parseColor("#$this"))
+fun String.fromHex() = Color(android.graphics.Color.parseColor(this))
