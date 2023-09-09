@@ -52,16 +52,16 @@ class RemoteDataSource @Inject constructor(
             platformsPagingSource
         }).flow.flowOn(Dispatchers.IO)
 
-    fun getDetailGame(id: String): Flow<DetailGameResponse> = flow {
-        val response = apiService.getDetailGame(id)
+    fun getDetailGame(gameId: String): Flow<DetailGameResponse> = flow {
+        val response = apiService.getDetailGame(gameId)
         val responseBody = response.body()
         responseBody?.let { detailGameResponse ->
             emit(detailGameResponse)
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getScreenshotsGame(id: String): Flow<ScreenshotsGameResponse> = flow {
-        val response = apiService.getScreenshotsGame(id)
+    fun getScreenshotsGame(gameId: String): Flow<ScreenshotsGameResponse> = flow {
+        val response = apiService.getScreenshotsGame(gameId)
         val responseBody = response.body()
         responseBody?.let { screenshotsGameResponse ->
             emit(screenshotsGameResponse)
@@ -70,7 +70,7 @@ class RemoteDataSource @Inject constructor(
 
     fun getGameSeriesPaging(
         gameId: String,
-        isOnePage: Boolean
+        isPaging: Boolean
     ): Flow<PagingData<GamesResultItemResponse>> =
         Pager(
             config = PagingConfig(
@@ -78,7 +78,7 @@ class RemoteDataSource @Inject constructor(
                 initialLoadSize = 10,
             ), pagingSourceFactory = {
                 gameSeriesPagingSource.apply {
-                    setDataGameSeries(gameId, isOnePage)
+                    setDataGameSeries(gameId, isPaging)
                 }
             }
         ).flow.flowOn(Dispatchers.IO)

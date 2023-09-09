@@ -124,7 +124,7 @@ fun DetailScreen(
     }
 
     LaunchedEffect(key1 = Unit) {
-        viewModel.setDataGameSeries(gameId, true)
+        viewModel.setDataGameSeries(gameId, false)
     }
 
     DetailContent(

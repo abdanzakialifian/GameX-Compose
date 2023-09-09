@@ -17,24 +17,24 @@ class DetailViewModel @Inject constructor(private val getDetailGameUseCase: GetD
     ViewModel() {
 
     private val _gameId = MutableStateFlow("")
-    private val _isOnePage = MutableStateFlow(false)
+    private val _isPaging = MutableStateFlow(false)
 
-    fun setDataGameSeries(gameId: String, isOnePage: Boolean) {
+    fun setDataGameSeries(gameId: String, isPaging: Boolean) {
         _gameId.value = gameId
-        _isOnePage.value = isOnePage
+        _isPaging.value = isPaging
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val getDetailGame: StateFlow<Pair<UiState<DetailGame>, StateFlow<PagingData<ListResultItem>>>> =
         combine(
             _gameId,
-            _isOnePage
-        ) { gameId, isOnePage ->
-            Pair(gameId, isOnePage)
+            _isPaging
+        ) { gameId, isPaging ->
+            Pair(gameId, isPaging)
         }.flatMapLatest { pair ->
             val gameId = pair.first
-            val isOnePage = pair.second
-            getDetailGameUseCase(gameId, isOnePage)
+            val isPaging = pair.second
+            getDetailGameUseCase(gameId, isPaging)
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),

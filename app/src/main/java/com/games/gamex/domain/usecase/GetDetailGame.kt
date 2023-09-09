@@ -19,7 +19,7 @@ import javax.inject.Singleton
 @Singleton
 class GetDetailGame @Inject constructor(private val gameXRepository: GameXRepository) {
     operator fun invoke(
-        gameId: String, isOnePage: Boolean
+        gameId: String, isPaging: Boolean
     ): Flow<Pair<UiState<DetailGame>, StateFlow<PagingData<ListResultItem>>>> = flow {
         emit(Pair(UiState.Loading, MutableStateFlow(PagingData.empty())))
         gameXRepository.getDetailGame(gameId)
@@ -28,7 +28,8 @@ class GetDetailGame @Inject constructor(private val gameXRepository: GameXReposi
                 detail
             }.zip(
                 gameXRepository.getGameSeriesPaging(
-                    gameId, isOnePage
+                    gameId,
+                    isPaging
                 )
             ) { detail, pagingDataGameSeries ->
                 Pair(detail, pagingDataGameSeries)

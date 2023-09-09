@@ -12,13 +12,13 @@ class GameSeriesPagingSource @Inject constructor(private val apiService: ApiServ
     PagingSource<Int, GamesResultItemResponse>() {
 
     private var gameId = ""
-    private var isOnePage = false
+    private var isPaging = false
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GamesResultItemResponse> {
         val position = params.key ?: INITIAL_POSITION
 
         return try {
-            val page = if (isOnePage) INITIAL_POSITION else position
+            val page = if (isPaging) position else INITIAL_POSITION
             val response = apiService.getGameSeries(gameId, page, params.loadSize)
             val responseBody = response.body()?.results ?: listOf()
             val next = response.body()?.next
@@ -47,9 +47,9 @@ class GameSeriesPagingSource @Inject constructor(private val apiService: ApiServ
                 ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
         }
 
-    fun setDataGameSeries(gameId: String, isOnePage: Boolean) {
+    fun setDataGameSeries(gameId: String, isPaging: Boolean) {
         this.gameId = gameId
-        this.isOnePage = isOnePage
+        this.isPaging = isPaging
     }
 
     companion object {

@@ -39,13 +39,13 @@ class GameXRepositoryImpl @Inject constructor(private val remoteDataSource: Remo
             }
         }
 
-    override fun getDetailGame(id: String): Flow<DetailGame> =
-        remoteDataSource.getDetailGame(id).map { detailGameResponse ->
+    override fun getDetailGame(gameId: String): Flow<DetailGame> =
+        remoteDataSource.getDetailGame(gameId).map { detailGameResponse ->
             detailGameResponse.mapDetailGameResponseToDetailGame()
         }
 
-    override fun getScreenshotsGame(id: String): Flow<List<Pair<Int, String>>> =
-        remoteDataSource.getScreenshotsGame(id).map { screenshotsGameResponse ->
+    override fun getScreenshotsGame(gameId: String): Flow<List<Pair<Int, String>>> =
+        remoteDataSource.getScreenshotsGame(gameId).map { screenshotsGameResponse ->
             val results = screenshotsGameResponse.results ?: listOf()
             results.map { screenshotsResultItemResponse ->
                 Pair(
@@ -56,9 +56,9 @@ class GameXRepositoryImpl @Inject constructor(private val remoteDataSource: Remo
         }
 
     override fun getGameSeriesPaging(
-        gameId: String, isOnePage: Boolean
+        gameId: String, isPaging: Boolean
     ): Flow<PagingData<ListResultItem>> =
-        remoteDataSource.getGameSeriesPaging(gameId, isOnePage).map { pagingData ->
+        remoteDataSource.getGameSeriesPaging(gameId, isPaging).map { pagingData ->
             pagingData.map { map ->
                 map.mapGamesResultItemResponseToListResultItem()
             }
