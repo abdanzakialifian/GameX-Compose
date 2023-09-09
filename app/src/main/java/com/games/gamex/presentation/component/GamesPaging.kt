@@ -1,4 +1,4 @@
-package com.games.gamex.presentation.home.view
+package com.games.gamex.presentation.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,8 +30,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.games.gamex.R
 import com.games.gamex.domain.model.ListResultItem
-import com.games.gamex.presentation.component.GameItemVertical
-import com.games.gamex.presentation.component.ShimmerAnimation
 import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.utils.Shimmer
 import com.games.gamex.utils.isScrollToEnd
@@ -39,7 +37,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 @Composable
-fun GamesVerticalContent(
+fun GamesPaging(
     gamesVerticalPaging: LazyPagingItems<ListResultItem>,
     scaffoldState: ScaffoldState,
     onGameVerticalClicked: (gameId: Int) -> Unit,
@@ -97,7 +95,7 @@ fun GamesVerticalSection(
             count = gamesVerticalPaging.itemCount,
             key = gamesVerticalPaging.itemKey { data -> data.id ?: 0 }) { index ->
             val game = gamesVerticalPaging[index]
-            GameItemVertical(
+            GameItemPaging(
                 image = game?.image ?: "",
                 name = game?.name ?: "",
                 date = game?.released ?: "",
@@ -150,7 +148,7 @@ fun GamesVerticalContentPreview() {
     val scaffoldState = rememberScaffoldState()
 
     GameXTheme {
-        GamesVerticalContent(
+        GamesPaging(
             gamesVerticalPaging = listResultPagingItems,
             scaffoldState = scaffoldState,
             onGameVerticalClicked = { },

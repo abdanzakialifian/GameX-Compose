@@ -20,7 +20,7 @@ import com.games.gamex.R
 import com.games.gamex.presentation.ui.theme.GameXTheme
 
 @Composable
-fun GameItemVerticalPlaceholder(brush: Brush, modifier: Modifier = Modifier) {
+fun GameItemPagingPlaceholder(brush: Brush, modifier: Modifier = Modifier) {
     Card(
         modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
@@ -75,7 +75,7 @@ fun GameItemVerticalPlaceholder(brush: Brush, modifier: Modifier = Modifier) {
 @Composable
 fun GameItemSecondPlaceholderPreview() {
     GameXTheme {
-        GameItemVerticalPlaceholder(
+        GameItemPagingPlaceholder(
             brush = Brush.linearGradient(
                 colors = listOf(
                     Color.LightGray.copy(alpha = 0.6F),
