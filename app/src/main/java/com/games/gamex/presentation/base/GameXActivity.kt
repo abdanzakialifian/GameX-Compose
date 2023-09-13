@@ -24,12 +24,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.games.gamex.presentation.detail.view.DetailScreen
+import com.games.gamex.presentation.gameslist.view.GamesListScreen
 import com.games.gamex.presentation.home.view.HomeScreen
 import com.games.gamex.presentation.navigation.Screen
 import com.games.gamex.presentation.splash.SplashScreen
 import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.presentation.ui.theme.Purple
 import com.games.gamex.utils.GAME_ID
+import com.games.gamex.utils.IS_PAGING
 import com.games.gamex.utils.VIBRANT
 import com.games.gamex.utils.fromHex
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -126,10 +128,54 @@ fun GameXApp() {
                     AnimatedVisibility(visible = true) {
                         DetailScreen(gameId = gameId ?: "", onColorPalette = { colors ->
                             vibrant = colors[VIBRANT] ?: colorStringPurple
-                        }, onImageBackClick = {
+                        }, onImageBackClicked = {
                             navController.navigateUp()
+                        }, onSeeAllClicked = { gameId, isPaging ->
+                            navController.navigate(
+                                Screen.GamesListScreen.createRoute(
+                                    gameId, isPaging
+                                )
+                            )
+                        }, onSimilarGameClicked = { gameId ->
+                            navController.navigate(
+                                Screen.DetailScreen.createRoute(
+                                    gameId.toString()
+                                )
+                            ) {
+                                popUpTo(Screen.HomeScreen.route) {
+                                    inclusive = false
+                                }
+                            }
                         })
                     }
+                }
+                composable(
+                    route = Screen.GamesListScreen.route,
+                    arguments = listOf(navArgument(GAME_ID) {
+                        type = NavType.StringType
+                    }, navArgument(IS_PAGING) {
+                        type = NavType.BoolType
+                    })
+                ) { backStackEntry ->
+                    val gameId = backStackEntry.arguments?.getString(GAME_ID)
+                    val isPaging = backStackEntry.arguments?.getBoolean(IS_PAGING)
+
+                    GamesListScreen(gameId = gameId ?: "",
+                        isPaging = isPaging ?: false,
+                        onArrowBackClicked = {
+                            navController.navigateUp()
+                        },
+                        onSimilarGameClicked = {
+                            navController.navigate(
+                                Screen.DetailScreen.createRoute(
+                                    gameId.toString()
+                                )
+                            ) {
+                                popUpTo(Screen.HomeScreen.route) {
+                                    inclusive = false
+                                }
+                            }
+                        })
                 }
             }
         }

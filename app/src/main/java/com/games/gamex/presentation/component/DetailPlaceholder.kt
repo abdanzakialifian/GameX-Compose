@@ -465,7 +465,9 @@ fun DetailScreenLoadingPreview() {
             uiState = UiState.Loading,
             gameSeriesPagingItems = listResultPagingItems,
             onImageUrl = {},
-            onImageBackClick = { }
+            onImageBackClick = {},
+            onSeeAllClicked = {},
+            onSimilarGameClicked = {}
         )
     }
 }

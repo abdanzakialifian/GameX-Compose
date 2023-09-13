@@ -38,6 +38,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -90,11 +91,17 @@ import kotlinx.coroutines.flow.flowOf
 fun DetailScreen(
     gameId: String,
     onColorPalette: (Map<String, String>) -> Unit,
-    onImageBackClick: () -> Unit,
+    onImageBackClicked: () -> Unit,
+    onSeeAllClicked: (String, Boolean) -> Unit,
+    onSimilarGameClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DetailViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
+
+    var isFetchData by rememberSaveable {
+        mutableStateOf(false)
+    }
 
     var imageUrl by remember {
         mutableStateOf("")
@@ -103,7 +110,7 @@ fun DetailScreen(
     val getDetailGamePair by viewModel.getDetailGame.collectAsStateWithLifecycle(
         initialValue = Pair(
             UiState.Loading, MutableStateFlow(PagingData.empty())
-        )
+        ),
     )
 
     val getDetailGameState = getDetailGamePair.first
@@ -123,8 +130,11 @@ fun DetailScreen(
         }
     }
 
-    LaunchedEffect(key1 = Unit) {
-        viewModel.setDataGameSeries(gameId, false)
+    if (!isFetchData) {
+        LaunchedEffect(key1 = true) {
+            isFetchData = true
+            viewModel.setDataGameSeries(gameId, false)
+        }
     }
 
     DetailContent(
@@ -133,7 +143,11 @@ fun DetailScreen(
         onImageUrl = { url ->
             imageUrl = url
         },
-        onImageBackClick = onImageBackClick,
+        onImageBackClick = onImageBackClicked,
+        onSeeAllClicked = {
+            onSeeAllClicked(gameId, true)
+        },
+        onSimilarGameClicked = onSimilarGameClicked,
         modifier = modifier
     )
 }
@@ -144,6 +158,8 @@ fun DetailContent(
     gameSeriesPagingItems: LazyPagingItems<ListResultItem>,
     onImageUrl: (String) -> Unit,
     onImageBackClick: () -> Unit,
+    onSeeAllClicked: () -> Unit,
+    onSimilarGameClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
     isPreview: Boolean = false,
 ) {
@@ -197,6 +213,8 @@ fun DetailContent(
                 DetailInformation(
                     data = data,
                     gameSeriesPagingItems = gameSeriesPagingItems,
+                    onSeeAllClicked = onSeeAllClicked,
+                    onSimilarGameClicked = onSimilarGameClicked,
                     isPreview = isPreview
                 )
             }
@@ -210,6 +228,8 @@ fun DetailContent(
 fun DetailInformation(
     data: DetailGame,
     gameSeriesPagingItems: LazyPagingItems<ListResultItem>,
+    onSeeAllClicked: () -> Unit,
+    onSimilarGameClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
     isPreview: Boolean = false,
 ) {
@@ -245,7 +265,10 @@ fun DetailInformation(
             )
 
             DetailSimilarGames(
-                gameSeriesPagingItems = gameSeriesPagingItems, isPreview = isPreview
+                gameSeriesPagingItems = gameSeriesPagingItems,
+                onSeeAllClicked = onSeeAllClicked,
+                onSimilarGameClicked = onSimilarGameClicked,
+                isPreview = isPreview
             )
         }
     }
@@ -535,6 +558,8 @@ fun DetailGameOverview(description: String?, modifier: Modifier = Modifier) {
 @Composable
 fun DetailSimilarGames(
     gameSeriesPagingItems: LazyPagingItems<ListResultItem>,
+    onSeeAllClicked: () -> Unit,
+    onSimilarGameClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
     isPreview: Boolean = false
 ) {
@@ -553,9 +578,12 @@ fun DetailSimilarGames(
                 )
 
                 Text(
-                    text = stringResource(id = R.string.see_all), fontFamily = FontFamily(
+                    text = stringResource(id = R.string.see_all),
+                    fontFamily = FontFamily(
                         Font(R.font.open_sans_semi_bold)
-                    ), color = Purple, fontSize = 14.sp
+                    ),
+                    color = Purple,
+                    fontSize = 14.sp
                 )
             }
 
@@ -579,16 +607,22 @@ fun DetailSimilarGames(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = stringResource(id = R.string.similar_games), fontFamily = FontFamily(
+                        text = stringResource(id = R.string.similar_games),
+                        fontFamily = FontFamily(
                             Font(R.font.open_sans_bold)
-                        ), fontSize = 16.sp
+                        ),
+                        fontSize = 16.sp
                     )
 
-                    if (gameSeriesPagingItems.itemCount > 10) {
+                    if (gameSeriesPagingItems.itemCount > 5) {
                         Text(
-                            text = stringResource(id = R.string.see_all), fontFamily = FontFamily(
+                            modifier = Modifier.clickable { onSeeAllClicked() },
+                            text = stringResource(id = R.string.see_all),
+                            fontFamily = FontFamily(
                                 Font(R.font.open_sans_semi_bold)
-                            ), color = Purple, fontSize = 14.sp
+                            ),
+                            color = Purple,
+                            fontSize = 14.sp
                         )
                     }
                 }
@@ -598,13 +632,19 @@ fun DetailSimilarGames(
                     contentPadding = PaddingValues(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(count = gameSeriesPagingItems.itemCount,
-                        key = gameSeriesPagingItems.itemKey { data -> data.id ?: 0 }) { index ->
+                    items(
+                        count = if (gameSeriesPagingItems.itemCount >= 5) 5 else gameSeriesPagingItems.itemCount,
+                        key = gameSeriesPagingItems.itemKey { data ->
+                            data.id ?: 0
+                        }) { index ->
                         val game = gameSeriesPagingItems[index]
                         GameItemHorizontal(
                             image = game?.image ?: "",
                             title = game?.name ?: "",
-                            onItemClicked = { })
+                            onItemClicked = {
+                                onSimilarGameClicked(game?.id ?: 0)
+                            }
+                        )
                     }
                 }
             }
@@ -637,7 +677,9 @@ fun DetailScreenSuccessPreview() {
             uiState = UiState.Success(detail),
             gameSeriesPagingItems = listResultPagingItems,
             onImageUrl = {},
-            onImageBackClick = { },
+            onImageBackClick = {},
+            onSeeAllClicked = {},
+            onSimilarGameClicked = {},
             isPreview = true
         )
     }

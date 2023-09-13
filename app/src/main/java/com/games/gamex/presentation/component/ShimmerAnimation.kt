@@ -39,7 +39,7 @@ fun ShimmerAnimation(shimmer: Shimmer) {
         Shimmer.GAME_ITEM_HORIZONTAL_PLACEHOLDER -> GameItemHorizontalPlaceholder(brush = brush)
         Shimmer.CATEGORIES_ITEM_PLACEHOLDER -> CategoriesItemPlaceholder(brush = brush)
         Shimmer.PLATFORM_ITEM_PLACEHOLDER -> PlatformItemPlaceholder(brush = brush)
-        Shimmer.GAME_ITEM_VERTICAL_PLACEHOLDER -> GameItemVerticalPlaceholder(brush = brush)
+        Shimmer.GAME_ITEM_VERTICAL_PLACEHOLDER -> GameItemPagingPlaceholder(brush = brush)
         Shimmer.GAME_DETAIL_PLACEHOLDER -> DetailPlaceholder(brush = brush)
     }
 }

@@ -1,6 +1,7 @@
 package com.games.gamex.utils
 
-const val GAME_ID = "Game Id"
+const val GAME_ID = "gameId"
+const val IS_PAGING = "isPaging"
 
 // color palette constants
 const val VIBRANT =  "Vibrant"

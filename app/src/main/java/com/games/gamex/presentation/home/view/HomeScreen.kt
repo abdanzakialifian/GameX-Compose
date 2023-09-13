@@ -58,20 +58,20 @@ fun HomeScreen(
         mutableStateOf("")
     }
 
-    val getAllGamesHorizontalState = viewModel.getAllGames.collectAsLazyPagingItems()
-    val getAllGameGenresState = viewModel.getAllGameGenres.collectAsLazyPagingItems()
-    val getAllGamePlatformsState = viewModel.getAllGamePlatforms.collectAsLazyPagingItems()
-    val getAllGamesVerticalState = if (searchQuery.isNotEmpty()) {
+    val getAllGamesHorizontalPagingItems = viewModel.getAllGames.collectAsLazyPagingItems()
+    val getAllGameGenresPagingItems = viewModel.getAllGameGenres.collectAsLazyPagingItems()
+    val getAllGamePlatformsPagingItems = viewModel.getAllGamePlatforms.collectAsLazyPagingItems()
+    val getAllSearchGamesPagingItems = if (searchQuery.isNotEmpty()) {
         viewModel.searchAllGames.collectAsLazyPagingItems()
     } else {
         viewModel.emptyFlow.collectAsLazyPagingItems()
     }
 
     HomeContent(
-        genresPaging = getAllGameGenresState,
-        gamesHorizontalPaging = getAllGamesHorizontalState,
-        platformsPaging = getAllGamePlatformsState,
-        gamesVerticalPaging = getAllGamesVerticalState,
+        genresPagingItems = getAllGameGenresPagingItems,
+        gamesHorizontalPagingItems = getAllGamesHorizontalPagingItems,
+        platformsPagingItems = getAllGamePlatformsPagingItems,
+        searchGamePagingItems = getAllSearchGamesPagingItems,
         searchQuery = searchQuery,
         onValueChange = { value ->
             searchQuery = value
@@ -87,10 +87,10 @@ fun HomeScreen(
 
 @Composable
 fun HomeContent(
-    genresPaging: LazyPagingItems<ListResultItem>,
-    gamesHorizontalPaging: LazyPagingItems<ListResultItem>,
-    platformsPaging: LazyPagingItems<ListResultItem>,
-    gamesVerticalPaging: LazyPagingItems<ListResultItem>,
+    genresPagingItems: LazyPagingItems<ListResultItem>,
+    gamesHorizontalPagingItems: LazyPagingItems<ListResultItem>,
+    platformsPagingItems: LazyPagingItems<ListResultItem>,
+    searchGamePagingItems: LazyPagingItems<ListResultItem>,
     searchQuery: String,
     onValueChange: (String) -> Unit,
     onGenreClicked: () -> Unit,
@@ -154,7 +154,7 @@ fun HomeContent(
                     } else {
                         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                             CategoriesContent(
-                                genresPaging = genresPaging,
+                                genresPaging = genresPagingItems,
                                 scaffoldState = scaffoldState,
                                 onGenreClicked = onGenreClicked,
                                 onFetchError = { isError ->
@@ -163,7 +163,7 @@ fun HomeContent(
                                 modifier = Modifier.padding(top = 20.dp)
                             )
                             GamesHorizontalContent(
-                                gamesHorizontalPaging = gamesHorizontalPaging,
+                                gamesHorizontalPaging = gamesHorizontalPagingItems,
                                 scaffoldState = scaffoldState,
                                 onGameHorizontalClicked = onGameHorizontalClicked,
                                 onFetchError = { isError ->
@@ -172,7 +172,7 @@ fun HomeContent(
                                 modifier = Modifier.padding(top = 20.dp)
                             )
                             PlatformsContent(
-                                platformsPaging = platformsPaging,
+                                platformsPaging = platformsPagingItems,
                                 scaffoldState = scaffoldState,
                                 onPlatformClicked = onPlatformClicked,
                                 onFetchError = { isError ->
@@ -184,9 +184,9 @@ fun HomeContent(
                     }
                 } else {
                     GamesPaging(
-                        gamesVerticalPaging = gamesVerticalPaging,
+                        gamesPagingItems = searchGamePagingItems,
                         scaffoldState = scaffoldState,
-                        onGameVerticalClicked = onGameVerticalClicked,
+                        onGamePagingItemsClicked = onGameVerticalClicked,
                     )
                 }
             }
@@ -219,10 +219,10 @@ fun HomeScreenPreview() {
         val listResultPagingItems =
             flowOf(PagingData.empty<ListResultItem>()).collectAsLazyPagingItems()
         HomeContent(
-            genresPaging = listResultPagingItems,
-            gamesHorizontalPaging = listResultPagingItems,
-            platformsPaging = listResultPagingItems,
-            gamesVerticalPaging = listResultPagingItems,
+            genresPagingItems = listResultPagingItems,
+            gamesHorizontalPagingItems = listResultPagingItems,
+            platformsPagingItems = listResultPagingItems,
+            searchGamePagingItems = listResultPagingItems,
             searchQuery = "",
             onValueChange = {},
             onGenreClicked = { },

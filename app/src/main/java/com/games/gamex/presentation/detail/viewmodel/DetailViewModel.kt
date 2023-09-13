@@ -34,10 +34,10 @@ class DetailViewModel @Inject constructor(private val getDetailGameUseCase: GetD
         }.flatMapLatest { pair ->
             val gameId = pair.first
             val isPaging = pair.second
-            getDetailGameUseCase(gameId, isPaging)
+            getDetailGameUseCase(gameId, isPaging, viewModelScope)
         }.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
+            started = SharingStarted.WhileSubscribed(5000L),
             initialValue = Pair(UiState.Loading, MutableStateFlow(PagingData.empty()))
         )
 }

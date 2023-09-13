@@ -38,9 +38,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun GamesPaging(
-    gamesVerticalPaging: LazyPagingItems<ListResultItem>,
+    gamesPagingItems: LazyPagingItems<ListResultItem>,
     scaffoldState: ScaffoldState,
-    onGameVerticalClicked: (gameId: Int) -> Unit,
+    onGamePagingItemsClicked: (gameId: Int) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberLazyListState()
@@ -53,26 +54,27 @@ fun GamesPaging(
     }
     // act when end of list reached
     LaunchedEffect(endOfListReached) {
-        gamesVerticalPaging.retry()
+        gamesPagingItems.retry()
     }
 
     // handle error data while load more
-    if (gamesVerticalPaging.loadState.append is LoadState.Error) {
+    if (gamesPagingItems.loadState.append is LoadState.Error) {
         LaunchedEffect(Unit) {
             coroutineScope.launch {
-                scaffoldState.snackbarHostState.showSnackbar(message = (gamesVerticalPaging.loadState.append as LoadState.Error).error.message.toString())
+                scaffoldState.snackbarHostState.showSnackbar(message = (gamesPagingItems.loadState.append as LoadState.Error).error.message.toString())
             }
         }
     }
 
     // initial load
-    when (gamesVerticalPaging.loadState.refresh) {
-        is LoadState.Loading -> GamesVerticalSectionPlaceholder()
+    when (gamesPagingItems.loadState.refresh) {
+        is LoadState.Loading -> GamesVerticalSectionPlaceholder(modifier)
 
         is LoadState.NotLoading -> GamesVerticalSection(
             scrollState = scrollState,
-            gamesVerticalPaging = gamesVerticalPaging,
-            onGameVerticalClicked = onGameVerticalClicked
+            gamesPagingItems = gamesPagingItems,
+            onGamePagingItemsClicked = onGamePagingItemsClicked,
+            modifier = modifier
         )
 
         is LoadState.Error -> {}
@@ -82,32 +84,33 @@ fun GamesPaging(
 @Composable
 fun GamesVerticalSection(
     scrollState: LazyListState,
-    gamesVerticalPaging: LazyPagingItems<ListResultItem>,
-    onGameVerticalClicked: (gameId: Int) -> Unit
+    gamesPagingItems: LazyPagingItems<ListResultItem>,
+    onGamePagingItemsClicked: (gameId: Int) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     LazyColumn(
-        modifier = Modifier.padding(horizontal = 20.dp),
+        modifier = modifier.padding(horizontal = 10.dp),
         contentPadding = PaddingValues(vertical = 20.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
         state = scrollState
     ) {
         items(
-            count = gamesVerticalPaging.itemCount,
-            key = gamesVerticalPaging.itemKey { data -> data.id ?: 0 }) { index ->
-            val game = gamesVerticalPaging[index]
+            count = gamesPagingItems.itemCount,
+            key = gamesPagingItems.itemKey { data -> data.id ?: 0 }) { index ->
+            val game = gamesPagingItems[index]
             GameItemPaging(
                 image = game?.image ?: "",
                 name = game?.name ?: "",
                 date = game?.released ?: "",
                 rating = game?.rating ?: 0.0F,
                 onItemClicked = {
-                    onGameVerticalClicked(game?.id ?: 0)
+                    onGamePagingItemsClicked(game?.id ?: 0)
                 }
             )
         }
 
         // load more (pagination)
-        if (gamesVerticalPaging.loadState.append == LoadState.Loading) {
+        if (gamesPagingItems.loadState.append == LoadState.Loading) {
             item {
                 Column(
                     modifier = Modifier
@@ -128,11 +131,11 @@ fun GamesVerticalSection(
 }
 
 @Composable
-fun GamesVerticalSectionPlaceholder() {
+fun GamesVerticalSectionPlaceholder(modifier: Modifier = Modifier) {
     LazyColumn(
         contentPadding = PaddingValues(vertical = 20.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = Modifier.padding(horizontal = 20.dp)
+        modifier = modifier.padding(horizontal = 10.dp)
     ) {
         items(count = 15) {
             ShimmerAnimation(shimmer = Shimmer.GAME_ITEM_VERTICAL_PLACEHOLDER)
@@ -149,9 +152,9 @@ fun GamesVerticalContentPreview() {
 
     GameXTheme {
         GamesPaging(
-            gamesVerticalPaging = listResultPagingItems,
+            gamesPagingItems = listResultPagingItems,
             scaffoldState = scaffoldState,
-            onGameVerticalClicked = { },
+            onGamePagingItemsClicked = { },
         )
     }
 }

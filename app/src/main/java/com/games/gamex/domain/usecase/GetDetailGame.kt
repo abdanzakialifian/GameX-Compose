@@ -1,17 +1,21 @@
 package com.games.gamex.domain.usecase
 
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.games.gamex.domain.interfaces.GameXRepository
 import com.games.gamex.domain.model.DetailGame
 import com.games.gamex.domain.model.ListResultItem
 import com.games.gamex.utils.UiState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.zip
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,7 +23,7 @@ import javax.inject.Singleton
 @Singleton
 class GetDetailGame @Inject constructor(private val gameXRepository: GameXRepository) {
     operator fun invoke(
-        gameId: String, isPaging: Boolean
+        gameId: String, isPaging: Boolean, viewModelScope: CoroutineScope
     ): Flow<Pair<UiState<DetailGame>, StateFlow<PagingData<ListResultItem>>>> = flow {
         emit(Pair(UiState.Loading, MutableStateFlow(PagingData.empty())))
         gameXRepository.getDetailGame(gameId)
@@ -42,7 +46,13 @@ class GetDetailGame @Inject constructor(private val gameXRepository: GameXReposi
             }.collect { gameDetail ->
                 val detailGame = gameDetail.first
                 val pagingDataGameSeries = gameDetail.second
-                emit(Pair(UiState.Success(detailGame), MutableStateFlow(pagingDataGameSeries)))
+                emit(
+                    Pair(
+                        UiState.Success(detailGame),
+                        flowOf(pagingDataGameSeries).cachedIn(viewModelScope)
+                            .stateIn(viewModelScope)
+                    )
+                )
             }
     }
 }
