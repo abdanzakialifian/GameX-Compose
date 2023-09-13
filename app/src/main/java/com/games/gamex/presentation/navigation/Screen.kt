@@ -1,7 +1,7 @@
 package com.games.gamex.presentation.navigation
 
 import com.games.gamex.utils.GAME_ID
-import com.games.gamex.utils.IS_PAGING
+import com.games.gamex.utils.NAVIGATE_FROM
 
 sealed class Screen(val route: String) {
     object SplashScreen : Screen("splash_screen")
@@ -10,8 +10,8 @@ sealed class Screen(val route: String) {
         fun createRoute(gameId: String): String = "detail_screen/$gameId"
     }
 
-    object GamesListScreen : Screen("games_list_screen/{$IS_PAGING}?$GAME_ID={$GAME_ID}") {
-        fun createRoute(gameId: String, isPaging: Boolean): String =
-            "games_list_screen/$isPaging?$GAME_ID=$gameId"
+    object GamesListScreen : Screen("games_list_screen/{$NAVIGATE_FROM}?$GAME_ID={$GAME_ID}") {
+        fun createRoute( navigateFrom: String, gameId: String = ""): String =
+            "games_list_screen/$navigateFrom?$GAME_ID=$gameId"
     }
 }

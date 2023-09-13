@@ -1,7 +1,12 @@
 package com.games.gamex.utils
 
+// navigation arguments
 const val GAME_ID = "gameId"
-const val IS_PAGING = "isPaging"
+const val NAVIGATE_FROM = "navigateFrom"
+
+// navigation key
+const val FROM_SIMILAR_GAMES = "fromSimilarGames"
+const val FROM_GAMES = "fromGames"
 
 // color palette constants
 const val VIBRANT =  "Vibrant"

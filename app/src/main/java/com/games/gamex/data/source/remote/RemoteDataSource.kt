@@ -28,15 +28,16 @@ class RemoteDataSource @Inject constructor(
     private val platformsPagingSource: PlatformsPagingSource,
     private val gameSeriesPagingSource: GameSeriesPagingSource,
 ) {
-    fun getAllGames(querySearch: String): Flow<PagingData<GamesResultItemResponse>> =
-        Pager(config = PagingConfig(
-            pageSize = 10,
-            initialLoadSize = 10,
-        ), pagingSourceFactory = {
-            gamesPagingSource.apply {
-                setQuerySearch(querySearch)
-            }
-        }).flow.flowOn(Dispatchers.IO)
+    fun getAllGames(
+        querySearch: String, isPaging: Boolean
+    ): Flow<PagingData<GamesResultItemResponse>> = Pager(config = PagingConfig(
+        pageSize = 10,
+        initialLoadSize = 10,
+    ), pagingSourceFactory = {
+        gamesPagingSource.apply {
+            setDataGame(querySearch, isPaging)
+        }
+    }).flow.flowOn(Dispatchers.IO)
 
     fun getAllGenres(): Flow<PagingData<GenresResultItemResponse>> = Pager(config = PagingConfig(
         pageSize = 10, initialLoadSize = 10
@@ -69,17 +70,13 @@ class RemoteDataSource @Inject constructor(
     }.flowOn(Dispatchers.IO)
 
     fun getGameSeriesPaging(
-        gameId: String,
-        isPaging: Boolean
-    ): Flow<PagingData<GamesResultItemResponse>> =
-        Pager(
-            config = PagingConfig(
-                pageSize = 10,
-                initialLoadSize = 10,
-            ), pagingSourceFactory = {
-                gameSeriesPagingSource.apply {
-                    setDataGameSeries(gameId, isPaging)
-                }
-            }
-        ).flow.flowOn(Dispatchers.IO)
+        gameId: String, isPaging: Boolean
+    ): Flow<PagingData<GamesResultItemResponse>> = Pager(config = PagingConfig(
+        pageSize = 10,
+        initialLoadSize = 10,
+    ), pagingSourceFactory = {
+        gameSeriesPagingSource.apply {
+            setDataGameSeries(gameId, isPaging)
+        }
+    }).flow.flowOn(Dispatchers.IO)
 }

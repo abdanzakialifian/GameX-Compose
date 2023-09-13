@@ -31,28 +31,29 @@ import com.games.gamex.domain.model.ListResultItem
 import com.games.gamex.presentation.component.GamesPaging
 import com.games.gamex.presentation.gameslist.viewmodel.GamesListViewModel
 import com.games.gamex.presentation.ui.theme.GameXTheme
+import com.games.gamex.utils.FROM_SIMILAR_GAMES
 import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun GamesListScreen(
     gameId: String,
-    isPaging: Boolean,
+    navigateFrom: String,
     onArrowBackClicked: () -> Unit,
     onSimilarGameClicked: (Int) -> Unit,
     viewModel: GamesListViewModel = hiltViewModel()
 ) {
     val scaffoldState = rememberScaffoldState()
 
-    val getAllGamesSeries = viewModel.getAllGamesSeries.collectAsLazyPagingItems()
+    val getAllGames =
+        if (navigateFrom == FROM_SIMILAR_GAMES) viewModel.getAllGamesSeries.collectAsLazyPagingItems() else viewModel.getAllGames.collectAsLazyPagingItems()
 
     LaunchedEffect(key1 = Unit) {
         viewModel.setGameId(gameId)
-        viewModel.setIsPaging(isPaging)
     }
 
     GamesListContent(
         scaffoldState = scaffoldState,
-        gamesSeries = getAllGamesSeries,
+        games = getAllGames,
         onArrowBackClicked = onArrowBackClicked,
         onSimilarGameClicked = onSimilarGameClicked
     )
@@ -61,42 +62,35 @@ fun GamesListScreen(
 @Composable
 fun GamesListContent(
     scaffoldState: ScaffoldState,
-    gamesSeries: LazyPagingItems<ListResultItem>,
+    games: LazyPagingItems<ListResultItem>,
     onArrowBackClicked: () -> Unit,
     onSimilarGameClicked: (Int) -> Unit,
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        modifier = Modifier.offset(x = (-10).dp),
-                        text = "Similar Games",
-                        fontFamily = FontFamily(
-                            Font(R.font.open_sans_bold)
-                        )
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onArrowBackClicked) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Icon Back"
-                        )
-                    }
-                },
-                backgroundColor = Color.White,
-                elevation = 0.dp
+    Scaffold(topBar = {
+        TopAppBar(title = {
+            Text(
+                modifier = Modifier.offset(x = (-10).dp),
+                text = "Similar Games",
+                fontFamily = FontFamily(
+                    Font(R.font.open_sans_bold)
+                )
             )
-        }
-    ) { paddingValues ->
+        }, navigationIcon = {
+            IconButton(onClick = onArrowBackClicked) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack, contentDescription = "Icon Back"
+                )
+            }
+        }, backgroundColor = Color.White, elevation = 0.dp
+        )
+    }) { paddingValues ->
         Column(
             modifier = Modifier
                 .background(Color.White)
                 .padding(paddingValues)
         ) {
             GamesPaging(
-                gamesPagingItems = gamesSeries,
+                gamesPagingItems = games,
                 scaffoldState = scaffoldState,
                 onGamePagingItemsClicked = onSimilarGameClicked
             )
@@ -114,8 +108,8 @@ fun GameListScreenPreview() {
 
         GamesListContent(
             scaffoldState = scaffoldState,
-            gamesSeries = listResultPagingItems,
-            onArrowBackClicked = { },
+            games = listResultPagingItems,
+            onArrowBackClicked = {},
             onSimilarGameClicked = {}
         )
     }

@@ -30,8 +30,10 @@ import com.games.gamex.presentation.navigation.Screen
 import com.games.gamex.presentation.splash.SplashScreen
 import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.presentation.ui.theme.Purple
+import com.games.gamex.utils.FROM_GAMES
+import com.games.gamex.utils.FROM_SIMILAR_GAMES
 import com.games.gamex.utils.GAME_ID
-import com.games.gamex.utils.IS_PAGING
+import com.games.gamex.utils.NAVIGATE_FROM
 import com.games.gamex.utils.VIBRANT
 import com.games.gamex.utils.fromHex
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -114,6 +116,11 @@ fun GameXApp() {
                                 )
                             )
                         },
+                        onSeeAllGamesClicked = {
+                            navController.navigate(
+                                Screen.GamesListScreen.createRoute(FROM_GAMES)
+                            )
+                        }
                     )
                 }
                 composable(
@@ -130,10 +137,11 @@ fun GameXApp() {
                             vibrant = colors[VIBRANT] ?: colorStringPurple
                         }, onImageBackClicked = {
                             navController.navigateUp()
-                        }, onSeeAllClicked = { gameId, isPaging ->
+                        }, onSeeAllClicked = { gameId ->
                             navController.navigate(
                                 Screen.GamesListScreen.createRoute(
-                                    gameId, isPaging
+                                    FROM_SIMILAR_GAMES,
+                                    gameId
                                 )
                             )
                         }, onSimilarGameClicked = { gameId ->
@@ -151,31 +159,37 @@ fun GameXApp() {
                 }
                 composable(
                     route = Screen.GamesListScreen.route,
-                    arguments = listOf(navArgument(GAME_ID) {
-                        type = NavType.StringType
-                    }, navArgument(IS_PAGING) {
-                        type = NavType.BoolType
-                    })
+                    arguments = listOf(
+                        navArgument(GAME_ID) {
+                            type = NavType.StringType
+                        }, navArgument(NAVIGATE_FROM) {
+                            type = NavType.StringType
+                        }
+                    )
                 ) { backStackEntry ->
+                    val navigateFrom = backStackEntry.arguments?.getString(NAVIGATE_FROM)
                     val gameId = backStackEntry.arguments?.getString(GAME_ID)
-                    val isPaging = backStackEntry.arguments?.getBoolean(IS_PAGING)
 
-                    GamesListScreen(gameId = gameId ?: "",
-                        isPaging = isPaging ?: false,
+                    GamesListScreen(
+                        gameId = gameId ?: "",
+                        navigateFrom = navigateFrom ?: "",
                         onArrowBackClicked = {
                             navController.navigateUp()
                         },
-                        onSimilarGameClicked = {
+                        onSimilarGameClicked = { gamesId ->
                             navController.navigate(
                                 Screen.DetailScreen.createRoute(
-                                    gameId.toString()
+                                    gamesId.toString()
                                 )
                             ) {
-                                popUpTo(Screen.HomeScreen.route) {
-                                    inclusive = false
+                                if (navigateFrom == FROM_SIMILAR_GAMES) {
+                                    popUpTo(Screen.HomeScreen.route) {
+                                        inclusive = false
+                                    }
                                 }
                             }
-                        })
+                        }
+                    )
                 }
             }
         }

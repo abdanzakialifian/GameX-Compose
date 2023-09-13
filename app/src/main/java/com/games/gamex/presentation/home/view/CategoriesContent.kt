@@ -101,14 +101,14 @@ fun CategoriesSection(
             text = stringResource(id = R.string.categories),
             color = Color.Black,
             fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
-            fontSize = 18.sp
+            fontSize = 16.sp
         )
 
         LazyRow(
             contentPadding = PaddingValues(horizontal = 20.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             state = scrollState,
-            modifier = Modifier.padding(top = 20.dp)
+            modifier = Modifier.padding(top = 14.dp)
         ) {
             items(
                 count = genresPaging.itemCount,
@@ -139,13 +139,13 @@ fun CategoriesSectionPlaceholder(modifier: Modifier = Modifier) {
             text = stringResource(id = R.string.categories),
             color = Color.Black,
             fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
-            fontSize = 18.sp
+            fontSize = 16.sp
         )
 
         LazyRow(
             contentPadding = PaddingValues(horizontal = 20.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
-            modifier = Modifier.padding(top = 20.dp)
+            modifier = Modifier.padding(top = 14.dp)
         ) {
             items(count = 10) {
                 ShimmerAnimation(shimmer = Shimmer.CATEGORIES_ITEM_PLACEHOLDER)

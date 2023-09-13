@@ -1,8 +1,12 @@
 package com.games.gamex.presentation.home.view
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -39,6 +43,7 @@ import com.games.gamex.domain.model.ListResultItem
 import com.games.gamex.presentation.component.GameItemHorizontal
 import com.games.gamex.presentation.component.ShimmerAnimation
 import com.games.gamex.presentation.ui.theme.GameXTheme
+import com.games.gamex.presentation.ui.theme.Purple
 import com.games.gamex.utils.Shimmer
 import com.games.gamex.utils.isScrollToEnd
 import kotlinx.coroutines.flow.flowOf
@@ -49,6 +54,7 @@ fun GamesHorizontalContent(
     gamesHorizontalPaging: LazyPagingItems<ListResultItem>,
     scaffoldState: ScaffoldState,
     onGameHorizontalClicked: (gameId: Int) -> Unit,
+    onSeeAllGamesClicked: () -> Unit,
     onFetchError: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -84,6 +90,7 @@ fun GamesHorizontalContent(
             scrollState = scrollState,
             gamesHorizontalPaging = gamesHorizontalPaging,
             onGameHorizontalClicked = onGameHorizontalClicked,
+            onSeeAllGamesClicked = onSeeAllGamesClicked,
             modifier = modifier
         )
 
@@ -96,25 +103,47 @@ fun GamesHorizontalSection(
     scrollState: LazyListState,
     gamesHorizontalPaging: LazyPagingItems<ListResultItem>,
     onGameHorizontalClicked: (gameId: Int) -> Unit,
+    onSeeAllGamesClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        Text(
-            modifier = Modifier.padding(horizontal = 20.dp),
-            text = stringResource(id = R.string.all_games),
-            color = Color.Black,
-            fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
-            fontSize = 18.sp
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(id = R.string.all_games),
+                color = Color.Black,
+                fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
+                fontSize = 16.sp
+            )
+
+            Text(
+                modifier = Modifier.clickable(
+                    // remove ripple click
+                    interactionSource = remember {
+                        MutableInteractionSource()
+                    }, indication = null
+                ) {
+                    onSeeAllGamesClicked()
+                },
+                text = stringResource(id = R.string.see_all),
+                color = Purple,
+                fontFamily = FontFamily(Font(resId = R.font.open_sans_semi_bold)),
+                fontSize = 14.sp
+            )
+        }
 
         LazyRow(
             contentPadding = PaddingValues(horizontal = 20.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             state = scrollState,
-            modifier = Modifier.padding(top = 20.dp)
+            modifier = Modifier.padding(top = 14.dp)
         ) {
-            items(
-                count = gamesHorizontalPaging.itemCount,
+            items(count = 10,
                 key = gamesHorizontalPaging.itemKey { data -> data.id ?: 0 }) { index ->
                 val game = gamesHorizontalPaging[index]
                 GameItemHorizontal(
@@ -149,16 +178,30 @@ fun GamesHorizontalSection(
 @Composable
 fun GamesHorizontalSectionPlaceholder(modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
-        Text(
-            modifier = Modifier.padding(horizontal = 20.dp),
-            text = stringResource(id = R.string.all_games),
-            color = Color.Black,
-            fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
-            fontSize = 18.sp
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(id = R.string.all_games),
+                color = Color.Black,
+                fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
+                fontSize = 16.sp
+            )
+
+            Text(
+                text = stringResource(id = R.string.see_all),
+                color = Purple,
+                fontFamily = FontFamily(Font(resId = R.font.open_sans_semi_bold)),
+                fontSize = 14.sp
+            )
+        }
 
         LazyRow(
-            contentPadding = PaddingValues(horizontal = 20.dp),
+            contentPadding = PaddingValues(horizontal = 14.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.padding(top = 20.dp)
         ) {
@@ -177,10 +220,10 @@ fun GamesHorizontalContentPreview() {
     val scaffoldState = rememberScaffoldState()
 
     GameXTheme {
-        GamesHorizontalContent(
-            gamesHorizontalPaging = listResultPagingItems,
+        GamesHorizontalContent(gamesHorizontalPaging = listResultPagingItems,
             scaffoldState = scaffoldState,
             onGameHorizontalClicked = { },
+            onSeeAllGamesClicked = {},
             onFetchError = { }
         )
     }

@@ -31,7 +31,7 @@ class HomeViewModel @Inject constructor(private val homeUseCaseWrapper: HomeUseC
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val searchAllGames: StateFlow<PagingData<ListResultItem>> =
         searchQuery.debounce(500L).flatMapLatest { searchQuery ->
-            homeUseCaseWrapper.getAllGames(searchQuery)
+            homeUseCaseWrapper.getAllGames(searchQuery, true)
         }.cachedIn(viewModelScope).stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
@@ -39,7 +39,7 @@ class HomeViewModel @Inject constructor(private val homeUseCaseWrapper: HomeUseC
         )
 
     val getAllGames: StateFlow<PagingData<ListResultItem>> =
-        homeUseCaseWrapper.getAllGames("").cachedIn(viewModelScope).stateIn(
+        homeUseCaseWrapper.getAllGames("", false).cachedIn(viewModelScope).stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
             initialValue = PagingData.empty()

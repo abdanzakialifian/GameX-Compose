@@ -50,6 +50,7 @@ fun HomeScreen(
     onGameHorizontalClicked: (gameId: Int) -> Unit,
     onPlatformClicked: () -> Unit,
     onGameVerticalClicked: (gameId: Int) -> Unit,
+    onSeeAllGamesClicked: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -81,6 +82,7 @@ fun HomeScreen(
         onGameHorizontalClicked = onGameHorizontalClicked,
         onPlatformClicked = onPlatformClicked,
         onGameVerticalClicked = onGameVerticalClicked,
+        onSeeAllGamesClicked = onSeeAllGamesClicked,
         modifier = modifier,
     )
 }
@@ -97,6 +99,7 @@ fun HomeContent(
     onGameHorizontalClicked: (gameId: Int) -> Unit,
     onPlatformClicked: () -> Unit,
     onGameVerticalClicked: (gameId: Int) -> Unit,
+    onSeeAllGamesClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isErrorCategories by remember {
@@ -166,6 +169,7 @@ fun HomeContent(
                                 gamesHorizontalPaging = gamesHorizontalPagingItems,
                                 scaffoldState = scaffoldState,
                                 onGameHorizontalClicked = onGameHorizontalClicked,
+                                onSeeAllGamesClicked = onSeeAllGamesClicked,
                                 onFetchError = { isError ->
                                     isErrorHorizontalGames = isError
                                 },
@@ -225,10 +229,11 @@ fun HomeScreenPreview() {
             searchGamePagingItems = listResultPagingItems,
             searchQuery = "",
             onValueChange = {},
-            onGenreClicked = { },
+            onGenreClicked = {},
             onGameHorizontalClicked = {},
-            onPlatformClicked = { },
-            onGameVerticalClicked = { }
+            onPlatformClicked = {},
+            onGameVerticalClicked = {},
+            onSeeAllGamesClicked = {}
         )
     }
 }

@@ -18,8 +18,10 @@ import javax.inject.Singleton
 @Singleton
 class GameXRepositoryImpl @Inject constructor(private val remoteDataSource: RemoteDataSource) :
     GameXRepository {
-    override fun getAllGames(querySearch: String): Flow<PagingData<ListResultItem>> =
-        remoteDataSource.getAllGames(querySearch).map { pagingData ->
+    override fun getAllGames(
+        querySearch: String, isPaging: Boolean
+    ): Flow<PagingData<ListResultItem>> =
+        remoteDataSource.getAllGames(querySearch, isPaging).map { pagingData ->
             pagingData.map { map ->
                 map.mapGamesResultItemResponseToListResultItem()
             }

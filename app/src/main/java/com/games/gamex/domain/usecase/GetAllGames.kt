@@ -9,6 +9,6 @@ import javax.inject.Singleton
 
 @Singleton
 class GetAllGames @Inject constructor(private val gameXRepository: GameXRepository) {
-    operator fun invoke(querySearch: String): Flow<PagingData<ListResultItem>> =
-        gameXRepository.getAllGames(querySearch)
+    operator fun invoke(querySearch: String, isPaging: Boolean): Flow<PagingData<ListResultItem>> =
+        gameXRepository.getAllGames(querySearch, isPaging)
 }

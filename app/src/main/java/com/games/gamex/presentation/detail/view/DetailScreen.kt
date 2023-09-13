@@ -92,7 +92,7 @@ fun DetailScreen(
     gameId: String,
     onColorPalette: (Map<String, String>) -> Unit,
     onImageBackClicked: () -> Unit,
-    onSeeAllClicked: (String, Boolean) -> Unit,
+    onSeeAllClicked: (String) -> Unit,
     onSimilarGameClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DetailViewModel = hiltViewModel(),
@@ -145,7 +145,7 @@ fun DetailScreen(
         },
         onImageBackClick = onImageBackClicked,
         onSeeAllClicked = {
-            onSeeAllClicked(gameId, true)
+            onSeeAllClicked(gameId)
         },
         onSimilarGameClicked = onSimilarGameClicked,
         modifier = modifier
@@ -616,7 +616,12 @@ fun DetailSimilarGames(
 
                     if (gameSeriesPagingItems.itemCount > 5) {
                         Text(
-                            modifier = Modifier.clickable { onSeeAllClicked() },
+                            modifier = Modifier.clickable(
+                                // remove ripple click
+                                interactionSource = remember {
+                                    MutableInteractionSource()
+                                }, indication = null
+                            ) { onSeeAllClicked() },
                             text = stringResource(id = R.string.see_all),
                             fontFamily = FontFamily(
                                 Font(R.font.open_sans_semi_bold)

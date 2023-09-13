@@ -6,7 +6,7 @@ import com.games.gamex.domain.model.ListResultItem
 import kotlinx.coroutines.flow.Flow
 
 interface GameXRepository {
-    fun getAllGames(querySearch: String): Flow<PagingData<ListResultItem>>
+    fun getAllGames(querySearch: String, isPaging: Boolean): Flow<PagingData<ListResultItem>>
     fun getAllGameGenres(): Flow<PagingData<ListResultItem>>
     fun getAllGamePlatforms(): Flow<PagingData<ListResultItem>>
     fun getDetailGame(gameId: String): Flow<DetailGame>
