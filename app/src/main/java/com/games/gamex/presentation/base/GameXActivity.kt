@@ -30,10 +30,11 @@ import com.games.gamex.presentation.navigation.Screen
 import com.games.gamex.presentation.splash.SplashScreen
 import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.presentation.ui.theme.Purple
-import com.games.gamex.utils.FROM_GAMES
-import com.games.gamex.utils.FROM_SIMILAR_GAMES
 import com.games.gamex.utils.GAME_ID
 import com.games.gamex.utils.NAVIGATE_FROM
+import com.games.gamex.utils.NAVIGATE_FROM_GAMES
+import com.games.gamex.utils.NAVIGATE_FROM_PLATFORMS
+import com.games.gamex.utils.NAVIGATE_FROM_SIMILAR_GAMES
 import com.games.gamex.utils.VIBRANT
 import com.games.gamex.utils.fromHex
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -108,8 +109,15 @@ fun GameXApp() {
                                 )
                             )
                         },
-                        onPlatformClicked = { navController.navigate(Screen.DetailScreen.route) },
-                        onGameVerticalClicked = { gameId ->
+                        onPlatformClicked = { platformId ->
+                            navController.navigate(
+                                Screen.GamesListScreen.createRoute(
+                                    NAVIGATE_FROM_PLATFORMS,
+                                    platformId.toString()
+                                )
+                            )
+                        },
+                        onGamePagingItemsClicked = { gameId ->
                             navController.navigate(
                                 Screen.DetailScreen.createRoute(
                                     gameId.toString()
@@ -118,7 +126,7 @@ fun GameXApp() {
                         },
                         onSeeAllGamesClicked = {
                             navController.navigate(
-                                Screen.GamesListScreen.createRoute(FROM_GAMES)
+                                Screen.GamesListScreen.createRoute(NAVIGATE_FROM_GAMES)
                             )
                         }
                     )
@@ -140,8 +148,7 @@ fun GameXApp() {
                         }, onSeeAllClicked = { gameId ->
                             navController.navigate(
                                 Screen.GamesListScreen.createRoute(
-                                    FROM_SIMILAR_GAMES,
-                                    gameId
+                                    NAVIGATE_FROM_SIMILAR_GAMES, gameId
                                 )
                             )
                         }, onSimilarGameClicked = { gameId ->
@@ -182,7 +189,7 @@ fun GameXApp() {
                                     gamesId.toString()
                                 )
                             ) {
-                                if (navigateFrom == FROM_SIMILAR_GAMES) {
+                                if (navigateFrom == NAVIGATE_FROM_SIMILAR_GAMES) {
                                     popUpTo(Screen.HomeScreen.route) {
                                         inclusive = false
                                     }

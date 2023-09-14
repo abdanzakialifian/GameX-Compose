@@ -19,22 +19,27 @@ import javax.inject.Singleton
 class GameXRepositoryImpl @Inject constructor(private val remoteDataSource: RemoteDataSource) :
     GameXRepository {
     override fun getAllGames(
-        querySearch: String, isPaging: Boolean
+        querySearch: String,
+        isPaging: Boolean,
     ): Flow<PagingData<ListResultItem>> =
-        remoteDataSource.getAllGames(querySearch, isPaging).map { pagingData ->
-            pagingData.map { map ->
-                map.mapGamesResultItemResponseToListResultItem()
+        remoteDataSource.getAllGames(
+            querySearch = querySearch,
+            isPaging = isPaging,
+        )
+            .map { pagingData ->
+                pagingData.map { map ->
+                    map.mapGamesResultItemResponseToListResultItem()
+                }
             }
-        }
 
-    override fun getAllGameGenres(): Flow<PagingData<ListResultItem>> =
+    override fun getAllGenres(): Flow<PagingData<ListResultItem>> =
         remoteDataSource.getAllGenres().map { pagingData ->
             pagingData.map { map ->
                 map.mapGenresResultItemResponseToListResultItem()
             }
         }
 
-    override fun getAllGamePlatforms(): Flow<PagingData<ListResultItem>> =
+    override fun getAllPlatforms(): Flow<PagingData<ListResultItem>> =
         remoteDataSource.getAllPlatforms().map { pagingData ->
             pagingData.map { map ->
                 map.mapPlatformsResultItemResponseToListResultItem()
@@ -65,4 +70,12 @@ class GameXRepositoryImpl @Inject constructor(private val remoteDataSource: Remo
                 map.mapGamesResultItemResponseToListResultItem()
             }
         }
+
+    override fun getGamePlatforms(platformId: Int): Flow<PagingData<ListResultItem>> =
+        remoteDataSource.getGamePlatforms(platformId)
+            .map { pagingData ->
+                pagingData.map { map ->
+                    map.mapGamesResultItemResponseToListResultItem()
+                }
+            }
 }

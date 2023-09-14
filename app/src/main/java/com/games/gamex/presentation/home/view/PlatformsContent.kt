@@ -48,7 +48,7 @@ import kotlinx.coroutines.launch
 fun PlatformsContent(
     platformsPaging: LazyPagingItems<ListResultItem>,
     scaffoldState: ScaffoldState,
-    onPlatformClicked: () -> Unit,
+    onPlatformClicked: (Int) -> Unit,
     onFetchError: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -94,7 +94,7 @@ fun PlatformsContent(
 fun PlatformsSection(
     scrollState: LazyListState,
     platformsPaging: LazyPagingItems<ListResultItem>,
-    onPlatformClicked: () -> Unit,
+    onPlatformClicked: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -110,18 +110,22 @@ fun PlatformsSection(
             contentPadding = PaddingValues(horizontal = 20.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             state = scrollState,
-            modifier = Modifier.padding(top = 14.dp, bottom = 40.dp)
+            modifier = Modifier.padding(top = 14.dp, bottom = 20.dp)
         ) {
             items(
                 count = platformsPaging.itemCount,
                 key = platformsPaging.itemKey { data -> data.id ?: 0 }) { index ->
                 val platform = platformsPaging[index]
-                PlatformItem(
-                    image = platform?.image ?: "",
-                    name = platform?.name ?: "",
-                    totalGames = platform?.gamesCount ?: 0,
-                    onItemClicked = onPlatformClicked
-                )
+                if(platform?.id != 1) {
+                    PlatformItem(
+                        image = platform?.image ?: "",
+                        name = platform?.name ?: "",
+                        totalGames = platform?.gamesCount ?: 0,
+                        onItemClicked = {
+                            onPlatformClicked(platform?.id ?: 0)
+                        }
+                    )
+                }
             }
 
             // load more (pagination)
@@ -160,7 +164,7 @@ fun PlatformsSectionPlaceholder(modifier: Modifier = Modifier) {
         LazyRow(
             contentPadding = PaddingValues(horizontal = 20.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
-            modifier = Modifier.padding(top = 14.dp, bottom = 40.dp)
+            modifier = Modifier.padding(top = 14.dp, bottom = 20.dp)
         ) {
             items(count = 10) {
                 ShimmerAnimation(shimmer = Shimmer.PLATFORM_ITEM_PLACEHOLDER)

@@ -48,8 +48,8 @@ import kotlinx.coroutines.flow.flowOf
 fun HomeScreen(
     onGenreClicked: () -> Unit,
     onGameHorizontalClicked: (gameId: Int) -> Unit,
-    onPlatformClicked: () -> Unit,
-    onGameVerticalClicked: (gameId: Int) -> Unit,
+    onPlatformClicked: (Int) -> Unit,
+    onGamePagingItemsClicked: (gameId: Int) -> Unit,
     onSeeAllGamesClicked: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
@@ -81,7 +81,7 @@ fun HomeScreen(
         onGenreClicked = onGenreClicked,
         onGameHorizontalClicked = onGameHorizontalClicked,
         onPlatformClicked = onPlatformClicked,
-        onGameVerticalClicked = onGameVerticalClicked,
+        onGamePagingItemsClicked = onGamePagingItemsClicked,
         onSeeAllGamesClicked = onSeeAllGamesClicked,
         modifier = modifier,
     )
@@ -97,8 +97,8 @@ fun HomeContent(
     onValueChange: (String) -> Unit,
     onGenreClicked: () -> Unit,
     onGameHorizontalClicked: (gameId: Int) -> Unit,
-    onPlatformClicked: () -> Unit,
-    onGameVerticalClicked: (gameId: Int) -> Unit,
+    onPlatformClicked: (Int) -> Unit,
+    onGamePagingItemsClicked: (gameId: Int) -> Unit,
     onSeeAllGamesClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -190,7 +190,7 @@ fun HomeContent(
                     GamesPaging(
                         gamesPagingItems = searchGamePagingItems,
                         scaffoldState = scaffoldState,
-                        onGamePagingItemsClicked = onGameVerticalClicked,
+                        onGamePagingItemsClicked = onGamePagingItemsClicked,
                     )
                 }
             }
@@ -232,7 +232,7 @@ fun HomeScreenPreview() {
             onGenreClicked = {},
             onGameHorizontalClicked = {},
             onPlatformClicked = {},
-            onGameVerticalClicked = {},
+            onGamePagingItemsClicked = {},
             onSeeAllGamesClicked = {}
         )
     }

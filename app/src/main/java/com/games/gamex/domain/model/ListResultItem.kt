@@ -6,5 +6,6 @@ data class ListResultItem(
     val name: String? = null,
     val released: String? = null,
     val rating: Float? = null,
-    val gamesCount: Int? = null
+    val gamesCount: Int? = null,
+    val listPlatforms: List<Platform>? = null
 )

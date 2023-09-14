@@ -39,21 +39,22 @@ class HomeViewModel @Inject constructor(private val homeUseCaseWrapper: HomeUseC
         )
 
     val getAllGames: StateFlow<PagingData<ListResultItem>> =
-        homeUseCaseWrapper.getAllGames("", false).cachedIn(viewModelScope).stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = PagingData.empty()
-        )
+        homeUseCaseWrapper.getAllGames("", false).cachedIn(viewModelScope)
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = PagingData.empty()
+            )
 
     val getAllGameGenres: StateFlow<PagingData<ListResultItem>> =
-        homeUseCaseWrapper.getAllGameGenres().cachedIn(viewModelScope).stateIn(
+        homeUseCaseWrapper.getAllGenres().cachedIn(viewModelScope).stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
             initialValue = PagingData.empty()
         )
 
     val getAllGamePlatforms: StateFlow<PagingData<ListResultItem>> =
-        homeUseCaseWrapper.getAllGamePlatforms().cachedIn(viewModelScope).stateIn(
+        homeUseCaseWrapper.getAllPlatforms().cachedIn(viewModelScope).stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
             initialValue = PagingData.empty()
