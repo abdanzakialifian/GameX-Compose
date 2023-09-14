@@ -53,7 +53,7 @@ import kotlinx.coroutines.launch
 fun GamesHorizontalContent(
     gamesHorizontalPaging: LazyPagingItems<ListResultItem>,
     scaffoldState: ScaffoldState,
-    onGameHorizontalClicked: (gameId: Int) -> Unit,
+    onGameClicked: (gameId: Int) -> Unit,
     onSeeAllGamesClicked: () -> Unit,
     onFetchError: (Boolean) -> Unit,
     modifier: Modifier = Modifier
@@ -89,7 +89,7 @@ fun GamesHorizontalContent(
         is LoadState.NotLoading -> GamesHorizontalSection(
             scrollState = scrollState,
             gamesHorizontalPaging = gamesHorizontalPaging,
-            onGameHorizontalClicked = onGameHorizontalClicked,
+            onGameClicked =  onGameClicked,
             onSeeAllGamesClicked = onSeeAllGamesClicked,
             modifier = modifier
         )
@@ -102,7 +102,7 @@ fun GamesHorizontalContent(
 fun GamesHorizontalSection(
     scrollState: LazyListState,
     gamesHorizontalPaging: LazyPagingItems<ListResultItem>,
-    onGameHorizontalClicked: (gameId: Int) -> Unit,
+    onGameClicked: (gameId: Int) -> Unit,
     onSeeAllGamesClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -149,7 +149,7 @@ fun GamesHorizontalSection(
                 GameItemHorizontal(
                     image = game?.image ?: "",
                     title = game?.name ?: "",
-                    onItemClicked = { onGameHorizontalClicked(game?.id ?: 0) },
+                    onItemClicked = {  onGameClicked(game?.id ?: 0) },
                 )
             }
 
@@ -222,7 +222,7 @@ fun GamesHorizontalContentPreview() {
     GameXTheme {
         GamesHorizontalContent(gamesHorizontalPaging = listResultPagingItems,
             scaffoldState = scaffoldState,
-            onGameHorizontalClicked = { },
+            onGameClicked = { },
             onSeeAllGamesClicked = {},
             onFetchError = { }
         )

@@ -53,4 +53,11 @@ interface ApiService {
         @Query("page_size") pageSize: Int,
         @Query("platforms") search: Int
     ): Response<GamesResponse>
+
+    @GET("games")
+    suspend fun getGameGenres(
+        @Query("page") page: Int,
+        @Query("page_size") pageSize: Int,
+        @Query("genres") search: Int
+    ): Response<GamesResponse>
 }

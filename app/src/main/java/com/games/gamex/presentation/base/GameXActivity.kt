@@ -33,6 +33,7 @@ import com.games.gamex.presentation.ui.theme.Purple
 import com.games.gamex.utils.GAME_ID
 import com.games.gamex.utils.NAVIGATE_FROM
 import com.games.gamex.utils.NAVIGATE_FROM_GAMES
+import com.games.gamex.utils.NAVIGATE_FROM_GENRES
 import com.games.gamex.utils.NAVIGATE_FROM_PLATFORMS
 import com.games.gamex.utils.NAVIGATE_FROM_SIMILAR_GAMES
 import com.games.gamex.utils.VIBRANT
@@ -101,8 +102,15 @@ fun GameXApp() {
                 }
                 composable(route = Screen.HomeScreen.route) {
                     HomeScreen(
-                        onGenreClicked = { navController.navigate(Screen.DetailScreen.route) },
-                        onGameHorizontalClicked = { gameId ->
+                        onGenreClicked = { genreId ->
+                            navController.navigate(
+                                Screen.GamesListScreen.createRoute(
+                                    NAVIGATE_FROM_GENRES,
+                                    genreId.toString()
+                                )
+                            )
+                        },
+                        onGameClicked = { gameId ->
                             navController.navigate(
                                 Screen.DetailScreen.createRoute(
                                     gameId.toString()

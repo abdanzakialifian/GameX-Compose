@@ -8,16 +8,16 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GamePlatformsPagingSource @Inject constructor(private val apiService: ApiService) :
+class GameGenresPagingSource @Inject constructor(private val apiService: ApiService) :
     PagingSource<Int, GamesResultItemResponse>() {
 
-    private var platformId: Int = 0
+    private var categoryId: Int = 0
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GamesResultItemResponse> {
         val position = params.key ?: INITIAL_POSITION
 
         return try {
-            val response = apiService.getGamePlatforms(position, params.loadSize, platformId)
+            val response = apiService.getGameGenres(position, params.loadSize, categoryId)
             val responseBody = response.body()?.results ?: listOf()
             val next = response.body()?.next
 
@@ -45,8 +45,8 @@ class GamePlatformsPagingSource @Inject constructor(private val apiService: ApiS
                 ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
         }
 
-    fun setDataPlatform(platformId: Int) {
-        this.platformId = platformId
+    fun setDataCategory(categoryId: Int) {
+        this.categoryId = categoryId
     }
 
     companion object {

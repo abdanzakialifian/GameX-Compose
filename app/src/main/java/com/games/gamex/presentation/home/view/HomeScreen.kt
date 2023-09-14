@@ -46,8 +46,8 @@ import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun HomeScreen(
-    onGenreClicked: () -> Unit,
-    onGameHorizontalClicked: (gameId: Int) -> Unit,
+    onGenreClicked: (genreId: Int) -> Unit,
+    onGameClicked: (gameId: Int) -> Unit,
     onPlatformClicked: (Int) -> Unit,
     onGamePagingItemsClicked: (gameId: Int) -> Unit,
     onSeeAllGamesClicked: () -> Unit,
@@ -79,7 +79,7 @@ fun HomeScreen(
             viewModel.setSearchQuery(searchQuery = value)
         },
         onGenreClicked = onGenreClicked,
-        onGameHorizontalClicked = onGameHorizontalClicked,
+        onGameClicked = onGameClicked,
         onPlatformClicked = onPlatformClicked,
         onGamePagingItemsClicked = onGamePagingItemsClicked,
         onSeeAllGamesClicked = onSeeAllGamesClicked,
@@ -95,8 +95,8 @@ fun HomeContent(
     searchGamePagingItems: LazyPagingItems<ListResultItem>,
     searchQuery: String,
     onValueChange: (String) -> Unit,
-    onGenreClicked: () -> Unit,
-    onGameHorizontalClicked: (gameId: Int) -> Unit,
+    onGenreClicked: (genreId: Int) -> Unit,
+    onGameClicked: (gameId: Int) -> Unit,
     onPlatformClicked: (Int) -> Unit,
     onGamePagingItemsClicked: (gameId: Int) -> Unit,
     onSeeAllGamesClicked: () -> Unit,
@@ -168,7 +168,7 @@ fun HomeContent(
                             GamesHorizontalContent(
                                 gamesHorizontalPaging = gamesHorizontalPagingItems,
                                 scaffoldState = scaffoldState,
-                                onGameHorizontalClicked = onGameHorizontalClicked,
+                                onGameClicked =  onGameClicked,
                                 onSeeAllGamesClicked = onSeeAllGamesClicked,
                                 onFetchError = { isError ->
                                     isErrorHorizontalGames = isError
@@ -230,7 +230,7 @@ fun HomeScreenPreview() {
             searchQuery = "",
             onValueChange = {},
             onGenreClicked = {},
-            onGameHorizontalClicked = {},
+            onGameClicked = {},
             onPlatformClicked = {},
             onGamePagingItemsClicked = {},
             onSeeAllGamesClicked = {}

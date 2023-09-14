@@ -8,7 +8,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GetAllGamePlatforms @Inject constructor(private val gameXRepository: GameXRepository) {
-    operator fun invoke(platformId: Int): Flow<PagingData<ListResultItem>> =
-        gameXRepository.getGamePlatforms(platformId)
+class GetAllGameGenres @Inject constructor(private val gameXRepository: GameXRepository) {
+    operator fun invoke(genreId: Int): Flow<PagingData<ListResultItem>> =
+        gameXRepository.getGameGenres(genreId)
 }

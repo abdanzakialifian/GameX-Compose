@@ -8,6 +8,7 @@ const val NAVIGATE_FROM = "navigate_from"
 const val NAVIGATE_FROM_SIMILAR_GAMES = "navigate_from_similar_games"
 const val NAVIGATE_FROM_GAMES = "navigate_from_games"
 const val NAVIGATE_FROM_PLATFORMS = "navigate_from_platforms"
+const val NAVIGATE_FROM_GENRES = "navigate_from_genres"
 
 // color palette constants
 const val VIBRANT =  "Vibrant"

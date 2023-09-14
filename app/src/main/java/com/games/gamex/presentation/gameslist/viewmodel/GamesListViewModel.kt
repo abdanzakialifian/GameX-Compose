@@ -43,7 +43,16 @@ class GamesListViewModel @Inject constructor(private val gamesListWrapper: Games
 
     val getAllGamePlatforms: StateFlow<PagingData<ListResultItem>> =
         _gameId.flatMapLatest { platformId ->
-            gamesListWrapper.getAllGamePlatforms(platformId = platformId.toInt())
+            gamesListWrapper.getAllGamePlatforms(platformId.toInt())
+        }.cachedIn(viewModelScope).stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = PagingData.empty()
+        )
+
+    val getAllGameGenres: StateFlow<PagingData<ListResultItem>> =
+        _gameId.flatMapLatest { genreId ->
+            gamesListWrapper.getAllGameGenres(genreId.toInt())
         }.cachedIn(viewModelScope).stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),

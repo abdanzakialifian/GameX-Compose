@@ -3,6 +3,7 @@ package com.games.gamex.data.source.remote
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.games.gamex.data.source.remote.paging.GameGenresPagingSource
 import com.games.gamex.data.source.remote.paging.GamePlatformsPagingSource
 import com.games.gamex.data.source.remote.paging.GameSeriesPagingSource
 import com.games.gamex.data.source.remote.paging.GamesPagingSource
@@ -28,7 +29,8 @@ class RemoteDataSource @Inject constructor(
     private val genresPagingSource: GenresPagingSource,
     private val platformsPagingSource: PlatformsPagingSource,
     private val gameSeriesPagingSource: GameSeriesPagingSource,
-    private val gamePlatformsPagingSource: GamePlatformsPagingSource
+    private val gamePlatformsPagingSource: GamePlatformsPagingSource,
+    private val gameGenresPagingSource: GameGenresPagingSource
 ) {
     fun getAllGames(
         querySearch: String,
@@ -92,7 +94,17 @@ class RemoteDataSource @Inject constructor(
             initialLoadSize = 10,
         ), pagingSourceFactory = {
             gamePlatformsPagingSource.apply {
-                setDataGame(platformId)
+                setDataPlatform(platformId)
+            }
+        }).flow.flowOn(Dispatchers.IO)
+
+    fun getGameGenres(genreId: Int): Flow<PagingData<GamesResultItemResponse>> =
+        Pager(config = PagingConfig(
+            pageSize = 10,
+            initialLoadSize = 10,
+        ), pagingSourceFactory = {
+            gameGenresPagingSource.apply {
+                setDataCategory(genreId)
             }
         }).flow.flowOn(Dispatchers.IO)
 }

@@ -78,4 +78,12 @@ class GameXRepositoryImpl @Inject constructor(private val remoteDataSource: Remo
                     map.mapGamesResultItemResponseToListResultItem()
                 }
             }
+
+    override fun getGameGenres(genreId: Int): Flow<PagingData<ListResultItem>> =
+        remoteDataSource.getGameGenres(genreId)
+            .map { pagingData ->
+                pagingData.map { map ->
+                    map.mapGamesResultItemResponseToListResultItem()
+                }
+            }
 }

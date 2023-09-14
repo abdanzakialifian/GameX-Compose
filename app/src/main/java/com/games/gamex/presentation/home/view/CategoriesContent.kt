@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 fun CategoriesContent(
     genresPaging: LazyPagingItems<ListResultItem>,
     scaffoldState: ScaffoldState,
-    onGenreClicked: () -> Unit,
+    onGenreClicked: (genreId: Int) -> Unit,
     onFetchError: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -92,13 +92,13 @@ fun CategoriesContent(
 fun CategoriesSection(
     scrollState: LazyListState,
     genresPaging: LazyPagingItems<ListResultItem>,
-    onGenreClicked: () -> Unit,
+    onGenreClicked: (genreId: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         Text(
             modifier = Modifier.padding(horizontal = 20.dp),
-            text = stringResource(id = R.string.categories),
+            text = stringResource(id = R.string.genres),
             color = Color.Black,
             fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
             fontSize = 16.sp
@@ -117,7 +117,9 @@ fun CategoriesSection(
                 CategoriesItem(
                     category = genre?.name ?: "",
                     image = genre?.image ?: "",
-                    onItemClicked = onGenreClicked
+                    onItemClicked = {
+                        onGenreClicked(genre?.id ?: 0)
+                    }
                 )
             }
 
@@ -136,7 +138,7 @@ fun CategoriesSectionPlaceholder(modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         Text(
             modifier = Modifier.padding(horizontal = 20.dp),
-            text = stringResource(id = R.string.categories),
+            text = stringResource(id = R.string.genres),
             color = Color.Black,
             fontFamily = FontFamily(Font(resId = R.font.open_sans_bold)),
             fontSize = 16.sp

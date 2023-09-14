@@ -33,6 +33,7 @@ import com.games.gamex.presentation.component.GamesPaging
 import com.games.gamex.presentation.gameslist.viewmodel.GamesListViewModel
 import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.utils.NAVIGATE_FROM_GAMES
+import com.games.gamex.utils.NAVIGATE_FROM_PLATFORMS
 import com.games.gamex.utils.NAVIGATE_FROM_SIMILAR_GAMES
 import kotlinx.coroutines.flow.flowOf
 
@@ -49,7 +50,8 @@ fun GamesListScreen(
     val getAllGames = when (navigateFrom) {
         NAVIGATE_FROM_SIMILAR_GAMES -> viewModel.getAllGamesSeries.collectAsLazyPagingItems()
         NAVIGATE_FROM_GAMES -> viewModel.getAllGames.collectAsLazyPagingItems()
-        else -> viewModel.getAllGamePlatforms.collectAsLazyPagingItems()
+        NAVIGATE_FROM_PLATFORMS -> viewModel.getAllGamePlatforms.collectAsLazyPagingItems()
+        else -> viewModel.getAllGameGenres.collectAsLazyPagingItems()
     }
 
     LaunchedEffect(key1 = Unit) {
@@ -76,7 +78,8 @@ fun GamesListContent(
     val title = when (navigateFrom) {
         NAVIGATE_FROM_SIMILAR_GAMES -> stringResource(id = R.string.similar_games)
         NAVIGATE_FROM_GAMES -> stringResource(id = R.string.games)
-        else -> stringResource(id = R.string.platforms)
+        NAVIGATE_FROM_PLATFORMS -> stringResource(id = R.string.platforms)
+        else -> stringResource(id = R.string.genres)
     }
     Scaffold(
         backgroundColor = Color.White,
