@@ -210,6 +210,7 @@ fun DetailContent(
     )
 
     BottomSheetScaffold(
+        modifier = modifier,
         scaffoldState = bottomSheetScaffoldState,
         sheetElevation = 0.dp,
         sheetBackgroundColor = Color.Transparent,
@@ -226,7 +227,7 @@ fun DetailContent(
         // set initial bottom sheet height
         sheetPeekHeight = configuration.screenHeightDp.dp - 250.dp
     ) {
-        Box(modifier = modifier) {
+        Box {
             if (isPreview) {
                 Box(
                     modifier = Modifier
@@ -279,6 +280,7 @@ fun DetailInformation(
 ) {
     Column(
         modifier = modifier
+            .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .background(
                 shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp), color = Color.White

@@ -3,14 +3,19 @@ package com.games.gamex.presentation.home.view
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.BottomSheetScaffold
+import androidx.compose.material.BottomSheetState
+import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.Card
-import androidx.compose.material.Scaffold
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
+import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -87,6 +93,7 @@ fun HomeScreen(
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeContent(
     genresPagingItems: LazyPagingItems<ListResultItem>,
@@ -113,87 +120,102 @@ fun HomeContent(
     }
     val scaffoldState = rememberScaffoldState()
 
-    Scaffold(scaffoldState = scaffoldState) { paddingValues ->
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 60.dp)) {
-                Text(
-                    text = stringResource(id = R.string.welcome),
-                    color = Color.White,
-                    fontFamily = FontFamily(
-                        Font(resId = R.font.open_sans_bold)
-                    ),
-                    fontSize = 24.sp
-                )
-                Text(
-                    modifier = Modifier.padding(top = 4.dp),
-                    text = stringResource(id = R.string.welcome_sub_title),
-                    color = Color.White,
-                    fontFamily = FontFamily(
-                        Font(resId = R.font.open_sans_medium)
-                    ),
-                    fontSize = 16.sp
-                )
-                CustomSearch(
-                    modifier = Modifier.padding(top = 30.dp),
-                    value = searchQuery,
-                    hint = stringResource(id = R.string.search_game),
-                    onValueChange = { value ->
-                        onValueChange(value)
-                    }
-                )
-            }
+    val configuration = LocalConfiguration.current
+
+    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+        // set initial bottom sheet
+        bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
+    )
+
+    BottomSheetScaffold(
+        modifier = modifier,
+        scaffoldState = bottomSheetScaffoldState,
+        sheetElevation = 0.dp,
+        sheetBackgroundColor = Color.Transparent,
+        sheetContentColor = Color.Transparent,
+        sheetContent = {
             Card(
-                modifier = Modifier.fillMaxSize(),
-                shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
+                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
                 backgroundColor = Color.White
             ) {
-                if (searchQuery.isEmpty()) {
-                    if (isErrorCategories && isErrorHorizontalGames && isErrorPlatforms) {
-                        HomeErrorSection()
-                    } else {
-                        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                            CategoriesContent(
-                                genresPaging = genresPagingItems,
-                                scaffoldState = scaffoldState,
-                                onGenreClicked = onGenreClicked,
-                                onFetchError = { isError ->
-                                    isErrorCategories = isError
-                                },
-                                modifier = Modifier.padding(top = 20.dp)
-                            )
-                            GamesHorizontalContent(
-                                gamesHorizontalPaging = gamesHorizontalPagingItems,
-                                scaffoldState = scaffoldState,
-                                onGameClicked =  onGameClicked,
-                                onSeeAllGamesClicked = onSeeAllGamesClicked,
-                                onFetchError = { isError ->
-                                    isErrorHorizontalGames = isError
-                                },
-                                modifier = Modifier.padding(top = 20.dp)
-                            )
-                            PlatformsContent(
-                                platformsPaging = platformsPagingItems,
-                                scaffoldState = scaffoldState,
-                                onPlatformClicked = onPlatformClicked,
-                                onFetchError = { isError ->
-                                    isErrorPlatforms = isError
-                                },
-                                modifier = Modifier.padding(top = 20.dp)
-                            )
+                Column(
+                    modifier = Modifier
+                        .heightIn(max = configuration.screenHeightDp.dp - 115.dp)
+                ) {
+                    if (searchQuery.isEmpty()) {
+                        if (isErrorCategories && isErrorHorizontalGames && isErrorPlatforms) {
+                            HomeErrorSection()
+                        } else {
+                            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                                CategoriesContent(
+                                    genresPaging = genresPagingItems,
+                                    scaffoldState = scaffoldState,
+                                    onGenreClicked = onGenreClicked,
+                                    onFetchError = { isError ->
+                                        isErrorCategories = isError
+                                    },
+                                    modifier = Modifier.padding(top = 20.dp)
+                                )
+                                GamesHorizontalContent(
+                                    gamesHorizontalPaging = gamesHorizontalPagingItems,
+                                    scaffoldState = scaffoldState,
+                                    onGameClicked = onGameClicked,
+                                    onSeeAllGamesClicked = onSeeAllGamesClicked,
+                                    onFetchError = { isError ->
+                                        isErrorHorizontalGames = isError
+                                    },
+                                    modifier = Modifier.padding(top = 20.dp)
+                                )
+                                PlatformsContent(
+                                    platformsPaging = platformsPagingItems,
+                                    scaffoldState = scaffoldState,
+                                    onPlatformClicked = onPlatformClicked,
+                                    onFetchError = { isError ->
+                                        isErrorPlatforms = isError
+                                    },
+                                    modifier = Modifier.padding(top = 20.dp)
+                                )
+                            }
                         }
+                    } else {
+                        GamesPaging(
+                            gamesPagingItems = searchGamePagingItems,
+                            scaffoldState = scaffoldState,
+                            onGamePagingItemsClicked = onGamePagingItemsClicked,
+                        )
                     }
-                } else {
-                    GamesPaging(
-                        gamesPagingItems = searchGamePagingItems,
-                        scaffoldState = scaffoldState,
-                        onGamePagingItemsClicked = onGamePagingItemsClicked,
-                    )
                 }
             }
+        },
+        // set initial bottom sheet height
+        sheetPeekHeight = configuration.screenHeightDp.dp - 240.dp
+    ) {
+        Column(modifier = Modifier.padding(start = 20.dp, top = 40.dp, end = 20.dp)) {
+            Text(
+                text = stringResource(id = R.string.welcome),
+                color = Color.White,
+                fontFamily = FontFamily(
+                    Font(resId = R.font.open_sans_bold)
+                ),
+                fontSize = 24.sp
+            )
+            Text(
+                modifier = Modifier.padding(top = 4.dp),
+                text = stringResource(id = R.string.welcome_sub_title),
+                color = Color.White,
+                fontFamily = FontFamily(
+                    Font(resId = R.font.open_sans_medium)
+                ),
+                fontSize = 16.sp
+            )
+            CustomSearch(
+                modifier = Modifier.padding(top = 30.dp),
+                value = searchQuery,
+                hint = stringResource(id = R.string.search_game),
+                onValueChange = { value ->
+                    onValueChange(value)
+                }
+            )
         }
     }
 }
