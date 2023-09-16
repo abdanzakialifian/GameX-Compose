@@ -49,6 +49,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.games.gamex.R
 import com.games.gamex.domain.model.ListResultItem
 import com.games.gamex.presentation.detail.view.DetailContent
+import com.games.gamex.presentation.detail.view.DetailContentState
 import com.games.gamex.presentation.ui.theme.GameXTheme
 import com.games.gamex.presentation.ui.theme.Purple
 import com.games.gamex.presentation.ui.theme.WhiteHeavy
@@ -94,7 +95,7 @@ fun DetailContentInformationPlaceholder(brush: Brush, modifier: Modifier = Modif
         modifier = modifier
             .fillMaxSize()
             .padding(top = 250.dp),
-        shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
+        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
         backgroundColor = Color.White
     ) {
         Column(
@@ -461,13 +462,13 @@ fun DetailScreenLoadingPreview() {
         flowOf(PagingData.empty<ListResultItem>()).collectAsLazyPagingItems()
 
     GameXTheme {
-        DetailContent(
+        DetailContentState(
             uiState = UiState.Loading,
             gameSeriesPagingItems = listResultPagingItems,
             onImageUrl = {},
             onImageBackClick = {},
             onSeeAllClicked = {},
-            onSimilarGameClicked = {}
+            onSimilarGameClicked = {},
         )
     }
 }

@@ -27,12 +27,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Card
+import androidx.compose.material.BottomSheetScaffold
+import androidx.compose.material.BottomSheetState
+import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,6 +50,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -137,7 +142,7 @@ fun DetailScreen(
         }
     }
 
-    DetailContent(
+    DetailContentState(
         uiState = getDetailGameState,
         gameSeriesPagingItems = getGameSeriesPagingItems,
         onImageUrl = { url ->
@@ -152,8 +157,9 @@ fun DetailScreen(
     )
 }
 
+
 @Composable
-fun DetailContent(
+fun DetailContentState(
     uiState: UiState<DetailGame>,
     gameSeriesPagingItems: LazyPagingItems<ListResultItem>,
     onImageUrl: (String) -> Unit,
@@ -166,61 +172,99 @@ fun DetailContent(
     when (uiState) {
         is UiState.Loading -> ShimmerAnimation(shimmer = Shimmer.GAME_DETAIL_PLACEHOLDER)
 
-        is UiState.Success -> {
-            val data = uiState.data
+        is UiState.Success -> DetailContent(
+            data = uiState.data,
+            gameSeriesPagingItems = gameSeriesPagingItems,
+            onImageUrl = onImageUrl,
+            onImageBackClick = onImageBackClick,
+            onSeeAllClicked = onSeeAllClicked,
+            onSimilarGameClicked = onSimilarGameClicked,
+            isPreview = isPreview,
+            modifier = modifier
+        )
 
-            onImageUrl(data.backgroundImageAdditional ?: "")
+        is UiState.Error -> {}
+    }
+}
 
-            Box(modifier = modifier) {
-                if (isPreview) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp)
-                            .align(Alignment.TopCenter)
-                            .background(color = Color.LightGray)
-                    )
-                } else {
-                    AsyncImage(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp)
-                            .align(Alignment.TopCenter),
-                        model = data.backgroundImageAdditional,
-                        placeholder = ColorPainter(GreyPlaceholder),
-                        contentDescription = "Image Background",
-                        contentScale = ContentScale.Crop
-                    )
-                }
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun DetailContent(
+    data: DetailGame,
+    gameSeriesPagingItems: LazyPagingItems<ListResultItem>,
+    onImageUrl: (String) -> Unit,
+    onImageBackClick: () -> Unit,
+    onSeeAllClicked: () -> Unit,
+    onSimilarGameClicked: (Int) -> Unit,
+    isPreview: Boolean,
+    modifier: Modifier = Modifier,
+) {
 
+    onImageUrl(data.backgroundImageAdditional ?: "")
+
+    val configuration = LocalConfiguration.current
+
+    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+        // set initial bottom sheet
+        bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
+    )
+
+    BottomSheetScaffold(
+        scaffoldState = bottomSheetScaffoldState,
+        sheetElevation = 0.dp,
+        sheetBackgroundColor = Color.Transparent,
+        sheetContentColor = Color.Transparent,
+        sheetContent = {
+            DetailInformation(
+                data = data,
+                gameSeriesPagingItems = gameSeriesPagingItems,
+                onSeeAllClicked = onSeeAllClicked,
+                onSimilarGameClicked = onSimilarGameClicked,
+                isPreview = isPreview
+            )
+        },
+        // set initial bottom sheet height
+        sheetPeekHeight = configuration.screenHeightDp.dp - 250.dp
+    ) {
+        Box(modifier = modifier) {
+            if (isPreview) {
                 Box(
-                    Modifier
-                        .padding(start = 10.dp, top = 10.dp)
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(WhiteTransparent)
-                        .align(Alignment.TopStart)
-                        .clickable { onImageBackClick() }) {
-                    Icon(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(20.dp),
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back Button"
-                    )
-                }
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                        .align(Alignment.TopCenter)
+                        .background(color = Color.LightGray)
+                )
+            } else {
+                AsyncImage(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                        .align(Alignment.TopCenter),
+                    model = data.backgroundImageAdditional,
+                    placeholder = ColorPainter(GreyPlaceholder),
+                    contentDescription = "Image Background",
+                    contentScale = ContentScale.Crop
+                )
+            }
 
-                DetailInformation(
-                    data = data,
-                    gameSeriesPagingItems = gameSeriesPagingItems,
-                    onSeeAllClicked = onSeeAllClicked,
-                    onSimilarGameClicked = onSimilarGameClicked,
-                    isPreview = isPreview
+            Box(
+                Modifier
+                    .padding(start = 10.dp, top = 10.dp)
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(WhiteTransparent)
+                    .align(Alignment.TopStart)
+                    .clickable { onImageBackClick() }) {
+                Icon(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(20.dp),
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back Button"
                 )
             }
         }
-
-        is UiState.Error -> {}
     }
 }
 
@@ -233,44 +277,39 @@ fun DetailInformation(
     modifier: Modifier = Modifier,
     isPreview: Boolean = false,
 ) {
-    Card(
+    Column(
         modifier = modifier
-            .fillMaxSize()
-            .padding(top = 250.dp),
-        shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
-        backgroundColor = Color.White
+            .verticalScroll(rememberScrollState())
+            .background(
+                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp), color = Color.White
+            )
+            .padding(top = 20.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(top = 20.dp)
-        ) {
-            DetailInformationHeader(
-                genres = data.genres,
-                imageBackground = data.imageBackground,
-                name = data.name,
-                rating = data.rating,
-                isPreview = isPreview
-            )
+        DetailInformationHeader(
+            genres = data.genres,
+            imageBackground = data.imageBackground,
+            name = data.name,
+            rating = data.rating,
+            isPreview = isPreview
+        )
 
-            DetailInformationSubHeader(
-                publishers = data.publishers, released = data.released, metacritic = data.metacritic
-            )
+        DetailInformationSubHeader(
+            publishers = data.publishers, released = data.released, metacritic = data.metacritic
+        )
 
-            DetailImageScreenshot(images = data.images, isPreview = isPreview)
+        DetailImageScreenshot(images = data.images, isPreview = isPreview)
 
-            DetailGameOverview(
-                description = data.description,
-                modifier = Modifier.padding(20.dp),
-            )
+        DetailGameOverview(
+            description = data.description,
+            modifier = Modifier.padding(20.dp),
+        )
 
-            DetailSimilarGames(
-                gameSeriesPagingItems = gameSeriesPagingItems,
-                onSeeAllClicked = onSeeAllClicked,
-                onSimilarGameClicked = onSimilarGameClicked,
-                isPreview = isPreview
-            )
-        }
+        DetailSimilarGames(
+            gameSeriesPagingItems = gameSeriesPagingItems,
+            onSeeAllClicked = onSeeAllClicked,
+            onSimilarGameClicked = onSimilarGameClicked,
+            isPreview = isPreview
+        )
     }
 }
 
@@ -578,12 +617,9 @@ fun DetailSimilarGames(
                 )
 
                 Text(
-                    text = stringResource(id = R.string.see_all),
-                    fontFamily = FontFamily(
+                    text = stringResource(id = R.string.see_all), fontFamily = FontFamily(
                         Font(R.font.open_sans_semi_bold)
-                    ),
-                    color = Purple,
-                    fontSize = 14.sp
+                    ), color = Purple, fontSize = 14.sp
                 )
             }
 
@@ -607,11 +643,9 @@ fun DetailSimilarGames(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = stringResource(id = R.string.similar_games),
-                        fontFamily = FontFamily(
+                        text = stringResource(id = R.string.similar_games), fontFamily = FontFamily(
                             Font(R.font.open_sans_bold)
-                        ),
-                        fontSize = 16.sp
+                        ), fontSize = 16.sp
                     )
 
                     if (gameSeriesPagingItems.itemCount > 5) {
@@ -637,19 +671,16 @@ fun DetailSimilarGames(
                     contentPadding = PaddingValues(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(
-                        count = if (gameSeriesPagingItems.itemCount >= 5) 5 else gameSeriesPagingItems.itemCount,
+                    items(count = if (gameSeriesPagingItems.itemCount >= 5) 5 else gameSeriesPagingItems.itemCount,
                         key = gameSeriesPagingItems.itemKey { data ->
                             data.id ?: 0
                         }) { index ->
                         val game = gameSeriesPagingItems[index]
-                        GameItemHorizontal(
-                            image = game?.image ?: "",
+                        GameItemHorizontal(image = game?.image ?: "",
                             title = game?.name ?: "",
                             onItemClicked = {
                                 onSimilarGameClicked(game?.id ?: 0)
-                            }
-                        )
+                            })
                     }
                 }
             }
@@ -678,7 +709,7 @@ fun DetailScreenSuccessPreview() {
         flowOf(PagingData.empty<ListResultItem>()).collectAsLazyPagingItems()
 
     GameXTheme {
-        DetailContent(
+        DetailContentState(
             uiState = UiState.Success(detail),
             gameSeriesPagingItems = listResultPagingItems,
             onImageUrl = {},
