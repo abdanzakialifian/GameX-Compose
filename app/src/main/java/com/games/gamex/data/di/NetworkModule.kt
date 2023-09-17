@@ -57,7 +57,7 @@ class NetworkModule {
     private external fun gameApiKey(): String
 
     companion object {
-        // Used to load the 'myapplication' library on application startup.
+        // Used to load the 'native-lib.cpp' library on application startup.
         init {
             System.loadLibrary("native-lib.cpp")
         }
