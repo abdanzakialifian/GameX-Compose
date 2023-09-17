@@ -1,6 +1,6 @@
 package com.games.gamex.data.di
 
-import com.games.gamex.BuildConfig
+//import com.games.gamex.BuildConfig
 import com.games.gamex.data.source.remote.services.ApiService
 import dagger.Module
 import dagger.Provides
@@ -27,7 +27,7 @@ class NetworkModule {
                 // add query parameter key every request
                 val original = chain.request()
                 val originalHttpUrl = original.url
-                val apiKey = BuildConfig.GAME_API_KEY
+                val apiKey = gameApiKey()
                 val url = originalHttpUrl.newBuilder()
                     .addQueryParameter("key", apiKey)
                     .build()
@@ -52,5 +52,14 @@ class NetworkModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         return retrofit.create(ApiService::class.java)
+    }
+
+    private external fun gameApiKey(): String
+
+    companion object {
+        // Used to load the 'myapplication' library on application startup.
+        init {
+            System.loadLibrary("native-lib.cpp")
+        }
     }
 }

@@ -9,8 +9,8 @@ class GameXApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         // timber logging
-        if (BuildConfig.DEBUG) {
+//        if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
-        }
+//        }
     }
 }
